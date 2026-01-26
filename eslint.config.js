@@ -32,6 +32,12 @@ export default defineConfig([
       },
     },
     rules: {
+      'import/no-unresolved': [
+        'error',
+        {
+          ignore: ['^/'],
+        },
+      ],
       'import/order': [
         'error',
         {
@@ -41,6 +47,11 @@ export default defineConfig([
               pattern: 'react',
               group: 'external',
               position: 'before',
+            },
+            {
+              pattern: '@/*',
+              group: 'internal',
+              position: 'after',
             },
           ],
           pathGroupsExcludedImportTypes: ['react'],
