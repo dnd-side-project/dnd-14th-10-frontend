@@ -3,6 +3,8 @@ import { useState } from 'react';
 import viteLogo from '/vite.svg';
 
 import '@/App.css';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
 import reactLogo from '@/assets/react.svg';
 
 function App() {
@@ -26,6 +28,7 @@ function App() {
         </p>
       </div>
       <p className='read-the-docs'>Click on the Vite and React logos to learn more</p>
+      <ReactQueryDevtools />
     </>
   );
 }
