@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import viteLogo from '/vite.svg';
 
-import '@/App.css';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import reactLogo from '@/assets/react.svg';
