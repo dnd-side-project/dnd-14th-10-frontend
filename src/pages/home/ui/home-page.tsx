@@ -1,12 +1,13 @@
+import { Button } from '@/components/ui/button';
+
 function HomePage() {
   return (
     <div className='font-pretendard min-h-screen bg-gray-50 p-8'>
       <div className='mx-auto max-w-4xl space-y-8'>
-        <header className='space-y-2'>
+        <header>
           <h1 className='text-heading1 font-bold tracking-tight text-gray-900'>
             디자인 시스템 테스트
           </h1>
-          <p className='text-body1 text-gray-600'>Tailwind CSS v4 + Pretendard 폰트 적용 확인</p>
         </header>
 
         <section className='space-y-4'>
@@ -120,17 +121,20 @@ function HomePage() {
         </section>
 
         <section className='space-y-4'>
-          <h2 className='text-heading2 font-bold text-gray-800'>Button Examples</h2>
+          <h2 className='text-heading2 font-bold text-gray-800'>Button Examples (shadcn)</h2>
           <div className='flex flex-wrap gap-3'>
-            <button className='bg-primary-600 text-body1 hover:bg-primary-700 rounded-lg px-6 py-3 font-medium text-white transition-colors'>
-              Primary Button
-            </button>
-            <button className='bg-secondary-600 text-body1 hover:bg-secondary-700 rounded-lg px-6 py-3 font-medium text-white transition-colors'>
-              Secondary Button
-            </button>
-            <button className='text-body1 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50'>
-              Outline Button
-            </button>
+            <Button>Primary Button</Button>
+            <Button variant='secondary'>Secondary Button</Button>
+            <Button variant='outline'>Outline Button</Button>
+            <Button variant='destructive'>Destructive Button</Button>
+            <Button variant='ghost'>Ghost Button</Button>
+            <Button variant='link'>Link Button</Button>
+          </div>
+          <div className='flex flex-wrap items-center gap-3'>
+            <Button size='lg'>Large</Button>
+            <Button size='default'>Default</Button>
+            <Button size='sm'>Small</Button>
+            <Button size='xs'>Extra Small</Button>
           </div>
         </section>
       </div>

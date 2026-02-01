@@ -1,10 +1,9 @@
 @import 'tailwindcss';
 @import 'pretendard/dist/web/variable/pretendardvariable.css';
+@import 'tw-animate-css';
 
-/* 디자인 시스템 테마 - Tailwind CSS v4 */
+/* 디자인 시스템 테마 */
 @theme {
-  /* 컬러 팔레트 */
-
   /* 프라이머리 컬러 */
   --color-primary-700: #7f5d38;
   --color-primary-600: #917454;
@@ -49,13 +48,54 @@
   --color-warning-light: #ffa68a;
   --color-warning-disabled: #fe4e1533;
 
-  /* 타이포그래피 */
+  /* shadcn 시맨틱 컬러 - 배경 & 전경 */
+  --color-background: #ffffff;
+  --color-foreground: #171719;
+  --color-card: #ffffff;
+  --color-card-foreground: #171719;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #171719;
+
+  /* shadcn 시맨틱 컬러 - 프라이머리 & 세컨더리 */
+  --color-primary: #7f5d38;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #3d8ea4;
+  --color-secondary-foreground: #ffffff;
+
+  /* shadcn 시맨틱 컬러 - 뮤트 & 액센트 */
+  --color-muted: #f1f3f5;
+  --color-muted-foreground: #5e656c;
+  --color-accent: #ddd7cf;
+  --color-accent-foreground: #7f5d38;
+
+  /* shadcn 시맨틱 컬러 - 경고 & 입력 */
+  --color-destructive: #fe4e15;
+  --color-border: #ced4da;
+  --color-input: #ced4da;
+  --color-ring: #a38b71;
+
+  /* shadcn 시맨틱 컬러 - 차트 */
+  --color-chart-1: #7f5d38;
+  --color-chart-2: #3d8ea4;
+  --color-chart-3: #a38b71;
+  --color-chart-4: #78b0c0;
+  --color-chart-5: #5e656c;
+
+  /* shadcn 시맨틱 컬러 - 사이드바 */
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #171719;
+  --color-sidebar-primary: #7f5d38;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #ddd7cf;
+  --color-sidebar-accent-foreground: #7f5d38;
+  --color-sidebar-border: #dee2e6;
+  --color-sidebar-ring: #a38b71;
 
   /* 폰트 패밀리 */
   --font-pretendard:
     'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
-  /* 폰트 크기 및 행간 - Figma Design System 기준 */
+  /* 폰트 크기 및 행간 */
   --text-heading1: 2rem;
   --text-heading1--line-height: 1.3;
   --text-heading2: 1.5rem;
@@ -78,7 +118,7 @@
   /* 자간 */
   --tracking-tight: -0.01em;
 
-  /* 스페이싱 (Gap) - Figma Design System 기준 */
+  /* 스페이싱 */
   --spacing-2: 0.25rem;
   --spacing-4: 0.75rem;
   --spacing-6: 1.25rem;
@@ -93,46 +133,11 @@
   --radius-2xl: 1.5rem;
 }
 
-/* 루트 스타일 (시맨틱 컬러 & 기본 스타일) */
+/* 기본 스타일 */
 :root {
-  /* 시맨틱 컬러 - Figma Design System 기준 */
-
-  /* 배경 (Background) */
-  --background-surface: #ffffff;
-  --background-base: var(--color-gray-50);
-
-  /* 테두리 (Border) */
-  --border-normal: var(--color-gray-500);
-  --border-strong: var(--color-gray-900);
-  --border-active: var(--color-gray-800);
-  --border-disabled: var(--color-gray-400);
-  --border-disabled-inverse: var(--color-gray-200);
-  --border-active-inverse: var(--color-gray-100);
-  --border-strong-inverse: var(--color-gray-50);
-
-  /* 텍스트 (Text) */
-  --text-primary: var(--color-gray-950);
-  --text-secondary: var(--color-gray-800);
-  --text-tertiary: var(--color-gray-700);
-  --text-quaternary: var(--color-gray-500);
-  --text-disabled: var(--color-gray-400);
-  --text-primary-inverse: var(--color-gray-50);
-
-  /* 아이콘 (Icon) */
-  --icon-primary: var(--color-gray-950);
-  --icon-secondary: var(--color-gray-800);
-  --icon-tertiary: var(--color-gray-700);
-  --icon-quaternary: var(--color-gray-500);
-  --icon-disabled: var(--color-gray-400);
-  --icon-primary-inverse: var(--color-gray-50);
-
-  /* 기본 스타일 */
   font-family: var(--font-pretendard);
   line-height: 1.5;
   font-weight: 400;
-  color: var(--text-primary);
-  background-color: var(--background-surface);
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -142,4 +147,17 @@
 body {
   margin: 0;
   min-height: 100vh;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
 }
