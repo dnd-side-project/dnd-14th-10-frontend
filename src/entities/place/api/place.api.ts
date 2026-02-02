@@ -20,7 +20,3 @@ export const getRecommendedPlaces = () => {
   return apiClient.get('/places/recommend');
 };
 
-// POST /api/places/{place-id}/wish (찜하기 토글)
-export const toggleWishlist = (placeId: string) => {
-  return apiClient.post(`/places/${placeId}/wish`);
-};

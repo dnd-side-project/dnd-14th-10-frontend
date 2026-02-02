@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { toggleWishlist } from '@/entities/place/api/place.api';
+import { toggleWishlist } from '../api/toggle-wishlist.api';
 
 export const useToggleWishlistMutation = () => {
   return useMutation({
