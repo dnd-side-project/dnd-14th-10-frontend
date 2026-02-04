@@ -26,8 +26,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Set build time
+        run: echo "VITE_BUILD_TIME=$(date)" >> $GITHUB_ENV
+
       - name: Build project
         run: pnpm run build
+        env:
+          VITE_BUILD_TIME: ${{ env.VITE_BUILD_TIME }}
 
       - name: Deploy to NHN Cloud via SSH
         uses: appleboy/scp-action@master
