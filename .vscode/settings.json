@@ -4,29 +4,5 @@
   // 파일 저장 시 자동으로 포맷팅 적용
   "editor.formatOnSave": true,
   // 모든 파일의 기본 포맷터를 Prettier로 설정
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  // TypeScript 파일 포맷터
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  // TypeScript React 파일(.tsx) 포맷터
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  // JavaScript 파일 포맷터
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  // JavaScript React 파일(.jsx) 포맷터
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  // JSON 파일 포맷터
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  // CSS 파일 포맷터
-  "[css]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
