@@ -4,6 +4,7 @@ import { apiClient } from '@/shared/api/client';
 
 function HomePage() {
   const [healthStatus, setHealthStatus] = useState('checking');
+  const buildTime = import.meta.env.VITE_BUILD_TIME;
 
   useEffect(() => {
     apiClient
@@ -22,6 +23,7 @@ function HomePage() {
     <div>
       <h1>home입니다.</h1>
       <p>Health Check Status: {healthStatus}</p>
+      {buildTime && <p>Last Build Time: {buildTime}</p>}
     </div>
   );
 }
