@@ -1,5 +1,31 @@
+import { useEffect, useState } from 'react';
+
+import { apiClient } from '@/shared/api/client';
+
 function HomePage() {
-  return <div>home입니다.</div>;
+  const [healthStatus, setHealthStatus] = useState('checking');
+  const buildTime = import.meta.env.VITE_BUILD_TIME;
+
+  useEffect(() => {
+    apiClient
+      .get(`${import.meta.env.VITE_API_BASE_URL}/api/actuator/health`)
+      .then((response) => {
+        console.log('Health check successful:', response.data);
+        setHealthStatus(response.data.status || 'successful');
+      })
+      .catch((error) => {
+        console.error('Health check failed:', error);
+        setHealthStatus('failed');
+      });
+  }, []);
+
+  return (
+    <div>
+      <h1>home입니다.</h1>
+      <p>Health Check Status: {healthStatus}</p>
+      {buildTime && <p>Last Build Time: {buildTime}</p>}
+    </div>
+  );
 }
 
 export default HomePage;

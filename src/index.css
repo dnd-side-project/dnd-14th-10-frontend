@@ -1,70 +1,164 @@
 @import 'tailwindcss';
+@import 'pretendard/dist/web/variable/pretendardvariable.css';
+@import 'tw-animate-css';
 
+/* 디자인 시스템 테마 */
+@theme {
+  /* 프라이머리 컬러 */
+  --color-primary-700: #7f5d38;
+  --color-primary-600: #917454;
+  --color-primary-500: #a38b71;
+  --color-primary-400: #b4a18d;
+  --color-primary-300: #c6b8a9;
+  --color-primary-200: #d2c8bd;
+  --color-primary-100: #ddd7cf;
+  --color-primary-50: #eae6e3;
+
+  /* 세컨더리 컬러 */
+  --color-secondary-700: #3d8ea4;
+  --color-secondary-600: #64a5b6;
+  --color-secondary-500: #78b0c0;
+  --color-secondary-400: #8bbbc8;
+  --color-secondary-300: #9ec7d2;
+  --color-secondary-200: #b1d2db;
+  --color-secondary-100: #c5dee4;
+  --color-secondary-50: #e2eef2;
+
+  /* 그레이스케일 */
+  --color-gray-950: #171719;
+  --color-gray-900: #212529;
+  --color-gray-800: #343a40;
+  --color-gray-700: #495057;
+  --color-gray-600: #5e656c;
+  --color-gray-500: #868e96;
+  --color-gray-400: #adb5bd;
+  --color-gray-300: #ced4da;
+  --color-gray-200: #dee2e6;
+  --color-gray-150: #e9ecef;
+  --color-gray-100: #f1f3f5;
+  --color-gray-50: #f8f9fa;
+
+  /* 시맨틱 컬러 - Positive (성공) */
+  --color-positive-default: #00d99f;
+  --color-positive-light: #83fcc9;
+  --color-positive-disabled: #00d99f33;
+
+  /* 시맨틱 컬러 - Warning (경고) */
+  --color-warning-default: #fe4e15;
+  --color-warning-light: #ffa68a;
+  --color-warning-disabled: #fe4e1533;
+
+  /* shadcn 시맨틱 컬러 - 배경 & 전경 */
+  --color-background: #ffffff;
+  --color-foreground: #171719;
+  --color-card: #ffffff;
+  --color-card-foreground: #171719;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #171719;
+
+  /* shadcn 시맨틱 컬러 - 프라이머리 & 세컨더리 */
+  --color-primary: #7f5d38;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #3d8ea4;
+  --color-secondary-foreground: #ffffff;
+
+  /* shadcn 시맨틱 컬러 - 뮤트 & 액센트 */
+  --color-muted: #f1f3f5;
+  --color-muted-foreground: #5e656c;
+  --color-accent: #ddd7cf;
+  --color-accent-foreground: #7f5d38;
+
+  /* shadcn 시맨틱 컬러 - 경고 & 입력 */
+  --color-destructive: #fe4e15;
+  --color-border: #ced4da;
+  --color-input: #ced4da;
+  --color-ring: #a38b71;
+
+  /* shadcn 시맨틱 컬러 - 차트 */
+  --color-chart-1: #7f5d38;
+  --color-chart-2: #3d8ea4;
+  --color-chart-3: #a38b71;
+  --color-chart-4: #78b0c0;
+  --color-chart-5: #5e656c;
+
+  /* shadcn 시맨틱 컬러 - 사이드바 */
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #171719;
+  --color-sidebar-primary: #7f5d38;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #ddd7cf;
+  --color-sidebar-accent-foreground: #7f5d38;
+  --color-sidebar-border: #dee2e6;
+  --color-sidebar-ring: #a38b71;
+
+  /* 폰트 패밀리 */
+  --font-pretendard:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* 폰트 크기 및 행간 */
+  --text-heading1: 2rem;
+  --text-heading1--line-height: 1.3;
+  --text-heading2: 1.5rem;
+  --text-heading2--line-height: 1.3;
+  --text-heading3: 1.375rem;
+  --text-heading3--line-height: 1.3;
+  --text-heading4: 1.125rem;
+  --text-heading4--line-height: 1.3;
+  --text-body1: 1rem;
+  --text-body1--line-height: 1.3;
+  --text-body2: 0.875rem;
+  --text-body2--line-height: 1.3;
+  --text-caption1: 0.8125rem;
+  --text-caption1--line-height: 1.3;
+  --text-caption2: 0.75rem;
+  --text-caption2--line-height: 1.3;
+  --text-caption3: 0.625rem;
+  --text-caption3--line-height: 1.3;
+
+  /* 자간 */
+  --tracking-tight: -0.01em;
+
+  /* 스페이싱 */
+  --spacing-2: 0.25rem;
+  --spacing-4: 0.75rem;
+  --spacing-6: 1.25rem;
+  --spacing-8: 2rem;
+
+  /* 테두리 둥글기 */
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+}
+
+/* 기본 스타일 */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--font-pretendard);
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  margin: 0 auto;
   min-height: 100vh;
+  max-width: 390px;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@layer base {
+  * {
+    @apply border-border;
   }
-  a:hover {
-    color: #747bff;
+  body {
+    @apply bg-background text-foreground;
   }
-  button {
-    background-color: #f9f9f9;
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
   }
 }
