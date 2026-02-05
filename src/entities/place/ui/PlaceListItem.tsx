@@ -22,7 +22,7 @@ export function PlaceListItem({
       {/* 상단 정보 영역 */}
       <div className='flex flex-col gap-[8px] px-5'>
         {/* 이름 + 위치 */}
-        <div className='flex items-center gap-2'>
+        <div className='flex items-center gap-[16px]'>
           <span className='text-body1 font-bold tracking-tight text-gray-950'>{name}</span>
           <span className='text-caption2 tracking-tight text-gray-600'>{location}</span>
         </div>
