@@ -39,8 +39,8 @@ function MapPage() {
   }, [currentLocation]);
 
   return (
-    <div className='w-screen h-screen flex flex-col'>
-      <div className='p-4 bg-white shadow-md z-10'>
+    <div className='flex h-screen w-screen flex-col'>
+      <div className='z-10 bg-white p-4 shadow-md'>
         {isLocating ? (
           <span>위치 정보를 파악하고 있습니다...</span>
         ) : (

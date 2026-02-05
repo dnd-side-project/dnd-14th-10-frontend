@@ -3,6 +3,8 @@ import { createBrowserRouter } from 'react-router-dom';
 import HomePage from '@/pages/home/ui/home-page';
 import LoginPage from '@/pages/login/ui/login-page';
 import MapPage from '@/pages/map/ui/map-page';
+
+import MapRecommendedPage from '@/pages/map-recommended/ui/map-recommended-page';
 import MyPage from '@/pages/my/ui/my-page';
 import RegistrationPage from '@/pages/registration/ui/registration-page';
 import ReviewCreationPage from '@/pages/review-creation/ui/review-creation-page';
@@ -21,6 +23,10 @@ export const router = createBrowserRouter([
       {
         path: '/map',
         element: <MapPage />,
+      },
+      {
+        path: '/map/recommended',
+        element: <MapRecommendedPage />,
       },
       {
         path: '/my',

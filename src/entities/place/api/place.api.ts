@@ -31,7 +31,17 @@ export const getNearbyPlaces = async (params: NearbyParams): Promise<Place[]> =>
   return data;
 };
 
+export interface RecommendedPlace {
+  id: string;
+  name: string;
+  location: string;
+  likeCount: number;
+  tags: string[];
+  images: string[];
+}
+
 // GET /api/places/recommend (추천 조회)
-export const getRecommendedPlaces = () => {
-  return apiClient.get('/places/recommend');
+export const getRecommendedPlaces = async (): Promise<RecommendedPlace[]> => {
+  const { data } = await apiClient.get<RecommendedPlace[]>('/places/recommend');
+  return data;
 };

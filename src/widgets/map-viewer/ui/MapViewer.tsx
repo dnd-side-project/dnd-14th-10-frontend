@@ -54,7 +54,7 @@ export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
   }, [isLoaded, currentLocation, places]);
 
   return (
-    <div className='w-full h-full border border-gray-200 overflow-hidden rounded-lg'>
+    <div className='h-full w-full overflow-hidden border border-gray-200'>
       <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
     </div>
   );
