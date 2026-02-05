@@ -1,6 +1,6 @@
 import HeartFilledIcon from '@/shared/ui/icons/HeartFilled.svg?react';
 
-export interface PlaceListItemProps {
+interface PlaceListItemProps {
   name: string;
   location: string;
   likeCount: number;
@@ -54,7 +54,7 @@ export function PlaceListItem({
       {/* 이미지 갤러리 */}
       <div className='scrollbar-hide flex gap-3 overflow-x-auto px-5'>
         {images.map((image, index) => (
-          <div key={index} className='h-[160px] w-[155px] shrink-0 overflow-hidden rounded-[12px]'>
+          <div key={image} className='h-[160px] w-[155px] shrink-0 overflow-hidden rounded-[12px]'>
             <img
               src={image}
               alt={`${name} 이미지 ${index + 1}`}

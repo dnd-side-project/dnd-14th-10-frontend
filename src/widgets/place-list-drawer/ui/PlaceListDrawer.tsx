@@ -1,12 +1,13 @@
 import { useState } from 'react';
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
-import { PlaceListItem, type PlaceListItemProps } from '@/entities/place/ui/PlaceListItem';
+import type { RecommendedPlace } from '@/entities/place/api/place.api';
+import { PlaceListItem } from '@/entities/place/ui/PlaceListItem';
 import { cn } from '@/lib/utils';
 
 interface PlaceListDrawerProps {
   open: boolean;
-  places: Omit<PlaceListItemProps, 'onClick'>[];
+  places: RecommendedPlace[];
   onPlaceClick?: (index: number) => void;
 }
 
@@ -44,7 +45,7 @@ export function PlaceListDrawer({ open, places, onPlaceClick }: PlaceListDrawerP
           )}
         >
           {places.map((place, index) => (
-            <div key={index} className='py-5 first:pt-0 last:pb-0'>
+            <div key={place.id} className='py-5 first:pt-0 last:pb-0'>
               <PlaceListItem {...place} onClick={() => onPlaceClick?.(index)} />
             </div>
           ))}
