@@ -12,25 +12,41 @@ export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const naverMapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
+  const currentLocationMarkerRef = useRef<naver.maps.Marker | null>(null);
   const isLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
 
-  useEffect(() => {
-    if (!isLoaded || !mapRef.current) return;
+  useEffect(
+    function initializeMap() {
+      if (!isLoaded || !mapRef.current) return;
 
-    if (!naverMapRef.current) {
-      naverMapRef.current = new window.naver.maps.Map(mapRef.current, {
-        center: new window.naver.maps.LatLng(37.5665, 126.978),
-        zoom: 15,
-      });
-    }
+      if (!naverMapRef.current) {
+        naverMapRef.current = new window.naver.maps.Map(mapRef.current, {
+          center: new window.naver.maps.LatLng(37.5665, 126.978),
+          zoom: 15,
+        });
+      }
 
-    const map = naverMapRef.current;
+      return () => {
+        naverMapRef.current?.destroy();
+        naverMapRef.current = null;
+      };
+    },
+    [isLoaded],
+  );
 
-    if (currentLocation) {
+  useEffect(
+    function updateCurrentLocationMarker() {
+      if (!naverMapRef.current || !currentLocation) return;
+
+      const map = naverMapRef.current;
       const latLng = new window.naver.maps.LatLng(currentLocation.lat, currentLocation.lng);
       map.setCenter(latLng);
 
-      new window.naver.maps.Marker({
+      if (currentLocationMarkerRef.current) {
+        currentLocationMarkerRef.current.setMap(null);
+      }
+
+      currentLocationMarkerRef.current = new window.naver.maps.Marker({
         position: latLng,
         map: map,
         icon: {
@@ -38,20 +54,43 @@ export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
             '<div style="width:12px; height:12px; background:blue; border-radius:50%; border:2px solid white;"></div>',
         },
       });
-    }
 
-    markersRef.current.forEach((marker) => marker.setMap(null));
-    markersRef.current = places.map(
-      (place) =>
-        new window.naver.maps.Marker({
-          position: new window.naver.maps.LatLng(place.locationPoint.lat, place.locationPoint.lng),
-          map: map,
-          title: place.name,
-        }),
-    );
+      return () => {
+        if (currentLocationMarkerRef.current) {
+          currentLocationMarkerRef.current.setMap(null);
+          currentLocationMarkerRef.current = null;
+        }
+      };
+    },
+    [currentLocation],
+  );
 
-    return () => {};
-  }, [isLoaded, currentLocation, places]);
+  useEffect(
+    function updatePlaceMarkers() {
+      if (!naverMapRef.current) return;
+
+      const map = naverMapRef.current;
+
+      markersRef.current.forEach((marker) => marker.setMap(null));
+      markersRef.current = places.map(
+        (place) =>
+          new window.naver.maps.Marker({
+            position: new window.naver.maps.LatLng(
+              place.locationPoint.lat,
+              place.locationPoint.lng,
+            ),
+            map: map,
+            title: place.name,
+          }),
+      );
+
+      return () => {
+        markersRef.current.forEach((marker) => marker.setMap(null));
+        markersRef.current = [];
+      };
+    },
+    [places],
+  );
 
   return (
     <div className='h-full w-full overflow-hidden border border-gray-200'>

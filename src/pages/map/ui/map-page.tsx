@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 import { getCurrentAddress } from '@/entities/place/api/get-current-address';
 import { useNearbyPlacesQuery } from '@/entities/place/model/use-nearby-places-query';
+import { useNaverMapScript } from '@/shared/lib/naver-map/use-naver-map-script';
 import { MapViewer } from '@/widgets/map-viewer/ui/MapViewer';
 
 // 서비스의 기준점이 되는 기본 위치 (예: 서울시청)
@@ -11,45 +12,67 @@ const DEFAULT_LOCATION = {
   address: '서울특별시 중구 태평로1가 31 (기본 위치)',
 };
 
-function MapPage() {
-  const [currentLocation, setCurrentLocation] = useState(DEFAULT_LOCATION);
-  const [isLocating, setIsLocating] = useState(true);
+type Location = {
+  lat: number;
+  lng: number;
+  address: string;
+};
 
-  const queryParams = useMemo(
-    () => ({
-      lat: currentLocation.lat,
-      lng: currentLocation.lng,
-    }),
-    [currentLocation],
-  );
-
-  const { data: places = [] } = useNearbyPlacesQuery(queryParams);
-
-  useEffect(() => {
-    if (currentLocation !== DEFAULT_LOCATION) return;
-    getCurrentAddress()
-      .then((info) => {
-        setCurrentLocation(info);
-        setIsLocating(false);
-      })
-      .catch((err) => {
-        console.error('실제 위치를 가져올 수 없어 기본 위치를 유지합니다.', err);
-        setIsLocating(false);
-      });
-  }, [currentLocation]);
+function MapContent({ currentLocation }: { currentLocation: Location }) {
+  const { data: places = [] } = useNearbyPlacesQuery({
+    lat: currentLocation.lat,
+    lng: currentLocation.lng,
+  });
 
   return (
-    <div className='flex h-screen w-screen flex-col'>
+    <>
       <div className='z-10 bg-white p-4 shadow-md'>
-        {isLocating ? (
-          <span>위치 정보를 파악하고 있습니다...</span>
-        ) : (
-          <span>현위치: {currentLocation.address}</span>
-        )}
+        <span>현위치: {currentLocation.address}</span>
       </div>
       <div className='flex-1'>
         <MapViewer currentLocation={currentLocation} places={places} />
       </div>
+    </>
+  );
+}
+
+function MapPage() {
+  const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
+  const isScriptLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+
+  useEffect(
+    function fetchCurrentLocation() {
+      if (!isScriptLoaded) return;
+
+      getCurrentAddress()
+        .then((info) => {
+          setCurrentLocation(info);
+        })
+        .catch((err) => {
+          console.error('실제 위치를 가져올 수 없어 기본 위치를 사용합니다.', err);
+          setCurrentLocation(DEFAULT_LOCATION);
+        });
+    },
+    [isScriptLoaded],
+  );
+
+  return (
+    <div className='flex h-screen w-screen flex-col'>
+      {currentLocation ? (
+        <Suspense
+          fallback={
+            <div className='z-10 bg-white p-4 shadow-md'>
+              <span>주변 장소를 불러오는 중...</span>
+            </div>
+          }
+        >
+          <MapContent currentLocation={currentLocation} />
+        </Suspense>
+      ) : (
+        <div className='z-10 bg-white p-4 shadow-md'>
+          <span>위치 정보를 파악하고 있습니다...</span>
+        </div>
+      )}
     </div>
   );
 }
