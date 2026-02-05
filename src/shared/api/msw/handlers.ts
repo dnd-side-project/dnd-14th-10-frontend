@@ -1,5 +1,71 @@
 import { http, HttpResponse } from 'msw';
 
+import type { PlaceDetail } from '@/entities/place/model/place.types';
+
+const createMockPlaceDetail = (id: string): PlaceDetail => ({
+  id,
+  name: 'DND 10',
+  category: '공공시설',
+  rating: 4.8,
+  reviewCount: 16,
+  tags: ['잔잔한 분위기', '대형'],
+  images: [
+    'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
+    'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=400',
+    'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
+  ],
+  address: '서울 강남구 도산대로 00길 00',
+  outletStatus: '넉넉함',
+  crowdedness: '여유',
+  calmnessIndex: 85,
+  restroomInfo: '알려지지 않음',
+  floorInfo: '3층',
+  mapImageUrl: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400',
+  locationPoint: { lat: 37.5665, lng: 126.978 },
+  reviewTags: [
+    { label: '집중하기 좋아요', percentage: 76 },
+    { label: '칸막이가 있어요', percentage: 68 },
+    { label: '이용자들이 대부분 성인이에요', percentage: 60 },
+    { label: '사장님이 친절해요', percentage: 46 },
+    { label: '아늑해요', percentage: 46 },
+  ],
+  reviews: [
+    {
+      id: '1',
+      authorName: '홍길동',
+      createdAt: '2026.02.03',
+      content:
+        '리뷰 텍스트는 세줄까지 미리보기 노출이 됩니다. 세줄이상 넘어가면 ...으로 대체되어 보이니 어쩌구저쩌구 욜로욜로 에베베베ㅔ 퇴근하고싶어요 집인데 집가고싶어요 왜 아직도 야작을 해야하는거지?',
+      imageUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=100',
+      tags: ['대화소리가 조금 들려요', '콘센트가 많아요', '조용해요'],
+    },
+    {
+      id: '2',
+      authorName: '김철수',
+      createdAt: '2026.02.01',
+      content: '조용하고 집중하기 좋은 공간입니다. 콘센트도 많아서 노트북 작업하기 딱 좋아요.',
+      imageUrl: 'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=100',
+      tags: ['집중하기 좋아요', '콘센트가 많아요'],
+    },
+    {
+      id: '3',
+      authorName: '이영희',
+      createdAt: '2026.01.28',
+      content: '분위기가 정말 좋고 사장님도 친절하세요. 자주 올 것 같아요!',
+      imageUrl: null,
+      tags: ['사장님이 친절해요', '아늑해요'],
+    },
+    {
+      id: '4',
+      authorName: '박민수',
+      createdAt: '2026.01.25',
+      content: '카공하기 최고의 장소입니다. 강력 추천해요.',
+      imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=100',
+      tags: ['집중하기 좋아요'],
+    },
+  ],
+});
+
 const MOCK_RECOMMENDED_PLACES = [
   {
     id: '1',
@@ -81,5 +147,10 @@ export const handlers = [
 
   http.get('/api/places/recommend', () => {
     return HttpResponse.json(MOCK_RECOMMENDED_PLACES);
+  }),
+
+  http.get('/api/places/:placeId', ({ params }) => {
+    const { placeId } = params;
+    return HttpResponse.json(createMockPlaceDetail(placeId as string));
   }),
 ];
