@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
-import type { RecommendedPlace } from '@/entities/place/api/place.api';
+
+import type { RecommendedPlace } from '@/entities/place/model/place.types';
 import { PlaceListItem } from '@/entities/place/ui/PlaceListItem';
 import { cn } from '@/lib/utils';
 
