@@ -189,10 +189,9 @@ function ReviewSection({ place }: { place: PlaceDetail }) {
   );
 }
 
-function PlaceDetailContent() {
-  const { id } = useParams<{ id: string }>();
+function PlaceDetailContent({ id }: { id: string }) {
   const navigate = useNavigate();
-  const { data: place } = usePlaceDetailQuery(id!);
+  const { data: place } = usePlaceDetailQuery(id);
 
   return (
     <div className='min-h-screen bg-white'>
@@ -218,6 +217,17 @@ function PlaceDetailContent() {
 }
 
 function PlaceDetailPage() {
+  const { id } = useParams<{ id: string }>();
+
+  // TODO: not found 페이지 구현
+  if (!id) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        <span>페이지를 찾을 수 없습니다.</span>
+      </div>
+    );
+  }
+
   return (
     <Suspense
       fallback={
@@ -226,7 +236,7 @@ function PlaceDetailPage() {
         </div>
       }
     >
-      <PlaceDetailContent />
+      <PlaceDetailContent id={id} />
     </Suspense>
   );
 }
