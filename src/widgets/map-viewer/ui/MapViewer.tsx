@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import type { Place } from '@/entities/place/api/place.api';
+import type { Place } from '@/entities/place/model/place.types';
 import { useNaverMapScript } from '@/shared/lib/naver-map/use-naver-map-script';
 
 interface MapViewerProps {
