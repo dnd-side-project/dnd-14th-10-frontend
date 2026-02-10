@@ -36,6 +36,15 @@ function DrawerOverlay({
   );
 }
 
+function DrawerStaticOverlay({ className }: { className?: string }) {
+  return (
+    <div
+      data-slot='drawer-static-overlay'
+      className={cn('animate-in fade-in-0 fixed inset-0 z-50 bg-black/50', className)}
+    />
+  );
+}
+
 function DrawerContent({
   className,
   children,
@@ -46,7 +55,7 @@ function DrawerContent({
 }) {
   return (
     <DrawerPortal data-slot='drawer-portal'>
-      {showOverlay && <DrawerOverlay />}
+      {showOverlay && <DrawerStaticOverlay />}
       <DrawerPrimitive.Content
         data-slot='drawer-content'
         className={cn(
@@ -120,6 +129,7 @@ export {
   Drawer,
   DrawerPortal,
   DrawerOverlay,
+  DrawerStaticOverlay,
   DrawerTrigger,
   DrawerClose,
   DrawerContent,
