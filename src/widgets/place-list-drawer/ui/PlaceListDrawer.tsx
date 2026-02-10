@@ -23,7 +23,7 @@ export function PlaceListDrawer({ open, places, onPlaceClick }: PlaceListDrawerP
       activeSnapPoint={snap}
       setActiveSnapPoint={setSnap}
       dismissible={false}
-      modal={snap === 1}
+      modal={false}
     >
       <DrawerContent
         showOverlay={snap === 1}
