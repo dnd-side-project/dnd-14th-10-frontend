@@ -131,6 +131,9 @@
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
+
+  /* 앱 레이아웃 */
+  --width-app: 390px;
 }
 
 /* 기본 스타일 */
@@ -146,8 +149,8 @@
 
 body {
   margin: 0 auto;
-  min-height: 100vh;
-  max-width: 390px;
+  min-height: 100dvh;
+  max-width: var(--width-app);
 }
 
 @layer base {
