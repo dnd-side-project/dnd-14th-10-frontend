@@ -17,7 +17,10 @@ export function BottomCta({
   className,
 }: BottomCtaProps) {
   return (
-    <div className='bg-white px-5 py-3'>
+    <div
+      className='fixed bottom-0 left-1/2 w-full max-w-[var(--width-app)] -translate-x-1/2 bg-white px-5 pt-3'
+      style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
+    >
       <Button
         type={type}
         disabled={disabled}
