@@ -1,14 +1,14 @@
-import type { PlaceType } from '@/features/register-place/model/use-registration-store';
+import type { PlaceCategory } from '@/features/register-place/model/register-place.types';
 
-interface PlaceTypeCardProps {
-  type: PlaceType;
+interface PlaceCategoryCardProps {
+  category: PlaceCategory;
   label: string;
   icon: string;
   isSelected: boolean;
   onClick: () => void;
 }
 
-function PlaceTypeCard({ label, icon, isSelected, onClick }: PlaceTypeCardProps) {
+function PlaceCategoryCard({ label, icon, isSelected, onClick }: PlaceCategoryCardProps) {
   return (
     <button
       type='button'
@@ -24,14 +24,14 @@ function PlaceTypeCard({ label, icon, isSelected, onClick }: PlaceTypeCardProps)
 }
 
 interface TypeSelectStepProps {
-  selectedType: PlaceType | null;
-  onSelect: (type: PlaceType) => void;
+  selectedCategory: PlaceCategory | null;
+  onSelect: (category: PlaceCategory) => void;
   onNext: () => void;
 }
 
-export function TypeSelectStep({ selectedType, onSelect, onNext }: TypeSelectStepProps) {
-  const handleSelect = (type: PlaceType) => {
-    onSelect(type);
+export function TypeSelectStep({ selectedCategory, onSelect, onNext }: TypeSelectStepProps) {
+  const handleSelect = (category: PlaceCategory) => {
+    onSelect(category);
     // 선택 후 바로 다음 단계로 이동
     setTimeout(() => onNext(), 150);
   };
@@ -43,19 +43,19 @@ export function TypeSelectStep({ selectedType, onSelect, onNext }: TypeSelectSte
       </h1>
 
       <div className='flex items-center gap-4'>
-        <PlaceTypeCard
-          type='cafe'
+        <PlaceCategoryCard
+          category='CAFE'
           label='카페'
           icon='☕'
-          isSelected={selectedType === 'cafe'}
-          onClick={() => handleSelect('cafe')}
+          isSelected={selectedCategory === 'CAFE'}
+          onClick={() => handleSelect('CAFE')}
         />
-        <PlaceTypeCard
-          type='public'
+        <PlaceCategoryCard
+          category='PUBLIC'
           label='공공시설'
           icon='🏛️'
-          isSelected={selectedType === 'public'}
-          onClick={() => handleSelect('public')}
+          isSelected={selectedCategory === 'PUBLIC'}
+          onClick={() => handleSelect('PUBLIC')}
         />
       </div>
     </div>

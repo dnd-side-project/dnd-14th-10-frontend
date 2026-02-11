@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 
-export type PlaceType = 'cafe' | 'public';
+import type {
+  CrowdStatus,
+  Mood,
+  OutletScore,
+  PlaceCategory,
+  PlaceImageRequest,
+  SpaceSize,
+} from './register-place.types';
 
 export interface LocationData {
   address: string;
@@ -8,47 +15,65 @@ export interface LocationData {
   latitude: number;
   longitude: number;
   placeName?: string;
+  regionCode?: number;
+}
+
+export interface DetailFormData {
+  name: string;
+  outletScore: OutletScore | null;
+  spaceSize: SpaceSize | null;
+  crowdStatus: CrowdStatus | null;
+  mood: Mood | null;
+  floorInfo?: number;
+  openTime?: string;
+  closeTime?: string;
+  restroomInfo?: string;
+  tagIds?: number[];
+  images: PlaceImageRequest[];
 }
 
 export interface RegistrationFormData {
   // Step 1: 유형 선택
-  placeType: PlaceType | null;
+  category: PlaceCategory | null;
 
   // Step 2: 위치 검색
   location: LocationData | null;
 
   // Step 3: 상세 정보
-  name: string;
-  description: string;
-  tags: string[];
-  images: File[];
+  detail: DetailFormData;
 }
 
 interface RegistrationStore {
   formData: RegistrationFormData;
 
   // Actions
-  setPlaceType: (type: PlaceType) => void;
+  setCategory: (category: PlaceCategory) => void;
   setLocation: (location: LocationData) => void;
-  setDetailInfo: (info: Pick<RegistrationFormData, 'name' | 'description' | 'tags' | 'images'>) => void;
+  setDetail: (detail: Partial<DetailFormData>) => void;
   reset: () => void;
 }
 
-const initialFormData: RegistrationFormData = {
-  placeType: null,
-  location: null,
+const initialDetailData: DetailFormData = {
   name: '',
-  description: '',
-  tags: [],
+  outletScore: null,
+  spaceSize: null,
+  crowdStatus: null,
+  mood: null,
   images: [],
+};
+
+const initialFormData: RegistrationFormData = {
+  category: null,
+  location: null,
+  detail: initialDetailData,
 };
 
 export const useRegistrationStore = create<RegistrationStore>((set) => ({
   formData: initialFormData,
 
-  setPlaceType: (type) =>
+  setCategory: (category) =>
     set((state) => ({
-      formData: { ...state.formData, placeType: type },
+      formData: { ...state.formData, category },
     })),
 
   setLocation: (location) =>
@@ -56,10 +81,16 @@ export const useRegistrationStore = create<RegistrationStore>((set) => ({
       formData: { ...state.formData, location },
     })),
 
-  setDetailInfo: (info) =>
+  setDetail: (detail) =>
     set((state) => ({
-      formData: { ...state.formData, ...info },
+      formData: {
+        ...state.formData,
+        detail: { ...state.formData.detail, ...detail },
+      },
     })),
 
   reset: () => set({ formData: initialFormData }),
 }));
+
+// PlaceType alias for backward compatibility
+export type PlaceType = 'cafe' | 'public';
