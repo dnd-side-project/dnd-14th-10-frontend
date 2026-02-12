@@ -1,24 +1,27 @@
 import type { PlaceCategory } from '@/features/register-place/model/register-place.types';
+import cafeIcon from '@/shared/assets/images/cafe-3d.png';
+import publicFacilityIcon from '@/shared/assets/images/public-facility-3d.png';
 
 interface PlaceCategoryCardProps {
   category: PlaceCategory;
   label: string;
   icon: string;
+  iconClassName: string;
   isSelected: boolean;
   onClick: () => void;
 }
 
-function PlaceCategoryCard({ label, icon, isSelected, onClick }: PlaceCategoryCardProps) {
+function PlaceCategoryCard({ label, icon, iconClassName, isSelected, onClick }: PlaceCategoryCardProps) {
   return (
     <button
       type='button'
       onClick={onClick}
-      className={`flex h-[167px] w-[167px] flex-col items-center justify-center gap-2 rounded-xl transition-all ${
-        isSelected ? 'bg-primary-100 ring-2 ring-primary-500' : 'bg-gray-100 hover:bg-gray-150'
+      className={`group flex h-[167px] w-[167px] flex-col items-center justify-center gap-2 rounded-xl transition-all ${
+        isSelected ? 'bg-primary-700 ring-2 ring-primary-700' : 'bg-gray-100 hover:bg-gray-150 active:bg-primary-700'
       }`}
     >
-      <span className='text-5xl'>{icon}</span>
-      <span className='text-body2 font-medium text-gray-950'>{label}</span>
+      <img src={icon} alt={label} className={iconClassName} />
+      <span className={`text-body2 font-medium ${isSelected ? 'text-white' : 'text-gray-950 group-active:text-white'}`}>{label}</span>
     </button>
   );
 }
@@ -46,14 +49,16 @@ export function TypeSelectStep({ selectedCategory, onSelect, onNext }: TypeSelec
         <PlaceCategoryCard
           category='CAFE'
           label='카페'
-          icon='☕'
+          icon={cafeIcon}
+          iconClassName='h-[48px] w-[50px]'
           isSelected={selectedCategory === 'CAFE'}
           onClick={() => handleSelect('CAFE')}
         />
         <PlaceCategoryCard
           category='PUBLIC'
           label='공공시설'
-          icon='🏛️'
+          icon={publicFacilityIcon}
+          iconClassName='h-[48px] w-[40px]'
           isSelected={selectedCategory === 'PUBLIC'}
           onClick={() => handleSelect('PUBLIC')}
         />
