@@ -1,9 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { BottomCta } from '@/shared/ui/bottom-cta/BottomCta';
 
 import { PlaceSearchBar } from './PlaceSearchBar';
-import { SelectedLocationInfo } from './SelectedLocationInfo';
+import { geocodeAddress, reverseGeocodeRegionCode } from '../api/geocode-place';
 import type { PlaceSearchResult } from '../api/search-place.api';
 import { useLocationMap } from '../lib/use-location-map';
 import { usePlaceSearch } from '../lib/use-place-search';
@@ -20,8 +20,6 @@ export function LocationSearchStep({
   onSelect,
   onNext,
 }: LocationSearchStepProps) {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
   // 검색 로직
   const { searchQuery, setSearchQuery, searchResults, isSearching, handleSearch, clearSearch } =
     usePlaceSearch();
@@ -35,45 +33,39 @@ export function LocationSearchStep({
     showInitialMarker: !!selectedLocation,
   });
 
+  // geocoding 요청 순서 추적 (레이스 컨디션 방지)
+  const geocodeRequestId = useRef(0);
+
   // 검색 결과 선택 - 주소로 좌표 조회 후 지도에 표시
   const handleSelectResult = useCallback(
-    (result: PlaceSearchResult) => {
-      if (!window.naver?.maps?.Service) return;
-
+    async (result: PlaceSearchResult) => {
       const addressToSearch = result.roadAddress || result.address;
+      const requestId = ++geocodeRequestId.current;
 
-      window.naver.maps.Service.geocode({ query: addressToSearch }, (status, response) => {
-        if (status !== window.naver.maps.Service.Status.OK || !response.v2.addresses.length) {
-          console.error('좌표 조회 실패');
-          return;
-        }
-
-        const addr = response.v2.addresses[0];
-        const latitude = parseFloat(addr.y);
-        const longitude = parseFloat(addr.x);
+      try {
+        const { latitude, longitude } = await geocodeAddress(addressToSearch);
+        if (requestId !== geocodeRequestId.current) return;
 
         updateMarkerPosition(latitude, longitude);
 
-        const locationData: LocationData = {
+        const regionCode = await reverseGeocodeRegionCode(latitude, longitude);
+        if (requestId !== geocodeRequestId.current) return;
+
+        onSelect({
           address: result.address,
           roadAddress: result.roadAddress,
           latitude,
           longitude,
           placeName: result.placeName,
-        };
-
-        onSelect(locationData);
+          regionCode,
+        });
         clearSearch();
-        setIsSearchOpen(false);
-      });
+      } catch (error) {
+        console.error('좌표 조회 실패:', error);
+      }
     },
     [updateMarkerPosition, onSelect, clearSearch],
   );
-
-  const handleCloseSearch = () => {
-    setIsSearchOpen(false);
-    clearSearch();
-  };
 
   return (
     <div className='flex h-[calc(100dvh-48px)] flex-col pb-20'>
@@ -86,28 +78,23 @@ export function LocationSearchStep({
       </div>
 
       {/* 지도 컨테이너 */}
-      <div className='relative mx-5 mb-4 flex-1 overflow-hidden rounded-xl'>
+      <div className='relative mx-5 mb-[8px] flex-1 overflow-hidden rounded-xl'>
         {/* 지도 */}
         <div ref={mapRef} className='h-full w-full' />
 
         {/* 검색바 - 지도 위에 떠있음 */}
         <div className='absolute top-5 right-5 left-5 z-10'>
           <PlaceSearchBar
-            isOpen={isSearchOpen}
-            onOpen={() => setIsSearchOpen(true)}
-            onClose={handleCloseSearch}
             searchQuery={searchQuery}
             onSearchQueryChange={setSearchQuery}
             onSearch={handleSearch}
             searchResults={searchResults}
             isSearching={isSearching}
             onSelectResult={handleSelectResult}
+            selectedLocation={selectedLocation}
           />
         </div>
       </div>
-
-      {/* 선택된 위치 */}
-      {selectedLocation && <SelectedLocationInfo location={selectedLocation} />}
 
       {/* 다음 버튼 */}
       <BottomCta onClick={onNext} disabled={!selectedLocation}>

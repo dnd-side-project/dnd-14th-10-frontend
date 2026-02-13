@@ -1,74 +1,50 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useDebounce } from '@/shared/lib/hooks/use-debounce';
 
-import { searchPlace, type PlaceSearchResult } from '../api/search-place.api';
+import type { PlaceSearchResult } from '../api/search-place.api';
+import { useNaverSearchQuery } from '../model/use-naver-search-query';
 
 interface UsePlaceSearchReturn {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   searchResults: PlaceSearchResult[];
   isSearching: boolean;
-  handleSearch: () => Promise<void>;
+  handleSearch: () => void;
   clearSearch: () => void;
 }
 
 export function usePlaceSearch(): UsePlaceSearchReturn {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<PlaceSearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [activeQuery, setActiveQuery] = useState('');
 
   const debouncedQuery = useDebounce(searchQuery, 300);
 
-  // 디바운스된 검색어로 검색 실행
-  useEffect(() => {
-    const search = async () => {
-      if (debouncedQuery.trim().length < 2) {
-        setSearchResults([]);
-        return;
-      }
+  const queryToUse = activeQuery || debouncedQuery;
 
-      setIsSearching(true);
-      try {
-        const results = await searchPlace(debouncedQuery);
-        setSearchResults(results);
-      } catch (error) {
-        console.error('검색 실패:', error);
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    };
+  const { data, isFetching } = useNaverSearchQuery(queryToUse);
 
-    search();
-  }, [debouncedQuery]);
+  const isDebouncing = searchQuery.trim().length >= 2 && searchQuery !== queryToUse;
 
-  // 즉시 검색 (Enter 키용)
-  const handleSearch = useCallback(async () => {
-    if (!searchQuery.trim()) return;
-
-    setIsSearching(true);
-    try {
-      const results = await searchPlace(searchQuery);
-      setSearchResults(results);
-    } catch (error) {
-      console.error('검색 실패:', error);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
+  const handleSearch = useCallback(() => {
+    if (searchQuery.trim()) {
+      setActiveQuery(searchQuery);
     }
   }, [searchQuery]);
 
   const clearSearch = useCallback(() => {
     setSearchQuery('');
-    setSearchResults([]);
+    setActiveQuery('');
   }, []);
 
   return {
     searchQuery,
-    setSearchQuery,
-    searchResults,
-    isSearching,
+    setSearchQuery: (query: string) => {
+      setSearchQuery(query);
+      setActiveQuery('');
+    },
+    searchResults: data ?? [],
+    isSearching: isFetching || isDebouncing,
     handleSearch,
     clearSearch,
   };
