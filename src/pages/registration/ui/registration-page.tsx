@@ -13,6 +13,8 @@ import { TypeSelectStep } from '@/features/register-place/ui/TypeSelectStep';
 import { useFunnel } from '@/shared/lib/funnel/use-funnel';
 import { Header } from '@/shared/ui/header/Header';
 
+import CloseIcon from '@/shared/ui/icons/Close.svg?react';
+
 const STEPS = ['type', 'location', 'detail', 'complete'] as const;
 type Step = (typeof STEPS)[number];
 
@@ -100,10 +102,19 @@ function RegistrationPage() {
     );
   };
 
-  // 완료 단계에서는 헤더 숨김
+  const handleCompleteClose = () => {
+    navigate(`/place/${registeredPlaceId}`, { replace: true });
+  };
+
   if (step === 'complete' && registeredPlaceId) {
     return (
       <div className='h-dvh overflow-hidden bg-white'>
+        <Header
+          onBack={handleCompleteClose}
+          title={getHeaderTitle(step, formData.category)}
+          left={<CloseIcon onClick={handleCompleteClose} />}
+        />
+
         <CompleteStep
           placeName={formData.location?.placeName || formData.detail.name}
           placeId={registeredPlaceId.toString()}
