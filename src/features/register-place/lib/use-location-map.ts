@@ -21,9 +21,10 @@ export function useLocationMap({
   const naverMapRef = useRef<naver.maps.Map | null>(null);
   const markerRef = useRef<naver.maps.Marker | null>(null);
 
+  const initialCenterRef = useRef(initialCenter);
+
   const isLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
 
-  // 마커 위치 업데이트
   const updateMarkerPosition = useCallback((lat: number, lng: number) => {
     if (!naverMapRef.current) return;
 
@@ -45,14 +46,16 @@ export function useLocationMap({
   useEffect(() => {
     if (!isLoaded || !mapRef.current || naverMapRef.current) return;
 
-    const center = new window.naver.maps.LatLng(initialCenter.lat, initialCenter.lng);
+    const center = new window.naver.maps.LatLng(
+      initialCenterRef.current.lat,
+      initialCenterRef.current.lng,
+    );
 
     naverMapRef.current = new window.naver.maps.Map(mapRef.current, {
       center,
       zoom: 16,
     });
 
-    // 초기 마커 표시
     if (showInitialMarker) {
       markerRef.current = new window.naver.maps.Marker({
         position: center,
@@ -61,14 +64,12 @@ export function useLocationMap({
     }
 
     return () => {
-      naverMapRef.current?.destroy();
-      naverMapRef.current = null;
+      if (naverMapRef.current) {
+        naverMapRef.current.destroy();
+        naverMapRef.current = null;
+      }
     };
-  }, [isLoaded, initialCenter.lat, initialCenter.lng, showInitialMarker]);
+  }, [isLoaded, showInitialMarker]);
 
-  return {
-    mapRef,
-    updateMarkerPosition,
-    isLoaded,
-  };
+  return { mapRef, updateMarkerPosition, isLoaded };
 }
