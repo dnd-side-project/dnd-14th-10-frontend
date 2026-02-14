@@ -117,9 +117,6 @@ export function DetailInputStep({ location, onSubmit, isSubmitting }: DetailInpu
             )}
 
             <div className='space-y-2'>
-              {/* <p className='font-bold text-gray-800'>
-                사진 등록 <span className='text-red-500'>*</span>
-              </p> */}
               <div className='flex items-center gap-3'>
                 <input
                   type='file'
