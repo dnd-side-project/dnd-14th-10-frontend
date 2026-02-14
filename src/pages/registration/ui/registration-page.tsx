@@ -106,7 +106,7 @@ function RegistrationPage() {
     navigate(`/place/${registeredPlaceId}`, { replace: true });
   };
 
-  if (step === 'complete' && registeredPlaceId) {
+  if (step === 'complete' && registeredPlaceId && formData.category) {
     return (
       <div className='h-dvh overflow-hidden bg-white'>
         <Header
@@ -118,6 +118,7 @@ function RegistrationPage() {
         <CompleteStep
           placeName={formData.location?.placeName || formData.detail.name}
           placeId={registeredPlaceId.toString()}
+          placeCategory={CATEGORY_LABELS[formData.category]}
         />
       </div>
     );

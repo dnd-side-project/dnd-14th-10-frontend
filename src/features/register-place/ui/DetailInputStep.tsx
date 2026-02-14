@@ -4,7 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import type { LocationData } from '@/features/register-place/model/use-registration-store';
+import {
+  useRegistrationStore,
+  type LocationData,
+} from '@/features/register-place/model/use-registration-store';
 
 import { BottomCta } from '@/shared/ui/bottom-cta/BottomCta';
 
@@ -57,6 +60,8 @@ export function DetailInputStep({ location, onSubmit, isSubmitting }: DetailInpu
     watch,
   } = methods;
 
+  const { setThumbnail } = useRegistrationStore();
+
   const images = watch('images') || [];
   const inputRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -87,11 +92,12 @@ export function DetailInputStep({ location, onSubmit, isSubmitting }: DetailInpu
   useEffect(() => {
     const newPreviews = images.map((file) => URL.createObjectURL(file));
     setPreviews(newPreviews);
+    setThumbnail(newPreviews[0]);
 
     return () => {
       newPreviews.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [images]);
+  }, [images, setThumbnail]);
 
   return (
     <FormProvider {...methods}>

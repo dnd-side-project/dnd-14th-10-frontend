@@ -43,13 +43,19 @@ export interface RegistrationFormData {
   detail: DetailFormData;
 }
 
+export interface RegistrationCompleteData {
+  thumbnail: string | null;
+}
+
 interface RegistrationStore {
   formData: RegistrationFormData;
+  completeData: RegistrationCompleteData;
 
   // Actions
   setCategory: (category: PlaceCategory) => void;
   setLocation: (location: LocationData) => void;
   setDetail: (detail: Partial<DetailFormData>) => void;
+  setThumbnail: (thumbnail: RegistrationCompleteData['thumbnail']) => void;
   reset: () => void;
 }
 
@@ -70,6 +76,9 @@ const initialFormData: RegistrationFormData = {
 
 export const useRegistrationStore = create<RegistrationStore>((set) => ({
   formData: initialFormData,
+  completeData: {
+    thumbnail: null,
+  },
 
   setCategory: (category) =>
     set((state) => ({
@@ -87,6 +96,11 @@ export const useRegistrationStore = create<RegistrationStore>((set) => ({
         ...state.formData,
         detail: { ...state.formData.detail, ...detail },
       },
+    })),
+
+  setThumbnail: (thumbnail) =>
+    set((state) => ({
+      completeData: { ...state.completeData, thumbnail },
     })),
 
   reset: () => set({ formData: initialFormData }),
