@@ -29,10 +29,7 @@ export function BusinessHoursSection() {
       <div className='mt-3 flex items-end gap-3'>
         <div className='flex flex-col gap-1'>
           <span className='text-[10px] font-medium text-gray-600'>시작 시간</span>
-          <div
-            className='relative h-[37px] w-[131px]'
-            onClick={() => openTimeRef.current?.showPicker()}
-          >
+          <div className='relative h-[37px]' onClick={() => openTimeRef.current?.showPicker()}>
             <input
               type='time'
               {...openTimeRegister}
@@ -52,10 +49,7 @@ export function BusinessHoursSection() {
         <span className='pb-2 text-[22px] font-medium text-gray-700'>~</span>
         <div className='flex flex-col gap-1'>
           <span className='text-[10px] font-medium text-gray-600'>마감 시간</span>
-          <div
-            className='relative h-[37px] w-[131px]'
-            onClick={() => closeTimeRef.current?.showPicker()}
-          >
+          <div className='relative h-[37px]' onClick={() => closeTimeRef.current?.showPicker()}>
             <input
               type='time'
               {...closeTimeRegister}
