@@ -1,29 +1,106 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { apiClient } from '@/shared/api/client';
+import { useNavigate } from 'react-router-dom';
+
+import {
+  mockNewCafePlaces,
+  mockNewPublicPlaces,
+  mockPopularCafePlaces,
+  mockPopularPublicPlaces,
+  mockRecommendedCafePlaces,
+  mockRecommendedPublicPlaces,
+} from '@/features/home/model/mock-data';
+import CategoryTabs from '@/features/home/ui/CategoryTabs';
+import type { Category } from '@/features/home/ui/CategoryTabs';
+import HomeHeader from '@/features/home/ui/HomeHeader';
+import PlaceSection from '@/features/home/ui/PlaceSection';
+import type { PlaceItem } from '@/features/home/ui/PlaceSection';
+import SearchInput from '@/shared/ui/inputs/SearchInput';
+
+const userName = '홍길동';
+const userLocation = '강남구';
 
 function HomePage() {
-  const [healthStatus, setHealthStatus] = useState('checking');
-  const buildTime = import.meta.env.VITE_BUILD_TIME;
+  const [category, setCategory] = useState<Category>('cafe');
+  const [likedPlaces, setLikedPlaces] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    apiClient
-      .get(`${import.meta.env.VITE_API_BASE_URL}/api/actuator/health`)
-      .then((response) => {
-        console.log('Health check successful:', response.data);
-        setHealthStatus(response.data.status || 'successful');
-      })
-      .catch((error) => {
-        console.error('Health check failed:', error);
-        setHealthStatus('failed');
-      });
-  }, []);
+  const navigate = useNavigate();
+
+  const popularPlaces = category === 'cafe' ? mockPopularCafePlaces : mockPopularPublicPlaces;
+  const recommendedPlaces =
+    category === 'cafe' ? mockRecommendedCafePlaces : mockRecommendedPublicPlaces;
+  const newPlaces = category === 'cafe' ? mockNewCafePlaces : mockNewPublicPlaces;
+
+  const applyLikedStatus = (places: PlaceItem[]): PlaceItem[] => {
+    return places.map((place) => ({
+      ...place,
+      isLiked: likedPlaces.has(place.id),
+    }));
+  };
+
+  const handleCategoryChange = (newCategory: Category) => {
+    setCategory(newCategory);
+  };
+
+  const handleSearchClick = () => {
+    navigate('/map');
+  };
+
+  const handlePlaceClick = (id: string) => {
+    navigate(`/place/${id}`);
+  };
+
+  const handleLikeClick = (id: string) => {
+    setLikedPlaces((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleMoreClick = () => {
+    navigate('/map');
+  };
 
   return (
-    <div>
-      <h1>home입니다.</h1>
-      <p>Health Check Status: {healthStatus}</p>
-      {buildTime && <p>Last Build Time: {buildTime}</p>}
+    <div className='flex min-h-screen flex-col bg-white'>
+      <div className='bg-gray-100 pt-5'>
+        <HomeHeader />
+        <div className='px-5 pt-[17px]'>
+          <SearchInput onClick={handleSearchClick} />
+        </div>
+        <CategoryTabs activeCategory={category} onCategoryChange={handleCategoryChange} />
+      </div>
+
+      <div className='flex flex-1 flex-col gap-[52px] pt-6 pb-10'>
+        <PlaceSection
+          title='인기있는 작업 공간'
+          places={applyLikedStatus(popularPlaces)}
+          onMoreClick={handleMoreClick}
+          onPlaceClick={handlePlaceClick}
+          onLikeClick={handleLikeClick}
+        />
+
+        <PlaceSection
+          title={`'${userName}'과 비슷한 분들이 좋아한 공간이에요`}
+          places={applyLikedStatus(recommendedPlaces)}
+          onMoreClick={handleMoreClick}
+          onPlaceClick={handlePlaceClick}
+          onLikeClick={handleLikeClick}
+        />
+
+        <PlaceSection
+          title={`${userLocation} 주변에 새로 생겼어요`}
+          places={applyLikedStatus(newPlaces)}
+          onMoreClick={handleMoreClick}
+          onPlaceClick={handlePlaceClick}
+          onLikeClick={handleLikeClick}
+        />
+      </div>
     </div>
   );
 }

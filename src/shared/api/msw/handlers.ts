@@ -129,7 +129,75 @@ const MOCK_RECOMMENDED_PLACES = [
   },
 ];
 
+// Mock 사용자 데이터
+const MOCK_USER_INFO = {
+  id: 'user-1',
+  name: '홍길동',
+  avatarUrl: null,
+  stats: {
+    placeCount: 5,
+    reviewCount: 25,
+    badgeCount: 3,
+  },
+};
+
+// Mock 최근 본 장소 데이터
+const MOCK_USER_HISTORIES = [
+  {
+    id: 'place-1',
+    name: '장소 이름',
+    imageUrl: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=400',
+    likeCount: 236,
+  },
+  {
+    id: 'place-2',
+    name: '장소 이름',
+    imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400',
+    likeCount: 450,
+  },
+  {
+    id: 'place-3',
+    name: '장소 이름',
+    imageUrl: 'https://images.unsplash.com/photo-1568992687947-868a62a9f521?w=400',
+    likeCount: 103,
+  },
+];
+
+// Mock 배지 데이터
+const MOCK_USER_BADGES = [
+  {
+    id: 'badge-1',
+    name: '첫 리뷰',
+    imageUrl: 'https://em-content.zobj.net/source/apple/391/sports-medal_1f3c5.png',
+  },
+  {
+    id: 'badge-2',
+    name: '탐험가',
+    imageUrl: 'https://em-content.zobj.net/source/apple/391/sports-medal_1f3c5.png',
+  },
+  {
+    id: 'badge-3',
+    name: '인기인',
+    imageUrl: 'https://em-content.zobj.net/source/apple/391/sports-medal_1f3c5.png',
+  },
+];
+
 export const handlers = [
+  // 사용자 정보 조회
+  http.get('/api/users/me', () => {
+    return HttpResponse.json(MOCK_USER_INFO);
+  }),
+
+  // 최근 본 장소 조회
+  http.get('/api/users/me/histories', () => {
+    return HttpResponse.json(MOCK_USER_HISTORIES);
+  }),
+
+  // 배지 조회
+  http.get('/api/users/me/badges', () => {
+    return HttpResponse.json(MOCK_USER_BADGES);
+  }),
+
   http.get('/api/places/nearby', () => {
     const mockPlaces = Array.from({ length: 100 }, (_, i) => ({
       id: String(i + 1),

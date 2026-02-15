@@ -5,7 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import type { PlaceDetail, ReviewTag } from '@/entities/place/model/place.types';
 import { usePlaceDetailQuery } from '@/entities/place/model/use-place-detail-query';
 import { ReviewCard } from '@/entities/place/ui/ReviewCard';
-import { Header } from '@/shared/ui/header/Header';
 import BuildingIcon from '@/shared/ui/icons/Building.svg?react';
 import ChevronRightIcon from '@/shared/ui/icons/ChevronRight.svg?react';
 import HeartIcon from '@/shared/ui/icons/Heart.svg?react';
@@ -15,6 +14,7 @@ import PeopleIcon from '@/shared/ui/icons/People.svg?react';
 import RestroomIcon from '@/shared/ui/icons/Restroom.svg?react';
 import ShareIcon from '@/shared/ui/icons/Share.svg?react';
 import StarIcon from '@/shared/ui/icons/Star.svg?react';
+import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 import { PlaceLocationMap } from '@/widgets/place-location-map/ui/PlaceLocationMap';
 
 function BasicInfoSection({ place }: { place: PlaceDetail }) {
@@ -195,7 +195,7 @@ function PlaceDetailContent({ id }: { id: string }) {
 
   return (
     <div className='min-h-screen bg-white'>
-      <Header
+      <NavigationBar
         onBack={() => navigate(-1)}
         right={
           <div className='flex gap-[16px]'>
