@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -6,13 +8,16 @@ import {
   mockRecentPlaces,
   mockUserData,
 } from '@/features/my/model/mock-data';
+import LogoutBottomSheet from '@/features/my/ui/LogoutBottomSheet';
 import MenuSection from '@/features/my/ui/MenuSection';
 import ProfileSection from '@/features/my/ui/ProfileSection';
 import RecentPlacesSection from '@/features/my/ui/RecentPlacesSection';
 import StatsSection from '@/features/my/ui/StatsSection';
-import { Header } from '@/shared/ui/header/Header';
+import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
-function MyPage() {
+export default function MyPage() {
+  const [isLogoutSheetOpen, setIsLogoutSheetOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -20,7 +25,7 @@ function MyPage() {
   };
 
   const handleEditProfile = () => {
-    // TODO: 프로필 수정 페이지로 이동
+    navigate('/my/edit');
   };
 
   const handlePlaceClick = (id: string) => {
@@ -30,14 +35,20 @@ function MyPage() {
   const handleMenuClick = (label: string) => {
     switch (label) {
       case '공지사항':
-        // TODO: 공지사항 페이지로 이동
+        navigate('/announcement');
         break;
       case '로그아웃':
-        // TODO: 로그아웃 처리
+        setIsLogoutSheetOpen(true);
         break;
       default:
         break;
     }
+  };
+
+  const handleLogoutConfirm = () => {
+    // TODO: 로그아웃 API 호출
+    setIsLogoutSheetOpen(false);
+    navigate('/login');
   };
 
   const statsData = createStatsData(mockUserData.stats);
@@ -48,10 +59,9 @@ function MyPage() {
 
   return (
     <div className='flex min-h-screen flex-col bg-white pt-6 pb-10'>
-      <Header title='MY' onBack={handleBack} />
+      <NavigationBar title='MY' onBack={handleBack} />
 
-      <div className='flex flex-col pt-6 pb-10'>
-        {/* 프로필 섹션 */}
+      <div className='flex flex-col pt-6'>
         <div className='flex flex-col gap-7 px-5'>
           <ProfileSection
             name={mockUserData.name}
@@ -61,14 +71,16 @@ function MyPage() {
           <StatsSection stats={statsData} />
         </div>
 
-        {/* 최근 본 장소 섹션 */}
         <RecentPlacesSection places={mockRecentPlaces} onPlaceClick={handlePlaceClick} />
 
-        {/* 메뉴 섹션 */}
         <MenuSection items={menuItemsWithHandlers} />
       </div>
+
+      <LogoutBottomSheet
+        isOpen={isLogoutSheetOpen}
+        onClose={() => setIsLogoutSheetOpen(false)}
+        onConfirm={handleLogoutConfirm}
+      />
     </div>
   );
 }
-
-export default MyPage;
