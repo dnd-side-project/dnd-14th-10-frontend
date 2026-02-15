@@ -31,7 +31,7 @@ export default function RecentPlacesSection({ places, onPlaceClick }: RecentPlac
                 {place.name}
               </span>
               <div className='flex items-center gap-1'>
-                <HeartFilledIcon className='text-primary-700 size-6' />
+                <HeartFilledIcon className='text-primary-700 size-4.5' />
                 <span className='text-caption1 text-primary-700 tracking-tight'>
                   {place.likeCount}
                 </span>

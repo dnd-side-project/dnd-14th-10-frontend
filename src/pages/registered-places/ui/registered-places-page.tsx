@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { mockRegisteredPlaces } from '@/features/registered-places/model/mock-data';
 import EmptyRegisteredPlaces from '@/features/registered-places/ui/EmptyRegisteredPlaces';
 import PlaceManageBottomSheet from '@/features/registered-places/ui/PlaceManageBottomSheet';
-import RegisteredPlaceItem from '@/features/registered-places/ui/RegisteredPlaceItem';
 import SortDropdown from '@/features/registered-places/ui/SortDropdown';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
+import PlaceListItem from '@/shared/ui/place-list-item/PlaceListItem';
 
 export default function RegisteredPlacesPage() {
   const [isManageSheetOpen, setIsManageSheetOpen] = useState(false);
@@ -54,13 +54,14 @@ export default function RegisteredPlacesPage() {
 
           <div className='mt-4.5 flex flex-col gap-5 px-5'>
             {mockRegisteredPlaces.map((place) => (
-              <RegisteredPlaceItem
+              <PlaceListItem
                 key={place.id}
                 name={place.name}
                 imageUrl={place.imageUrl}
                 likeCount={place.likeCount}
                 tags={place.tags}
                 isLiked={place.isLiked}
+                showMoreButton
                 onMoreClick={handleMoreClick}
                 onClick={() => handlePlaceClick(place.id)}
               />

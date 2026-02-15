@@ -16,10 +16,12 @@ import MyEditBirthdayPage from '@/pages/my-edit-birthday/ui/my-edit-birthday-pag
 import MyEditNicknamePage from '@/pages/my-edit-nickname/ui/my-edit-nickname-page';
 import OnboardingPage from '@/pages/onboarding/ui/onboarding-page';
 import PlaceDetailPage from '@/pages/place-detail/ui/place-detail-page';
+import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
 import RegisteredPlacesPage from '@/pages/registered-places/ui/registered-places-page';
 import RegistrationPage from '@/pages/registration/ui/registration-page';
 import ReviewCreationPage from '@/pages/review-creation/ui/review-creation-page';
 import ReviewHistoryPage from '@/pages/review-history/ui/review-history-page';
+import WishlistPage from '@/pages/wishlist/ui/wishlist-page';
 import WithdrawalPage from '@/pages/withdrawal/ui/withdrawal-page';
 
 export const router = createBrowserRouter([
@@ -89,6 +91,14 @@ export const router = createBrowserRouter([
       {
         path: '/my/badges',
         element: <BadgePage />,
+      },
+      {
+        path: '/wishlist',
+        element: <WishlistPage />,
+      },
+      {
+        path: '/place-not-found',
+        element: <PlaceNotFoundPage />,
       },
     ],
   },

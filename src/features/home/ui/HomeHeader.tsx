@@ -13,7 +13,7 @@ export default function HomeHeader() {
   };
 
   const handleWishlistClick = () => {
-    // TODO: 위시리스트 페이지로 이동
+    navigate('/wishlist');
   };
 
   const handleMyPageClick = () => {
