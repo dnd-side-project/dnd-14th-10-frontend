@@ -60,7 +60,7 @@ export default function MyPage() {
         navigate('/my/reviews');
         break;
       case '배지':
-        // TODO: 배지 페이지로 이동
+        navigate('/my/badges');
         break;
       default:
         break;

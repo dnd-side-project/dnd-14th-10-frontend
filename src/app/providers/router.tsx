@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from '@/app/layouts/MainLayout';
 import AnnouncementListPage from '@/pages/announcement/ui/announcement-list-page';
 import AnnouncementDetailPage from '@/pages/announcement-detail/ui/announcement-detail-page';
+import BadgePage from '@/pages/badge/ui/badge-page';
 import HomePage from '@/pages/home/ui/home-page';
 import LoginPage from '@/pages/login/ui/login-page';
 import MapPage from '@/pages/map/ui/map-page';
@@ -84,6 +85,10 @@ export const router = createBrowserRouter([
       {
         path: '/my/reviews',
         element: <ReviewHistoryPage />,
+      },
+      {
+        path: '/my/badges',
+        element: <BadgePage />,
       },
     ],
   },
