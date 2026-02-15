@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { mockRegisteredPlaces } from '@/features/registered-places/model/mock-data';
 import EmptyRegisteredPlaces from '@/features/registered-places/ui/EmptyRegisteredPlaces';
-import PlaceManageBottomSheet from '@/features/registered-places/ui/PlaceManageBottomSheet';
 import SortDropdown from '@/features/registered-places/ui/SortDropdown';
+import { ActionMenuBottomSheet } from '@/shared/ui/bottom-sheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 import PlaceListItem from '@/shared/ui/place-list-item/PlaceListItem';
 
@@ -72,11 +72,14 @@ export default function RegisteredPlacesPage() {
         <EmptyRegisteredPlaces onRegisterClick={handleRegisterClick} />
       )}
 
-      <PlaceManageBottomSheet
+      <ActionMenuBottomSheet
         isOpen={isManageSheetOpen}
         onClose={() => setIsManageSheetOpen(false)}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        title='장소 관리'
+        items={[
+          { label: '정보 수정', onClick: handleEdit },
+          { label: '삭제', onClick: handleDelete, variant: 'danger' },
+        ]}
       />
     </div>
   );

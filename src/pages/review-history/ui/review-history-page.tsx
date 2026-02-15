@@ -6,7 +6,7 @@ import SortDropdown from '@/features/registered-places/ui/SortDropdown';
 import { mockReviews } from '@/features/review-history/model/mock-data';
 import EmptyReviews from '@/features/review-history/ui/EmptyReviews';
 import ReviewItem from '@/features/review-history/ui/ReviewItem';
-import ReviewManageBottomSheet from '@/features/review-history/ui/ReviewManageBottomSheet';
+import { ActionMenuBottomSheet } from '@/shared/ui/bottom-sheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 export default function ReviewHistoryPage() {
@@ -68,11 +68,14 @@ export default function ReviewHistoryPage() {
         <EmptyReviews />
       )}
 
-      <ReviewManageBottomSheet
+      <ActionMenuBottomSheet
         isOpen={isManageSheetOpen}
         onClose={() => setIsManageSheetOpen(false)}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        title='리뷰 관리'
+        items={[
+          { label: '리뷰 수정', onClick: handleEdit },
+          { label: '삭제', onClick: handleDelete, variant: 'danger' },
+        ]}
       />
     </div>
   );

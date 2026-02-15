@@ -8,11 +8,11 @@ import {
   mockRecentPlaces,
   mockUserData,
 } from '@/features/my/model/mock-data';
-import LogoutBottomSheet from '@/features/my/ui/LogoutBottomSheet';
 import MenuSection from '@/features/my/ui/MenuSection';
 import ProfileSection from '@/features/my/ui/ProfileSection';
 import RecentPlacesSection from '@/features/my/ui/RecentPlacesSection';
 import StatsSection from '@/features/my/ui/StatsSection';
+import { ConfirmBottomSheet } from '@/shared/ui/bottom-sheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 export default function MyPage() {
@@ -92,9 +92,12 @@ export default function MyPage() {
         <MenuSection items={menuItemsWithHandlers} />
       </div>
 
-      <LogoutBottomSheet
+      <ConfirmBottomSheet
         isOpen={isLogoutSheetOpen}
         onClose={() => setIsLogoutSheetOpen(false)}
+        title='로그아웃 확인'
+        message='로그아웃 하시겠습니까?'
+        confirmText='로그아웃'
         onConfirm={handleLogoutConfirm}
       />
     </div>
