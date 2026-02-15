@@ -49,9 +49,11 @@ function DrawerContent({
   className,
   children,
   showOverlay = true,
+  hideHandle = false,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Content> & {
   showOverlay?: boolean;
+  hideHandle?: boolean;
 }) {
   return (
     <DrawerPortal data-slot='drawer-portal'>
@@ -68,11 +70,13 @@ function DrawerContent({
         )}
         {...props}
       >
-        <div
-          data-vaul-handle
-          aria-hidden='true'
-          className='mx-auto mt-[16px] hidden h-2 w-[42px] shrink-0 cursor-grab rounded-full bg-gray-300 group-data-[vaul-drawer-direction=bottom]/drawer-content:block active:cursor-grabbing'
-        />
+        {!hideHandle && (
+          <div
+            data-vaul-handle
+            aria-hidden='true'
+            className='mx-auto mt-[16px] hidden h-2 w-[42px] shrink-0 cursor-grab rounded-full bg-gray-300 group-data-[vaul-drawer-direction=bottom]/drawer-content:block active:cursor-grabbing'
+          />
+        )}
         {children}
       </DrawerPrimitive.Content>
     </DrawerPortal>

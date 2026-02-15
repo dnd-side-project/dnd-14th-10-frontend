@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import { cn } from '@/lib/utils';
 import GojkLogo from '@/shared/ui/icons/GojkLogo.svg?react';
 import GoogleLogo from '@/shared/ui/icons/GoogleLogo.svg?react';
@@ -39,7 +41,7 @@ function SocialButton({ provider, onClick }: SocialButtonProps) {
       type='button'
       onClick={onClick}
       className={cn(
-        'flex h-[52px] w-full items-center justify-center gap-2 rounded-lg',
+        'flex h-[52px] w-full items-center justify-center gap-4 rounded-lg',
         'text-body1 font-medium',
         bgColor,
         textColor,
@@ -52,8 +54,15 @@ function SocialButton({ provider, onClick }: SocialButtonProps) {
 }
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
   const handleSocialLogin = (provider: 'kakao' | 'google' | 'naver') => {
     console.log(`${provider} 로그인 클릭`);
+
+    // 카카오 로그인 시 온보딩으로 이동 (임시 - 실제 로그인 구현 전까지)
+    if (provider === 'kakao') {
+      navigate('/onboarding');
+    }
   };
 
   return (

@@ -1,16 +1,16 @@
 import { createBrowserRouter } from 'react-router-dom';
 
+import MainLayout from '@/app/layouts/MainLayout';
 import HomePage from '@/pages/home/ui/home-page';
 import LoginPage from '@/pages/login/ui/login-page';
 import MapPage from '@/pages/map/ui/map-page';
 
 import MapRecommendedPage from '@/pages/map-recommended/ui/map-recommended-page';
 import MyPage from '@/pages/my/ui/my-page';
+import OnboardingPage from '@/pages/onboarding/ui/onboarding-page';
 import PlaceDetailPage from '@/pages/place-detail/ui/place-detail-page';
 import RegistrationPage from '@/pages/registration/ui/registration-page';
 import ReviewCreationPage from '@/pages/review-creation/ui/review-creation-page';
-
-import MainLayout from '../layouts/MainLayout';
 
 export const router = createBrowserRouter([
   {
@@ -49,5 +49,9 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/onboarding',
+    element: <OnboardingPage />,
   },
 ]);
