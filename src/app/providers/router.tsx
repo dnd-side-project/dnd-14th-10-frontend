@@ -18,6 +18,7 @@ import PlaceDetailPage from '@/pages/place-detail/ui/place-detail-page';
 import RegisteredPlacesPage from '@/pages/registered-places/ui/registered-places-page';
 import RegistrationPage from '@/pages/registration/ui/registration-page';
 import ReviewCreationPage from '@/pages/review-creation/ui/review-creation-page';
+import ReviewHistoryPage from '@/pages/review-history/ui/review-history-page';
 import WithdrawalPage from '@/pages/withdrawal/ui/withdrawal-page';
 
 export const router = createBrowserRouter([
@@ -79,6 +80,10 @@ export const router = createBrowserRouter([
       {
         path: '/my/registered-places',
         element: <RegisteredPlacesPage />,
+      },
+      {
+        path: '/my/reviews',
+        element: <ReviewHistoryPage />,
       },
     ],
   },

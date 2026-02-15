@@ -57,7 +57,7 @@ export default function MyPage() {
         navigate('/my/registered-places');
         break;
       case '리뷰':
-        // TODO: 리뷰 히스토리 페이지로 이동
+        navigate('/my/reviews');
         break;
       case '배지':
         // TODO: 배지 페이지로 이동
