@@ -7,6 +7,8 @@ import FormLabel from '@/shared/ui/forms/FormLabel';
 interface NicknameStepProps {
   onComplete: (nickname: string) => void;
   onBack: () => void;
+  initialValue?: string;
+  buttonText?: string;
 }
 
 const getKoreanLength = (str: string): number => {
@@ -17,8 +19,13 @@ const getEnglishLength = (str: string): number => {
   return str.replace(/[^a-zA-Z]/g, '').length;
 };
 
-export default function NicknameStep({ onComplete, onBack }: NicknameStepProps) {
-  const [nickname, setNickname] = useState('');
+export default function NicknameStep({
+  onComplete,
+  onBack,
+  initialValue = '',
+  buttonText = '시작하기',
+}: NicknameStepProps) {
+  const [nickname, setNickname] = useState(initialValue);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const koreanLength = getKoreanLength(nickname);
@@ -86,13 +93,13 @@ export default function NicknameStep({ onComplete, onBack }: NicknameStepProps) 
       onBack={onBack}
       footer={
         <div
-          className='px-5 pb-8 transition-all duration-200'
+          className='px-5 transition-all duration-200'
           style={{
-            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 16 : 32,
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 16 : 0,
           }}
         >
           <PrimaryButton onClick={handleComplete} disabled={!isValid}>
-            시작하기
+            {buttonText}
           </PrimaryButton>
         </div>
       }

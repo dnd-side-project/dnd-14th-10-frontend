@@ -9,11 +9,27 @@ import FormLabel from '@/shared/ui/forms/FormLabel';
 interface BirthdayStepProps {
   onNext: (birthday: string) => void;
   onBack: () => void;
+  initialValue?: string;
+  buttonText?: string;
 }
 
-export default function BirthdayStep({ onNext, onBack }: BirthdayStepProps) {
+const parseInitialDate = (value?: string): DateValue | null => {
+  if (!value) return null;
+  const [year, month, day] = value.split('-').map(Number);
+  if (!year || !month || !day) return null;
+  return { year, month, day };
+};
+
+export default function BirthdayStep({
+  onNext,
+  onBack,
+  initialValue,
+  buttonText = '다음 단계',
+}: BirthdayStepProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<DateValue | null>(null);
+  const [selectedDate, setSelectedDate] = useState<DateValue | null>(
+    parseInitialDate(initialValue),
+  );
 
   const handleOpenPicker = () => {
     setIsPickerOpen(true);
@@ -41,9 +57,9 @@ export default function BirthdayStep({ onNext, onBack }: BirthdayStepProps) {
       title='생년월일을 입력해주세요.'
       onBack={onBack}
       footer={
-        <div className='px-5 pb-8'>
+        <div className='px-5'>
           <PrimaryButton onClick={handleNext} disabled={!isValid}>
-            다음 단계
+            {buttonText}
           </PrimaryButton>
         </div>
       }

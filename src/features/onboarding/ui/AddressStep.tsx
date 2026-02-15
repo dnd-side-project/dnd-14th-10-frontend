@@ -9,11 +9,25 @@ import AddressPicker from '@/shared/ui/inputs/AddressPicker';
 interface AddressStepProps {
   onNext: (address: string) => void;
   onBack: () => void;
+  initialValue?: string;
+  buttonText?: string;
 }
 
-export default function AddressStep({ onNext, onBack }: AddressStepProps) {
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
-  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+const parseInitialAddress = (value?: string): { city: string | null; district: string | null } => {
+  if (!value) return { city: null, district: null };
+  const parts = value.split(' ');
+  return { city: parts[0] || null, district: parts[1] || null };
+};
+
+export default function AddressStep({
+  onNext,
+  onBack,
+  initialValue,
+  buttonText = '다음 단계',
+}: AddressStepProps) {
+  const initialAddress = parseInitialAddress(initialValue);
+  const [selectedCity, setSelectedCity] = useState<string | null>(initialAddress.city);
+  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(initialAddress.district);
 
   const handleCityChange = (city: string) => {
     setSelectedCity(city);
@@ -37,9 +51,9 @@ export default function AddressStep({ onNext, onBack }: AddressStepProps) {
       title='거주지를 입력해주세요.'
       onBack={onBack}
       footer={
-        <div className='px-5 pb-8'>
+        <div className='px-5'>
           <PrimaryButton onClick={handleNext} disabled={!isValid}>
-            다음 단계
+            {buttonText}
           </PrimaryButton>
         </div>
       }
