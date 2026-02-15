@@ -51,6 +51,22 @@ export default function MyPage() {
     navigate('/login');
   };
 
+  const handleStatClick = (label: string) => {
+    switch (label) {
+      case '장소 등록':
+        navigate('/my/registered-places');
+        break;
+      case '리뷰':
+        // TODO: 리뷰 히스토리 페이지로 이동
+        break;
+      case '배지':
+        // TODO: 배지 페이지로 이동
+        break;
+      default:
+        break;
+    }
+  };
+
   const statsData = createStatsData(mockUserData.stats);
   const menuItemsWithHandlers = mockMenuItems.map((item) => ({
     ...item,
@@ -68,7 +84,7 @@ export default function MyPage() {
             avatarUrl={mockUserData.avatarUrl}
             onEditClick={handleEditProfile}
           />
-          <StatsSection stats={statsData} />
+          <StatsSection stats={statsData} onStatClick={handleStatClick} />
         </div>
 
         <RecentPlacesSection places={mockRecentPlaces} onPlaceClick={handlePlaceClick} />

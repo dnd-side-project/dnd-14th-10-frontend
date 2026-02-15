@@ -15,6 +15,7 @@ import MyEditBirthdayPage from '@/pages/my-edit-birthday/ui/my-edit-birthday-pag
 import MyEditNicknamePage from '@/pages/my-edit-nickname/ui/my-edit-nickname-page';
 import OnboardingPage from '@/pages/onboarding/ui/onboarding-page';
 import PlaceDetailPage from '@/pages/place-detail/ui/place-detail-page';
+import RegisteredPlacesPage from '@/pages/registered-places/ui/registered-places-page';
 import RegistrationPage from '@/pages/registration/ui/registration-page';
 import ReviewCreationPage from '@/pages/review-creation/ui/review-creation-page';
 import WithdrawalPage from '@/pages/withdrawal/ui/withdrawal-page';
@@ -74,6 +75,10 @@ export const router = createBrowserRouter([
       {
         path: '/announcement/:id',
         element: <AnnouncementDetailPage />,
+      },
+      {
+        path: '/my/registered-places',
+        element: <RegisteredPlacesPage />,
       },
     ],
   },
