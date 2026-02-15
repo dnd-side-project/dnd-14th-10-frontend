@@ -22,6 +22,7 @@ export function useLocationMap({
   const markerRef = useRef<naver.maps.Marker | null>(null);
 
   const initialCenterRef = useRef(initialCenter);
+  const showInitialMarkerRef = useRef(showInitialMarker);
 
   const isLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
 
@@ -56,7 +57,7 @@ export function useLocationMap({
       zoom: 16,
     });
 
-    if (showInitialMarker) {
+    if (showInitialMarkerRef.current) {
       markerRef.current = new window.naver.maps.Marker({
         position: center,
         map: naverMapRef.current,
@@ -69,7 +70,7 @@ export function useLocationMap({
         naverMapRef.current = null;
       }
     };
-  }, [isLoaded, showInitialMarker]);
+  }, [isLoaded]);
 
   return { mapRef, updateMarkerPosition, isLoaded };
 }
