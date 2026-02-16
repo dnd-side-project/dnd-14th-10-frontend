@@ -147,7 +147,7 @@
 body {
   margin: 0 auto;
   min-height: 100vh;
-  max-width: 390px;
+  max-width: 450px;
 }
 
 @layer base {
