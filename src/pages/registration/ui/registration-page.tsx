@@ -76,7 +76,7 @@ function RegistrationPage() {
         category: formData.category,
         latitude: formData.location.latitude,
         longitude: formData.location.longitude,
-        regionCode: formData.location.regionCode ?? 1,
+        regionCode: formData.location.regionCode,
         addressDetail: formData.location.roadAddress || formData.location.address,
         outletScore: detail.outletScore,
         spaceSize: detail.spaceSize,
@@ -146,12 +146,6 @@ function RegistrationPage() {
 
       {step === 'detail' && (
         <>
-          {console.log(
-            'detail step - category:',
-            formData.category,
-            'location:',
-            formData.location,
-          )}
           {formData.category && formData.location ? (
             <DetailInputStep
               location={formData.location}

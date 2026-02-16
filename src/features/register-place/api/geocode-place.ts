@@ -29,23 +29,27 @@ export function geocodeAddress(address: string): Promise<GeocodeResult> {
 }
 
 /** 좌표 → 행정동 코드 조회 (reverse geocode) */
-export function reverseGeocodeRegionCode(lat: number, lng: number): Promise<number | undefined> {
-  return new Promise((resolve) => {
+export function reverseGeocodeRegionCode(lat: number, lng: number): Promise<number> {
+  return new Promise((resolve, reject) => {
     if (!window.naver?.maps?.Service) {
-      return resolve(undefined);
+      return reject(new Error('Naver Maps Service를 사용할 수 없습니다.'));
     }
 
     const coords = new window.naver.maps.LatLng(lat, lng);
 
     window.naver.maps.Service.reverseGeocode({ coords }, (status, response) => {
       if (status !== window.naver.maps.Service.Status.OK) {
-        return resolve(undefined);
+        return reject(new Error('역지오코딩 실패'));
       }
 
       const admResult = response.v2.results?.find((r) => r.name === 'admcode');
       const codeId = admResult?.code?.id;
 
-      resolve(codeId ? parseInt(codeId, 10) || undefined : undefined);
+      if (codeId === undefined) {
+        reject(new Error('행정동 코드를 찾을 수 없습니다.'));
+      } else {
+        resolve(parseInt(codeId, 10));
+      }
     });
   });
 }

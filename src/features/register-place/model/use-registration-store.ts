@@ -15,7 +15,7 @@ export interface LocationData {
   latitude: number;
   longitude: number;
   placeName?: string;
-  regionCode?: number;
+  regionCode: number;
 }
 
 export interface DetailFormData {
@@ -105,6 +105,3 @@ export const useRegistrationStore = create<RegistrationStore>((set) => ({
 
   reset: () => set({ formData: initialFormData }),
 }));
-
-// PlaceType alias for backward compatibility
-export type PlaceType = 'cafe' | 'public';
