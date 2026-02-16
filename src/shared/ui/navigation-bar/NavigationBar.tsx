@@ -19,7 +19,7 @@ export default function NavigationBar({ left, title, right, onBack }: Navigation
     ) : null);
 
   return (
-    <header className='sticky top-0 z-101 flex h-12 items-center justify-between border-b border-gray-200 bg-white px-5'>
+    <header className='sticky top-0 z-10 flex h-12 items-center justify-between border-b border-gray-200 bg-white px-5'>
       <div className='flex min-w-0 flex-1 items-center gap-[16px]'>
         {leftContent}
         {title && <div className='text-heading3 truncate font-bold text-gray-950'>{title}</div>}

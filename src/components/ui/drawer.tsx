@@ -40,7 +40,7 @@ function DrawerStaticOverlay({ className }: { className?: string }) {
   return (
     <div
       data-slot='drawer-static-overlay'
-      className={cn('animate-in fade-in-0 fixed inset-0 z-102 bg-black/50', className)}
+      className={cn('animate-in fade-in-0 fixed inset-0 z-50 bg-black/50', className)}
     />
   );
 }
