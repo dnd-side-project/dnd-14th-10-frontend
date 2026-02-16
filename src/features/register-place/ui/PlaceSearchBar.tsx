@@ -101,8 +101,8 @@ export function PlaceSearchBar({
           {/* 검색 결과 */}
           {searchResults.length > 0 && (
             <ul className='border-gray-150 max-h-[50vh] overflow-y-auto border-t'>
-              {searchResults.map((result, index) => (
-                <li key={index}>
+              {searchResults.map((result) => (
+                <li key={`${result.placeName}-${result.address}`}>
                   <button
                     type='button'
                     onMouseDown={(e) => e.preventDefault()}

@@ -42,7 +42,7 @@ function BasicInfoSection({ place }: { place: PlaceDetail }) {
       <div className='scrollbar-hide -mx-5 mb-5 flex gap-4 overflow-x-auto px-5'>
         {place.images.map((image, index) => (
           <img
-            key={index}
+            key={image}
             src={image}
             alt={`${place.name} 이미지 ${index + 1}`}
             className='h-[207px] w-[260px] flex-shrink-0 rounded-lg object-cover'
