@@ -112,7 +112,7 @@ export default function WheelPicker({ isOpen, onClose, onConfirm, initialDate }:
             className={`px-4 transition-opacity duration-200 ${isPickerVisible ? 'opacity-100' : 'opacity-0'}`}
             data-vaul-no-drag
           >
-            <WheelPickerWrapper className='w-full border-none bg-transparent px-0 shadow-none'>
+            <WheelPickerWrapper className='w-full border-none bg-transparent px-5 shadow-none'>
               <WheelPickerComponent
                 options={yearOptions}
                 value={date.year}
@@ -120,8 +120,8 @@ export default function WheelPicker({ isOpen, onClose, onConfirm, initialDate }:
                 optionItemHeight={45}
                 classNames={{
                   highlightWrapper: 'bg-gray-100 rounded-l-lg rounded-r-none',
-                  optionItem: 'text-gray-400',
-                  highlightItem: 'font-medium text-gray-950',
+                  optionItem: 'text-gray-400 text-[18px] font-medium',
+                  highlightItem: 'text-gray-950 text-[18px] font-medium',
                 }}
               />
               <WheelPickerComponent
@@ -131,8 +131,8 @@ export default function WheelPicker({ isOpen, onClose, onConfirm, initialDate }:
                 optionItemHeight={45}
                 classNames={{
                   highlightWrapper: 'bg-gray-100 rounded-none',
-                  optionItem: 'text-gray-400',
-                  highlightItem: 'font-medium text-gray-950',
+                  optionItem: 'text-gray-400 text-[18px] font-medium',
+                  highlightItem: 'text-gray-950 text-[18px] font-medium',
                 }}
               />
               <WheelPickerComponent
@@ -142,8 +142,8 @@ export default function WheelPicker({ isOpen, onClose, onConfirm, initialDate }:
                 optionItemHeight={45}
                 classNames={{
                   highlightWrapper: 'bg-gray-100 rounded-r-lg rounded-l-none',
-                  optionItem: 'text-gray-400',
-                  highlightItem: 'font-medium text-gray-950',
+                  optionItem: 'text-gray-400 text-[18px] font-medium',
+                  highlightItem: 'text-gray-950 text-[18px] font-medium',
                 }}
               />
             </WheelPickerWrapper>
