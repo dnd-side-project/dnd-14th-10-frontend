@@ -66,8 +66,13 @@ export function useLocationMap({
 
     return () => {
       if (naverMapRef.current) {
-        naverMapRef.current.destroy();
-        naverMapRef.current = null;
+        try {
+          naverMapRef.current.destroy();
+        } catch (e) {
+          console.log('destroyed', e);
+        } finally {
+          naverMapRef.current = null;
+        }
       }
     };
   }, [isLoaded]);
