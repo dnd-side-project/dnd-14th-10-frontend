@@ -1,6 +1,10 @@
 import { http, HttpResponse } from 'msw';
 
 import type { PlaceDetail } from '@/entities/place/model/place.types';
+import type {
+  PlaceRegisterRequest,
+  PlaceRegisterResponse,
+} from '@/features/register-place/model/register-place.types';
 
 const createMockPlaceDetail = (id: string): PlaceDetail => ({
   id,
@@ -152,5 +156,20 @@ export const handlers = [
   http.get('/api/places/:placeId', ({ params }) => {
     const { placeId } = params;
     return HttpResponse.json(createMockPlaceDetail(placeId as string));
+  }),
+
+  // POST /api/places (장소 등록)
+  http.post('/api/places', async ({ request }) => {
+    const body = (await request.json()) as PlaceRegisterRequest;
+    console.log('[MSW] 장소 등록 요청:', body);
+
+    // 새로운 장소 ID 생성 (실제로는 서버에서 생성)
+    const newPlaceId = Math.floor(Math.random() * 10000) + 1000;
+
+    const response: PlaceRegisterResponse = {
+      id: newPlaceId,
+    };
+
+    return HttpResponse.json(response, { status: 201 });
   }),
 ];
