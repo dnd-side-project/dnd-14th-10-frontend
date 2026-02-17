@@ -40,7 +40,7 @@ export default function ReviewHistoryPage() {
   const hasReviews = mockReviews.length > 0;
 
   return (
-    <div className='flex min-h-screen flex-col bg-white pt-6 pb-10'>
+    <div className='flex min-h-screen flex-col bg-white'>
       <NavigationBar title='리뷰 히스토리' onBack={handleBack} />
 
       {hasReviews ? (

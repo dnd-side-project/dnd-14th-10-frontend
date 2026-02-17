@@ -15,7 +15,7 @@ export default function PlaceNotFoundPage() {
   };
 
   return (
-    <div className='flex min-h-screen flex-col bg-white pt-6 pb-10'>
+    <div className='flex min-h-screen flex-col bg-white'>
       <header className='border-gray-150 flex h-[48px] items-center border-b px-5 py-3'>
         <button type='button' onClick={handleClose}>
           <CloseIcon className='size-6 text-gray-950' />

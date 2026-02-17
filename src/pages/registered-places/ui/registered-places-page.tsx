@@ -43,7 +43,7 @@ export default function RegisteredPlacesPage() {
   const hasPlaces = mockRegisteredPlaces.length > 0;
 
   return (
-    <div className='flex min-h-screen flex-col bg-white pt-6 pb-10'>
+    <div className='flex min-h-screen flex-col bg-white'>
       <NavigationBar title='등록 장소 히스토리' onBack={handleBack} />
 
       {hasPlaces ? (

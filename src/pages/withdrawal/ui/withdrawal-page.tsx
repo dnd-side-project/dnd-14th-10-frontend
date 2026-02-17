@@ -46,7 +46,7 @@ export default function WithdrawalPage() {
   };
 
   return (
-    <div className='flex min-h-screen flex-col bg-white pt-6 pb-10'>
+    <div className='flex min-h-screen flex-col bg-white pb-3'>
       <NavigationBar onBack={handleBack} />
 
       <div className='flex flex-1 flex-col gap-12 px-5 pt-6'>

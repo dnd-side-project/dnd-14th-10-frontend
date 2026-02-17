@@ -74,7 +74,7 @@ export default function MyPage() {
   }));
 
   return (
-    <div className='flex min-h-screen flex-col bg-white pt-6 pb-10'>
+    <div className='flex min-h-screen flex-col bg-white'>
       <NavigationBar title='MY' onBack={handleBack} />
 
       <div className='flex flex-col pt-6'>

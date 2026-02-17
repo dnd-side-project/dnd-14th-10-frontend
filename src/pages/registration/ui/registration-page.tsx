@@ -11,9 +11,8 @@ import { DetailInputStep } from '@/features/register-place/ui/DetailInputStep';
 import { LocationSearchStep } from '@/features/register-place/ui/LocationSearchStep';
 import { TypeSelectStep } from '@/features/register-place/ui/TypeSelectStep';
 import { useFunnel } from '@/shared/lib/funnel/use-funnel';
-import { Header } from '@/shared/ui/header/Header';
-
 import CloseIcon from '@/shared/ui/icons/Close.svg?react';
+import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 const STEPS = ['type', 'location', 'detail', 'complete'] as const;
 type Step = (typeof STEPS)[number];
@@ -109,10 +108,14 @@ function RegistrationPage() {
   if (step === 'complete' && registeredPlaceId && formData.category) {
     return (
       <div className='h-dvh overflow-hidden bg-white'>
-        <Header
+        <NavigationBar
           onBack={handleCompleteClose}
           title={getHeaderTitle(step, formData.category)}
-          left={<CloseIcon onClick={handleCompleteClose} />}
+          left={
+            <button onClick={handleCompleteClose}>
+              <CloseIcon className='h-[24px] w-[24px]' />
+            </button>
+          }
         />
 
         <CompleteStep
@@ -126,7 +129,7 @@ function RegistrationPage() {
 
   return (
     <div className='h-dvh overflow-hidden bg-white'>
-      <Header onBack={handleBack} title={getHeaderTitle(step, formData.category)} />
+      <NavigationBar onBack={handleBack} title={getHeaderTitle(step, formData.category)} />
 
       {step === 'type' && (
         <TypeSelectStep

@@ -15,7 +15,7 @@ export default function AnnouncementDetailPage() {
 
   if (!announcement) {
     return (
-      <div className='flex min-h-screen flex-col bg-white pt-6 pb-10'>
+      <div className='flex min-h-screen flex-col bg-white'>
         <NavigationBar title='공지사항 상세' onBack={handleBack} />
         <div className='flex flex-1 items-center justify-center'>
           <p className='text-body1 text-gray-500'>공지사항을 찾을 수 없습니다.</p>
@@ -25,7 +25,7 @@ export default function AnnouncementDetailPage() {
   }
 
   return (
-    <div className='flex min-h-screen flex-col bg-white pt-6 pb-10'>
+    <div className='flex min-h-screen flex-col bg-white'>
       <NavigationBar title='공지사항 상세' onBack={handleBack} />
 
       <div className='flex flex-col pt-6'>

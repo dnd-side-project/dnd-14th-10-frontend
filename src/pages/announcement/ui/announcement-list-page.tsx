@@ -16,7 +16,7 @@ export default function AnnouncementListPage() {
   };
 
   return (
-    <div className='flex min-h-screen flex-col bg-white pt-6 pb-10'>
+    <div className='flex min-h-screen flex-col bg-white'>
       <NavigationBar title='공지사항' onBack={handleBack} />
 
       <div className='flex flex-col px-5 pt-6'>
