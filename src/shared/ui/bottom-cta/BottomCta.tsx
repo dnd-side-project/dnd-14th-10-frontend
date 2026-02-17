@@ -26,10 +26,10 @@ export function BottomCta({
         disabled={disabled}
         onClick={onClick}
         className={cn(
-          'h-[52px] w-full rounded-lg text-body1',
+          'text-body1 h-[52px] w-full rounded-lg',
           disabled
             ? 'bg-gray-100 font-medium text-gray-500 hover:bg-gray-100'
-            : 'bg-primary-700 font-bold text-white hover:bg-primary-700/90',
+            : 'bg-primary-700 hover:bg-primary-700/90 font-bold text-white',
           className,
         )}
       >
