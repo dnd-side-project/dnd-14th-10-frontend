@@ -92,7 +92,12 @@ export default function WheelPicker({ isOpen, onClose, onConfirm, initialDate }:
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent showOverlay hideHandle className='mb-5 border-none bg-transparent'>
+      <DrawerContent
+        variant='panel'
+        showOverlay
+        hideHandle
+        className='mb-5 border-none bg-transparent'
+      >
         <DrawerTitle className='sr-only'>생년월일 선택</DrawerTitle>
         <div className='mx-5 rounded-xl bg-white pb-6'>
           <div className='mx-auto mt-4 h-1 w-[42px] cursor-grab rounded-full bg-gray-300 active:cursor-grabbing' />

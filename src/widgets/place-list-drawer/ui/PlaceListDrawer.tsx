@@ -27,9 +27,10 @@ export function PlaceListDrawer({ open, places, onPlaceClick }: PlaceListDrawerP
       modal={false}
     >
       <DrawerContent
+        variant='panel'
         showOverlay={snap === 1}
         className={cn(
-          'z-101 mx-auto max-w-[450px] rounded-t-xl px-0 outline-none focus:ring-0 focus:outline-none data-[vaul-drawer-direction=bottom]:border-0',
+          'z-101 mx-auto max-w-[450px] px-0 outline-none focus:ring-0 focus:outline-none data-[vaul-drawer-direction=bottom]:border-0',
           'h-screen',
           'data-[vaul-drawer-direction=bottom]:max-h-[calc(100vh-72px)]',
           'overflow-hidden',

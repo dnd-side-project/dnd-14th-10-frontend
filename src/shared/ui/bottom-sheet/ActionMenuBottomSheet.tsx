@@ -21,7 +21,11 @@ export default function ActionMenuBottomSheet({
 }: ActionMenuBottomSheetProps) {
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent className='mb-5 rounded-t-[30px]' hideHandle>
+      <DrawerContent
+        variant='popup'
+        className='mb-5 data-[vaul-drawer-direction=bottom]:border-0'
+        hideHandle
+      >
         <DrawerTitle className='sr-only'>{title}</DrawerTitle>
         <div className='mx-auto mt-[10px] h-[5px] w-[43px] rounded-[30px] bg-[#d2d4d5]' />
         <div className='mt-[15px] flex flex-col px-5'>
