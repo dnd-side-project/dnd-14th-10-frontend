@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
-import cafeIconUrl from '@/shared/ui/icons/CategoryCafe.svg';
-import publicIconUrl from '@/shared/ui/icons/CategoryPublic.svg';
+import cafeIconUrl from '@/shared/ui/icons/CategoryCafe.png';
+import publicIconUrl from '@/shared/ui/icons/CategoryPublic.png';
 
 export type Category = 'cafe' | 'public';
 

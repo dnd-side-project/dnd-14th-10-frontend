@@ -1,4 +1,4 @@
-import PlaceRegisterIcon from '@/shared/ui/icons/PlaceRegisterIcon.svg';
+import PlaceRegisterIcon from '@/shared/ui/icons/PlaceRegisterIcon.png';
 
 interface EmptyRegisteredPlacesProps {
   onRegisterClick: () => void;

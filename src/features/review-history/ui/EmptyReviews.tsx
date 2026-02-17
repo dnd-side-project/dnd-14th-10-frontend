@@ -1,4 +1,4 @@
-import ReviewIcon from '@/shared/ui/icons/ReviewIcon.svg';
+import ReviewIcon from '@/shared/ui/icons/ReviewIcon.png';
 
 export default function EmptyReviews() {
   return (

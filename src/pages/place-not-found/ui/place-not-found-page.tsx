@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import CloseIcon from '@/shared/ui/icons/Close.svg?react';
-import WarningTriangleIcon from '@/shared/ui/icons/WarningTriangle.svg';
+import WarningTriangleIcon from '@/shared/ui/icons/WarningTriangle.png';
 
 export default function PlaceNotFoundPage() {
   const navigate = useNavigate();

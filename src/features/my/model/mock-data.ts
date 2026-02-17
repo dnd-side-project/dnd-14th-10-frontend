@@ -1,6 +1,6 @@
-import badgeIcon from '@/shared/ui/icons/BadgeIcon.svg';
-import placeRegisterIcon from '@/shared/ui/icons/PlaceRegisterIcon.svg';
-import reviewIcon from '@/shared/ui/icons/ReviewIcon.svg';
+import badgeIcon from '@/shared/ui/icons/BadgeIcon.png';
+import placeRegisterIcon from '@/shared/ui/icons/PlaceRegisterIcon.png';
+import reviewIcon from '@/shared/ui/icons/ReviewIcon.png';
 
 export const STATS_ICONS = {
   placeRegister: placeRegisterIcon,
