@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { mockRegisteredPlaces } from '@/features/registered-places/model/mock-data';
 import EmptyRegisteredPlaces from '@/features/registered-places/ui/EmptyRegisteredPlaces';
 import SortDropdown from '@/features/registered-places/ui/SortDropdown';
-import { ActionMenuBottomSheet } from '@/shared/ui/bottom-sheet';
+import ActionMenuBottomSheet from '@/shared/ui/bottom-sheet/ActionMenuBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 import PlaceListItem from '@/shared/ui/place-list-item/PlaceListItem';
 

@@ -12,7 +12,7 @@ import MenuSection from '@/features/my/ui/MenuSection';
 import ProfileSection from '@/features/my/ui/ProfileSection';
 import RecentPlacesSection from '@/features/my/ui/RecentPlacesSection';
 import StatsSection from '@/features/my/ui/StatsSection';
-import { ConfirmBottomSheet } from '@/shared/ui/bottom-sheet';
+import ConfirmBottomSheet from '@/shared/ui/bottom-sheet/ConfirmBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 export default function MyPage() {

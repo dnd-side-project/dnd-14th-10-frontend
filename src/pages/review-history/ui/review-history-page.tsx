@@ -6,7 +6,7 @@ import SortDropdown from '@/features/registered-places/ui/SortDropdown';
 import { mockReviews } from '@/features/review-history/model/mock-data';
 import EmptyReviews from '@/features/review-history/ui/EmptyReviews';
 import ReviewItem from '@/features/review-history/ui/ReviewItem';
-import { ActionMenuBottomSheet } from '@/shared/ui/bottom-sheet';
+import ActionMenuBottomSheet from '@/shared/ui/bottom-sheet/ActionMenuBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 export default function ReviewHistoryPage() {

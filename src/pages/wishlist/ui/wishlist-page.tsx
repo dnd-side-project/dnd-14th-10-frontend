@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import SortDropdown from '@/features/registered-places/ui/SortDropdown';
 import { mockWishlistItems } from '@/features/wishlist/model/mock-data';
 import EmptyWishlist from '@/features/wishlist/ui/EmptyWishlist';
-import { ConfirmBottomSheet } from '@/shared/ui/bottom-sheet';
+import ConfirmBottomSheet from '@/shared/ui/bottom-sheet/ConfirmBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 import PlaceListItem from '@/shared/ui/place-list-item/PlaceListItem';
 
