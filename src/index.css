@@ -133,6 +133,9 @@
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
   --radius-3xl: 1.875rem;
+
+  /* 앱 레이아웃 */
+  --width-app: 450px;
 }
 
 /* 기본 스타일 */
