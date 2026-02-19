@@ -223,6 +223,15 @@ export const handlers = [
 
   http.get('/api/places/:placeId', ({ params }) => {
     const { placeId } = params;
+    const VALID_PLACE_IDS = ['1', '2', '3', '4', '5'];
+
+    if (!VALID_PLACE_IDS.includes(placeId as string)) {
+      return HttpResponse.json(
+        { message: '존재하지 않는 장소입니다.' },
+        { status: 404 },
+      );
+    }
+
     return HttpResponse.json(createMockPlaceDetail(placeId as string));
   }),
 

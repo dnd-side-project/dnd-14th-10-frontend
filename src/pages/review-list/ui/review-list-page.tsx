@@ -4,6 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { usePlaceDetailQuery } from '@/entities/place/model/use-place-detail-query';
 import { ReviewCard } from '@/entities/place/ui/ReviewCard';
+import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
+import PlaceErrorBoundary from '@/shared/ui/error-boundary/PlaceErrorBoundary';
 import StarIcon from '@/shared/ui/icons/Star.svg?react';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
@@ -38,22 +40,20 @@ export default function ReviewListPage() {
   const { id } = useParams<{ id: string }>();
 
   if (!id) {
-    return (
-      <div className='flex min-h-screen items-center justify-center'>
-        <span>페이지를 찾을 수 없습니다.</span>
-      </div>
-    );
+    return <PlaceNotFoundPage />;
   }
 
   return (
-    <Suspense
-      fallback={
-        <div className='flex min-h-screen items-center justify-center'>
-          <span>로딩 중...</span>
-        </div>
-      }
-    >
-      <ReviewListContent id={id} />
-    </Suspense>
+    <PlaceErrorBoundary>
+      <Suspense
+        fallback={
+          <div className='flex min-h-screen items-center justify-center'>
+            <span>로딩 중...</span>
+          </div>
+        }
+      >
+        <ReviewListContent id={id} />
+      </Suspense>
+    </PlaceErrorBoundary>
   );
 }

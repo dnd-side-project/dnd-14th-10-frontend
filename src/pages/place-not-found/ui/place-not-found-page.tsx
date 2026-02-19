@@ -1,17 +1,36 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import CloseIcon from '@/shared/ui/icons/Close.svg?react';
 import WarningTriangleIcon from '@/shared/ui/icons/WarningTriangle.png';
 
-export default function PlaceNotFoundPage() {
+interface NotFoundState {
+  buttonText?: string;
+  navigateTo?: string;
+}
+
+interface PlaceNotFoundPageProps {
+  buttonText?: string;
+  navigateTo?: string;
+}
+
+export default function PlaceNotFoundPage(props: PlaceNotFoundPageProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = (location.state as NotFoundState) ?? {};
+
+  const buttonText = props.buttonText ?? state.buttonText ?? '이전 페이지로 돌아가기';
+  const navigateTo = props.navigateTo ?? state.navigateTo;
 
   const handleClose = () => {
     navigate(-1);
   };
 
-  const handleGoToWishlist = () => {
-    navigate('/wishlist');
+  const handleButtonClick = () => {
+    if (navigateTo) {
+      navigate(navigateTo);
+    } else {
+      navigate(-1);
+    }
   };
 
   return (
@@ -29,10 +48,10 @@ export default function PlaceNotFoundPage() {
         </span>
         <button
           type='button'
-          onClick={handleGoToWishlist}
+          onClick={handleButtonClick}
           className='text-primary-600 mt-4 rounded-[100px] bg-[#EAE6E3] px-5 py-[11px] text-[15px] leading-normal font-medium tracking-[-0.237px]'
         >
-          위시리스트로 돌아가기
+          {buttonText}
         </button>
       </div>
     </div>

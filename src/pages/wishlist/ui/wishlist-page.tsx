@@ -21,7 +21,9 @@ export default function WishlistPage() {
 
   const handlePlaceClick = (item: (typeof mockWishlistItems)[0]) => {
     if (item.isDeleted) {
-      navigate('/place-not-found');
+      navigate('/place-not-found', {
+        state: { buttonText: '위시리스트로 돌아가기', navigateTo: '/wishlist' },
+      });
     } else {
       navigate(`/place/${item.id}`);
     }

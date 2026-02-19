@@ -5,6 +5,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import type { PlaceDetail, ReviewTag } from '@/entities/place/model/place.types';
 import { usePlaceDetailQuery } from '@/entities/place/model/use-place-detail-query';
 import { ReviewCard } from '@/entities/place/ui/ReviewCard';
+import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
+import PlaceErrorBoundary from '@/shared/ui/error-boundary/PlaceErrorBoundary';
 import BuildingIcon from '@/shared/ui/icons/Building.svg?react';
 import ChevronRightIcon from '@/shared/ui/icons/ChevronRight.svg?react';
 import HeartIcon from '@/shared/ui/icons/Heart.svg?react';
@@ -222,25 +224,22 @@ function PlaceDetailContent({ id }: { id: string }) {
 function PlaceDetailPage() {
   const { id } = useParams<{ id: string }>();
 
-  // TODO: not found 페이지 구현
   if (!id) {
-    return (
-      <div className='flex min-h-screen items-center justify-center'>
-        <span>페이지를 찾을 수 없습니다.</span>
-      </div>
-    );
+    return <PlaceNotFoundPage />;
   }
 
   return (
-    <Suspense
-      fallback={
-        <div className='flex min-h-screen items-center justify-center'>
-          <span>로딩 중...</span>
-        </div>
-      }
-    >
-      <PlaceDetailContent id={id} />
-    </Suspense>
+    <PlaceErrorBoundary>
+      <Suspense
+        fallback={
+          <div className='flex min-h-screen items-center justify-center'>
+            <span>로딩 중...</span>
+          </div>
+        }
+      >
+        <PlaceDetailContent id={id} />
+      </Suspense>
+    </PlaceErrorBoundary>
   );
 }
 
