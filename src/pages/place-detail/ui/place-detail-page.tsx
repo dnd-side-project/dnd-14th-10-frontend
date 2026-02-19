@@ -1,4 +1,4 @@
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -12,6 +12,7 @@ import calmnessNoisy from '@/shared/assets/images/noisy-3d.png';
 import calmnessSilent from '@/shared/assets/images/silent-3d.png';
 import PlaceErrorBoundary from '@/shared/ui/error-boundary/PlaceErrorBoundary';
 import BuildingIcon from '@/shared/ui/icons/Building.svg?react';
+import ChevronDownIcon from '@/shared/ui/icons/ChevronDown.svg?react';
 import ChevronRightIcon from '@/shared/ui/icons/ChevronRight.svg?react';
 import HeartIcon from '@/shared/ui/icons/Heart.svg?react';
 import MapPinIcon from '@/shared/ui/icons/MapPin.svg?react';
@@ -162,9 +163,14 @@ function ReviewTagBar({
   );
 }
 
+// 바 5개 + gap 포함: (32px * 5) + (gap 4px * 5) = 180px, gap 영역에서 잘려 경계선 방지
+const COLLAPSED_TAG_HEIGHT = 180;
+
 function ReviewSection({ place }: { place: PlaceDetail }) {
   const navigate = useNavigate();
+  const [isTagsExpanded, setIsTagsExpanded] = useState(false);
   const maxPercentage = Math.max(...place.reviewTags.map((t) => t.percentage));
+  const hasMoreTags = place.reviewTags.length > 5;
 
   return (
     <section className='px-5 py-8'>
@@ -178,10 +184,38 @@ function ReviewSection({ place }: { place: PlaceDetail }) {
         </button>
       </div>
 
-      <div className='mb-8 flex flex-col gap-1'>
-        {place.reviewTags.map((tag, index) => (
-          <ReviewTagBar key={tag.label} tag={tag} index={index} maxPercentage={maxPercentage} />
-        ))}
+      <div className='mb-8'>
+        <div
+          className='relative overflow-hidden transition-[max-height] duration-300'
+          style={{ maxHeight: isTagsExpanded ? '600px' : `${COLLAPSED_TAG_HEIGHT}px` }}
+        >
+          <div className='flex flex-col gap-1'>
+            {place.reviewTags.map((tag, index) => (
+              <ReviewTagBar key={tag.label} tag={tag} index={index} maxPercentage={maxPercentage} />
+            ))}
+          </div>
+
+          {hasMoreTags && !isTagsExpanded && (
+            <div
+              className='pointer-events-none absolute right-0 bottom-0 left-0 h-[84px]'
+              style={{
+                background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, #FFF 100%)',
+              }}
+            />
+          )}
+        </div>
+
+        {hasMoreTags && (
+          <button
+            type='button'
+            onClick={() => setIsTagsExpanded((prev) => !prev)}
+            className='mt-2 flex w-full items-center justify-center'
+          >
+            <ChevronDownIcon
+              className={`h-6 w-6 text-gray-600 transition-transform duration-300 ${isTagsExpanded ? 'rotate-180' : ''}`}
+            />
+          </button>
+        )}
       </div>
 
       <div>

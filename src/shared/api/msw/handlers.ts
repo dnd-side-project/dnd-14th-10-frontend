@@ -32,6 +32,9 @@ const createMockPlaceDetail = (id: string): PlaceDetail => ({
     { label: '이용자들이 대부분 성인이에요', percentage: 60 },
     { label: '사장님이 친절해요', percentage: 46 },
     { label: '아늑해요', percentage: 46 },
+    { label: '콘센트가 많아요', percentage: 38 },
+    { label: '조용해요', percentage: 30 },
+    { label: '주차가 편해요', percentage: 22 },
   ],
   reviews: [
     {
