@@ -173,7 +173,10 @@ function ReviewSection({ place }: { place: PlaceDetail }) {
             <StarIcon className='text-primary-700 h-6 w-6' />
             <span className='text-lg font-medium'>{place.rating}</span>
           </div>
-          <button className='flex items-center gap-1 text-gray-700'>
+          <button
+            onClick={() => navigate(`/place/${place.id}/reviews`)}
+            className='flex items-center gap-1 text-gray-700'
+          >
             <span>리뷰 전체보기 ({place.reviewCount})</span>
             <ChevronRightIcon className='h-6 w-6 text-gray-700' />
           </button>
