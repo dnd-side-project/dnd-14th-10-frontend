@@ -2,21 +2,21 @@ import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
-import {
-  createStatsData,
-  mockMenuItems,
-  mockRecentPlaces,
-  mockUserData,
-} from '@/features/my/model/mock-data';
+import { logout } from '@/features/auth/api/auth.api';
+import { useAuthStore } from '@/features/auth/model/use-auth-store';
+import { createStatsData, mockMenuItems, mockRecentPlaces } from '@/features/my/model/mock-data';
 import MenuSection from '@/features/my/ui/MenuSection';
 import ProfileSection from '@/features/my/ui/ProfileSection';
 import RecentPlacesSection from '@/features/my/ui/RecentPlacesSection';
 import StatsSection from '@/features/my/ui/StatsSection';
+import { useUserQuery } from '@/features/user/model/use-user-query';
+import { getErrorMessage } from '@/shared/api/error.utils';
 import ConfirmBottomSheet from '@/shared/ui/bottom-sheet/ConfirmBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 export default function MyPage() {
   const [isLogoutSheetOpen, setIsLogoutSheetOpen] = useState(false);
+  const { data: user, isLoading } = useUserQuery();
 
   const navigate = useNavigate();
 
@@ -45,8 +45,16 @@ export default function MyPage() {
     }
   };
 
-  const handleLogoutConfirm = () => {
-    // TODO: 로그아웃 API 호출
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+
+  const handleLogoutConfirm = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('로그아웃 실패:', getErrorMessage(error));
+      // 서버 에러여도 로컬 상태는 초기화
+    }
+    clearAuth();
     setIsLogoutSheetOpen(false);
     navigate('/login');
   };
@@ -67,11 +75,22 @@ export default function MyPage() {
     }
   };
 
-  const statsData = createStatsData(mockUserData.stats);
+  const statsData = createStatsData({ placeCount: 0, reviewCount: 0, badgeCount: 0 });
   const menuItemsWithHandlers = mockMenuItems.map((item) => ({
     ...item,
     onClick: () => handleMenuClick(item.label),
   }));
+
+  if (isLoading) {
+    return (
+      <div className='flex min-h-screen flex-col bg-white'>
+        <NavigationBar title='MY' onBack={handleBack} />
+        <div className='flex flex-1 items-center justify-center'>
+          <div className='border-t-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-gray-200' />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='flex min-h-screen flex-col bg-white'>
@@ -80,8 +99,8 @@ export default function MyPage() {
       <div className='flex flex-col pt-6'>
         <div className='flex flex-col gap-7 px-5'>
           <ProfileSection
-            name={mockUserData.name}
-            avatarUrl={mockUserData.avatarUrl}
+            name={user?.nickname || ''}
+            avatarUrl={user?.profileImg || undefined}
             onEditClick={handleEditProfile}
           />
           <StatsSection stats={statsData} onStatClick={handleStatClick} />
