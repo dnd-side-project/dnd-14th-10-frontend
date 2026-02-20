@@ -4,15 +4,15 @@
 
 // 온보딩 퍼널 단계별 컨텍스트 타입
 export type OnboardingSteps = {
-  birthday: {
-    birthday?: string;
+  birth: {
+    birth?: string;
   };
   address: {
-    birthday: string;
+    birth: string;
     address?: string;
   };
   nickname: {
-    birthday: string;
+    birth: string;
     address: string;
     nickname?: string;
   };
@@ -20,7 +20,7 @@ export type OnboardingSteps = {
 
 // 온보딩 완료 데이터
 export interface OnboardingData {
-  birthday: string;
+  birth: string;
   address: string;
   nickname: string;
 }
