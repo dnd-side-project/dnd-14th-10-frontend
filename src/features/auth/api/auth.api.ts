@@ -25,6 +25,9 @@ export const kakaoOAuthLogin = (data: OAuthRequest) => {
   return apiClient.post<OAuthResponse>('/auth/oauth/kakao', data);
 };
 
+/** OAuth 로그인 (kakaoOAuthLogin alias) */
+export const login = kakaoOAuthLogin;
+
 // POST /api/auth/signup - 회원가입
 export interface SignupRequest {
   signupToken: string;
@@ -46,6 +49,9 @@ export interface SignupResponse {
 export const signup = (data: SignupRequest) => {
   return apiClient.post<SignupResponse>('/auth/signup', data);
 };
+
+/** 카카오 회원가입 (signup alias) */
+export const kakaoSignUp = signup;
 
 // POST /api/auth/refresh - 토큰 갱신
 export interface RefreshResponse {
