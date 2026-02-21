@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/features/auth/model/use-auth-store';
-import { apiClient } from '@/shared/api/client';
+import { apiClient, authClient } from '@/shared/api/client';
 import { isApiError } from '@/shared/api/error.utils';
 
 interface QueueItem {
@@ -50,12 +50,6 @@ export const setupInterceptors = () => {
 
       // 401 에러이고 재시도하지 않은 요청인 경우
       if (error.response?.status === 401 && !originalRequest._retry) {
-        // refresh 요청 자체가 401이면 인증 상태만 초기화 (리다이렉트는 ProtectedRoute에서 처리)
-        if (originalRequest.url?.includes('/auth/refresh')) {
-          useAuthStore.getState().clearAuth();
-          return Promise.reject(error);
-        }
-
         // 이미 토큰 갱신 중이면 큐에 대기
         if (isRefreshing) {
           return new Promise<string>((resolve, reject) => {
@@ -70,7 +64,8 @@ export const setupInterceptors = () => {
         isRefreshing = true;
 
         try {
-          const response = await apiClient.post<{ accessToken: string }>('/auth/refresh');
+          // authClient는 인터셉터가 없으므로 401이 나도 재귀 호출되지 않음
+          const response = await authClient.post<{ accessToken: string }>('/auth/refresh');
           const newToken = response.data.accessToken;
 
           useAuthStore.getState().setAuth(newToken);
@@ -81,7 +76,6 @@ export const setupInterceptors = () => {
         } catch (refreshError) {
           processQueue(refreshError, null);
           useAuthStore.getState().clearAuth();
-          // 리다이렉트는 ProtectedRoute에서 처리 (선언적 방식)
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
