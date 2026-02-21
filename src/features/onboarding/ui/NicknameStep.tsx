@@ -9,6 +9,7 @@ interface NicknameStepProps {
   onBack: () => void;
   initialValue?: string;
   buttonText?: string;
+  isSubmitting?: boolean;
 }
 
 const getKoreanLength = (str: string): number => {
@@ -24,6 +25,7 @@ export default function NicknameStep({
   onBack,
   initialValue = '',
   buttonText = '시작하기',
+  isSubmitting = false,
 }: NicknameStepProps) {
   const [nickname, setNickname] = useState(initialValue);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -98,8 +100,8 @@ export default function NicknameStep({
             paddingBottom: keyboardHeight > 0 ? keyboardHeight + 16 : 0,
           }}
         >
-          <PrimaryButton onClick={handleComplete} disabled={!isValid}>
-            {buttonText}
+          <PrimaryButton onClick={handleComplete} disabled={!isValid || isSubmitting}>
+            {isSubmitting ? '처리 중...' : buttonText}
           </PrimaryButton>
         </div>
       }

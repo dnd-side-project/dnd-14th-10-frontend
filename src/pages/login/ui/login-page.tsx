@@ -1,10 +1,13 @@
-import { useNavigate } from 'react-router-dom';
-
 import { cn } from '@/lib/utils';
 import GojkLogo from '@/shared/ui/icons/GojkLogo.svg?react';
 import GoogleLogo from '@/shared/ui/icons/GoogleLogo.svg?react';
 import KakaoLogo from '@/shared/ui/icons/KakaoLogo.svg?react';
 import NaverLogo from '@/shared/ui/icons/NaverLogo.svg?react';
+
+// 카카오 OAuth 설정
+const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
+const KAKAO_REDIRECT_URI = `${window.location.origin}/oauth/kakao/callback`;
+const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${encodeURIComponent(KAKAO_REDIRECT_URI)}&response_type=code`;
 
 interface SocialButtonProps {
   provider: 'kakao' | 'google' | 'naver';
@@ -54,15 +57,17 @@ function SocialButton({ provider, onClick }: SocialButtonProps) {
 }
 
 export default function LoginPage() {
-  const navigate = useNavigate();
-
   const handleSocialLogin = (provider: 'kakao' | 'google' | 'naver') => {
     console.log(`${provider} 로그인 클릭`);
 
-    // 카카오 로그인 시 온보딩으로 이동 (임시 - 실제 로그인 구현 전까지)
+    // 카카오 로그인: 카카오 인증 페이지로 리다이렉트
     if (provider === 'kakao') {
-      navigate('/onboarding');
+      window.location.href = KAKAO_AUTH_URL;
+      return;
     }
+
+    // TODO: 구글, 네이버 로그인 구현
+    console.log(`${provider} 로그인은 아직 구현되지 않았습니다.`);
   };
 
   return (
