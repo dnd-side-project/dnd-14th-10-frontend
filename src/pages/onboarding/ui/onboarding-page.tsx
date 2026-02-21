@@ -48,17 +48,21 @@ export default function OnboardingPage() {
 
     setIsSubmitting(true);
 
+    const signupData = {
+      signupToken,
+      name,
+      nickname: data.nickname,
+      gender: 'MALE' as const, // TODO: 성별 선택 스텝 추가 시 수정
+      birth: data.birth,
+      profileImg,
+      locationConsent: true, // TODO: 위치 정보 동의 스텝 추가 시 수정
+      regionCode: 1168010100, // TODO: 거주지(address)에서 regionCode로 변환하는 로직 추가 필요
+    };
+
+    console.log('회원가입 요청 데이터:', signupData);
+
     try {
-      const response = await signup({
-        signupToken,
-        name,
-        nickname: data.nickname,
-        gender: 'OTHER', // TODO: 성별 선택 스텝 추가 시 수정
-        birth: data.birth,
-        profileImg,
-        locationConsent: true, // TODO: 위치 정보 동의 스텝 추가 시 수정
-        regionCode: 1168010100, // TODO: 거주지(address)에서 regionCode로 변환하는 로직 추가 필요
-      });
+      const response = await signup(signupData);
 
       useAuthStore.getState().setAuth(response.data.accessToken, response.data.user);
 
