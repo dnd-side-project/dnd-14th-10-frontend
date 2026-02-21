@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import type { PlaceCategory } from '@/features/register-place/model/register-place.types';
 import { useRegisterPlaceMutation } from '@/features/register-place/model/use-register-place-mutation';
 import { useRegistrationStore } from '@/features/register-place/model/use-registration-store';
+import { useUploadImagesMutation } from '@/features/register-place/model/use-upload-images-mutation';
 import { CompleteStep } from '@/features/register-place/ui/CompleteStep';
 import type { DetailFormValues } from '@/features/register-place/ui/DetailInputStep';
 import { DetailInputStep } from '@/features/register-place/ui/DetailInputStep';
@@ -39,7 +40,8 @@ function RegistrationPage() {
   const { formData, setCategory, setLocation, setDetail } = useRegistrationStore();
   const [registeredPlaceId, setRegisteredPlaceId] = useState<number | null>(null);
 
-  const { mutate: registerPlace, isPending } = useRegisterPlaceMutation();
+  const { mutate: registerPlace, isPending: isRegistering } = useRegisterPlaceMutation();
+  const { mutateAsync: uploadImages, isPending: isUploading } = useUploadImagesMutation();
 
   const handleBack = () => {
     if (canGoBack) {
@@ -49,56 +51,68 @@ function RegistrationPage() {
     }
   };
 
-  const handleSubmit = (detail: DetailFormValues) => {
+  const isPending = isUploading || isRegistering;
+
+  const handleSubmit = async (detail: DetailFormValues) => {
     if (!formData.category || !formData.location) return;
 
     const floorInfoNumber = detail.floorInfo ? parseInt(detail.floorInfo, 10) : undefined;
+    const openTime = detail.openTime || undefined;
+    const closeTime = detail.closeTime || undefined;
+    const restroomInfo = detail.restroomInfo || undefined;
     const placeName = formData.location.placeName || '';
 
-    setDetail({
-      name: placeName,
-      outletScore: detail.outletScore,
-      spaceSize: detail.spaceSize,
-      crowdStatus: detail.crowdStatus,
-      mood: detail.mood,
-      floorInfo: floorInfoNumber,
-      openTime: detail.openTime,
-      closeTime: detail.closeTime,
-      restroomInfo: detail.restroomInfo,
-      tagIds: detail.tagIds,
-      images: [],
-    });
+    try {
+      const { images } = await uploadImages(detail.images);
 
-    registerPlace(
-      {
+      setDetail({
         name: placeName,
-        category: formData.category,
-        latitude: formData.location.latitude,
-        longitude: formData.location.longitude,
-        regionCode: formData.location.regionCode,
-        addressDetail: formData.location.roadAddress || formData.location.address,
         outletScore: detail.outletScore,
         spaceSize: detail.spaceSize,
         crowdStatus: detail.crowdStatus,
         mood: detail.mood,
-        images: [], // TODO: 이미지 업로드 구현
         floorInfo: floorInfoNumber,
-        openTime: detail.openTime,
-        closeTime: detail.closeTime,
-        restroomInfo: detail.restroomInfo,
+        openTime,
+        closeTime,
+        restroomInfo,
         tagIds: detail.tagIds,
-      },
-      {
-        onSuccess: (response) => {
-          setRegisteredPlaceId(response.data?.id ?? null);
-          setStep('complete', { replace: true });
+        images,
+      });
+
+      registerPlace(
+        {
+          name: placeName,
+          category: formData.category,
+          latitude: formData.location.latitude,
+          longitude: formData.location.longitude,
+          regionCode: formData.location.regionCode,
+          addressDetail: formData.location.roadAddress || formData.location.address,
+          outletScore: detail.outletScore,
+          spaceSize: detail.spaceSize,
+          crowdStatus: detail.crowdStatus,
+          mood: detail.mood,
+          images,
+          floorInfo: floorInfoNumber,
+          openTime,
+          closeTime,
+          restroomInfo,
+          tagIds: detail.tagIds,
         },
-        onError: (error) => {
-          console.error('등록 실패:', error);
-          alert('장소 등록에 실패했습니다. 다시 시도해주세요.');
+        {
+          onSuccess: (response) => {
+            setRegisteredPlaceId(response.data?.placeId ?? null);
+            setStep('complete', { replace: true });
+          },
+          onError: (error) => {
+            console.error('등록 실패:', error);
+            alert('장소 등록에 실패했습니다. 다시 시도해주세요.');
+          },
         },
-      },
-    );
+      );
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+      alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   const handleCompleteClose = () => {

@@ -238,6 +238,25 @@ export const handlers = [
     return HttpResponse.json(createMockPlaceDetail(placeId as string));
   }),
 
+  // POST /api/places/images/presigned-url (Presigned URL 발급)
+  http.post('/api/places/images/presigned-url', async ({ request }) => {
+    const body = (await request.json()) as { filenames: string[] };
+    console.log('[MSW] Presigned URL 요청:', body);
+
+    const urls = body.filenames.map((filename) => {
+      const uuid = crypto.randomUUID();
+      const ext = filename.split('.').pop();
+      const objectKey = `place/${uuid}.${ext}`;
+      return {
+        filename,
+        url: `https://mock-storage.example.com/${objectKey}?presigned=true`,
+        objectKey,
+      };
+    });
+
+    return HttpResponse.json({ urls });
+  }),
+
   // POST /api/places (장소 등록)
   http.post('/api/places', async ({ request }) => {
     const body = (await request.json()) as PlaceRegisterRequest;
@@ -247,9 +266,9 @@ export const handlers = [
     const newPlaceId = Math.floor(Math.random() * 10000) + 1000;
 
     const response: PlaceRegisterResponse = {
-      id: newPlaceId,
+      placeId: newPlaceId,
     };
 
-    return HttpResponse.json(response, { status: 201 });
+    return HttpResponse.json(response, { status: 200 });
   }),
 ];
