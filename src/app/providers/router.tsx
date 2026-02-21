@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 
+import ProtectedRoute from '@/app/components/ProtectedRoute';
 import MainLayout from '@/app/layouts/MainLayout';
 import AnnouncementListPage from '@/pages/announcement/ui/announcement-list-page';
 import AnnouncementDetailPage from '@/pages/announcement-detail/ui/announcement-detail-page';
@@ -7,13 +8,13 @@ import BadgePage from '@/pages/badge/ui/badge-page';
 import HomePage from '@/pages/home/ui/home-page';
 import LoginPage from '@/pages/login/ui/login-page';
 import MapPage from '@/pages/map/ui/map-page';
-
 import MapRecommendedPage from '@/pages/map-recommended/ui/map-recommended-page';
 import MyPage from '@/pages/my/ui/my-page';
 import MyEditPage from '@/pages/my-edit/ui/my-edit-page';
 import MyEditAddressPage from '@/pages/my-edit-address/ui/my-edit-address-page';
 import MyEditBirthdayPage from '@/pages/my-edit-birthday/ui/my-edit-birthday-page';
 import MyEditNicknamePage from '@/pages/my-edit-nickname/ui/my-edit-nickname-page';
+import OAuthKakaoCallbackPage from '@/pages/oauth-kakao-callback/ui/oauth-kakao-callback-page';
 import OnboardingPage from '@/pages/onboarding/ui/onboarding-page';
 import PlaceDetailPage from '@/pages/place-detail/ui/place-detail-page';
 import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
@@ -43,23 +44,43 @@ export const router = createBrowserRouter([
       },
       {
         path: '/my',
-        element: <MyPage />,
+        element: (
+          <ProtectedRoute>
+            <MyPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/my/edit',
-        element: <MyEditPage />,
+        element: (
+          <ProtectedRoute>
+            <MyEditPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/my/edit/birthday',
-        element: <MyEditBirthdayPage />,
+        element: (
+          <ProtectedRoute>
+            <MyEditBirthdayPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/my/edit/address',
-        element: <MyEditAddressPage />,
+        element: (
+          <ProtectedRoute>
+            <MyEditAddressPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/my/edit/nickname',
-        element: <MyEditNicknamePage />,
+        element: (
+          <ProtectedRoute>
+            <MyEditNicknamePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/registration',
@@ -87,15 +108,27 @@ export const router = createBrowserRouter([
       },
       {
         path: '/my/registered-places',
-        element: <RegisteredPlacesPage />,
+        element: (
+          <ProtectedRoute>
+            <RegisteredPlacesPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/my/reviews',
-        element: <ReviewHistoryPage />,
+        element: (
+          <ProtectedRoute>
+            <ReviewHistoryPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/my/badges',
-        element: <BadgePage />,
+        element: (
+          <ProtectedRoute>
+            <BadgePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/wishlist',
@@ -118,5 +151,9 @@ export const router = createBrowserRouter([
   {
     path: '/withdrawal',
     element: <WithdrawalPage />,
+  },
+  {
+    path: '/oauth/kakao/callback',
+    element: <OAuthKakaoCallbackPage />,
   },
 ]);
