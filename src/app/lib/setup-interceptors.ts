@@ -1,6 +1,6 @@
-import { useAuthStore } from '@/features/auth/model/use-auth-store';
 import { apiClient, authClient } from '@/shared/api/client';
 import { isApiError } from '@/shared/api/error.utils';
+import { useAuthStore } from '@/shared/store/use-auth-store';
 
 interface QueueItem {
   resolve: (token: string) => void;
