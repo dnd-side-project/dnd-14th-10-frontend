@@ -1,11 +1,69 @@
 import { apiClient } from '@/shared/api/client';
+import type { User } from '@/shared/types/user';
 
-// POST /api/users/kakao (카카오 가입)
-export const kakaoSignUp = (data: unknown) => {
-  return apiClient.post('/users/kakao', data);
+export interface OAuthInfo {
+  name: string;
+  profileImg: string;
+}
+
+// POST /api/auth/oauth/{provider} - OAuth 로그인
+export interface OAuthRequest {
+  code: string;
+  redirectUri: string;
+}
+
+export interface OAuthResponse {
+  isNewUser: boolean;
+  accessToken?: string;
+  expiresIn?: number;
+  user?: User;
+  signupToken?: string;
+  oauthInfo?: OAuthInfo;
+}
+
+export const kakaoOAuthLogin = (data: OAuthRequest) => {
+  return apiClient.post<OAuthResponse>('/auth/oauth/kakao', data);
 };
 
-// POST /api/auth/login (로그인)
-export const login = (data: unknown) => {
-  return apiClient.post('/auth/login', data);
+/** OAuth 로그인 (kakaoOAuthLogin alias) */
+export const login = kakaoOAuthLogin;
+
+// POST /api/auth/signup - 회원가입
+export interface SignupRequest {
+  signupToken: string;
+  name: string;
+  nickname: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  birth: string;
+  profileImg?: string;
+  locationConsent: boolean;
+  regionCode: number;
+}
+
+export interface SignupResponse {
+  accessToken: string;
+  expiresIn: number;
+  user: User;
+}
+
+export const signup = (data: SignupRequest) => {
+  return apiClient.post<SignupResponse>('/auth/signup', data);
+};
+
+/** 카카오 회원가입 (signup alias) */
+export const kakaoSignUp = signup;
+
+// POST /api/auth/refresh - 토큰 갱신
+export interface RefreshResponse {
+  accessToken: string;
+  expiresIn: number;
+}
+
+export const refreshToken = () => {
+  return apiClient.post<RefreshResponse>('/auth/refresh');
+};
+
+// POST /api/auth/logout - 로그아웃
+export const logout = () => {
+  return apiClient.post('/auth/logout');
 };
