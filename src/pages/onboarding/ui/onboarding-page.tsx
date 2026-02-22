@@ -4,12 +4,12 @@ import { useFunnel } from '@use-funnel/react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 import { signup } from '@/features/auth/api/auth.api';
-import { useAuthStore } from '@/features/auth/model/use-auth-store';
 import type { Gender, OnboardingSteps } from '@/features/onboarding/model/onboarding.types';
 import AddressStep from '@/features/onboarding/ui/AddressStep';
 import BirthdayStep from '@/features/onboarding/ui/BirthdayStep';
 import NicknameStep from '@/features/onboarding/ui/NicknameStep';
 import { getErrorMessage, getFieldErrors } from '@/shared/api/error.utils';
+import { useAuthStore } from '@/shared/store/use-auth-store';
 
 export default function OnboardingPage() {
   const navigate = useNavigate();

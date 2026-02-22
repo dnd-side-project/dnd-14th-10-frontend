@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { checkNickname } from '@/entities/user/api/user.api';
 import OnboardingLayout from '@/features/onboarding/ui/OnboardingLayout';
-import { checkNickname } from '@/features/user/api/user.api';
 import PrimaryButton from '@/shared/ui/buttons/PrimaryButton';
 import FormLabel from '@/shared/ui/forms/FormLabel';
 

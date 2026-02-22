@@ -1,43 +1,111 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
 
+import {
+  useMyReviewsInfiniteQuery,
+  useDeleteReviewMutation,
+  type ReviewSortType,
+} from '@/entities/review/model/use-my-reviews-query';
 import SortDropdown from '@/features/registered-places/ui/SortDropdown';
-import { mockReviews } from '@/features/review-history/model/mock-data';
 import EmptyReviews from '@/features/review-history/ui/EmptyReviews';
 import ReviewItem from '@/features/review-history/ui/ReviewItem';
 import ActionMenuBottomSheet from '@/shared/ui/bottom-sheet/ActionMenuBottomSheet';
+import ConfirmBottomSheet from '@/shared/ui/bottom-sheet/ConfirmBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
+const SORT_OPTIONS: { label: string; value: ReviewSortType }[] = [
+  { label: '최신순', value: 'latest' },
+  { label: '이름순', value: 'name' },
+];
+
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}.${month}.${day}`;
+};
+
 export default function ReviewHistoryPage() {
+  const [sortType, setSortType] = useState<ReviewSortType>('latest');
+  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
   const [isManageSheetOpen, setIsManageSheetOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
 
   const navigate = useNavigate();
+  const { ref: loadMoreRef, inView } = useInView();
+
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useMyReviewsInfiniteQuery(sortType);
+  const deleteReviewMutation = useDeleteReviewMutation();
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleBack = () => {
     navigate(-1);
   };
 
-  const handleMoreClick = () => {
+  const handleSortClick = () => {
+    setIsSortSheetOpen(true);
+  };
+
+  const handleSortSelect = (value: ReviewSortType) => {
+    setSortType(value);
+    setIsSortSheetOpen(false);
+  };
+
+  const handleMoreClick = (reviewId: number) => {
+    setSelectedReviewId(reviewId);
     setIsManageSheetOpen(true);
   };
 
-  const handleReviewClick = (reviewId: string) => {
-    // TODO: 리뷰 상세 페이지로 이동
+  const handleReviewClick = (reviewId: number) => {
     console.log('Review clicked:', reviewId);
   };
 
   const handleEdit = () => {
-    // TODO: 리뷰 수정 페이지로 이동
     setIsManageSheetOpen(false);
   };
 
-  const handleDelete = () => {
-    // TODO: 삭제 API 호출
+  const handleDeleteClick = () => {
     setIsManageSheetOpen(false);
+    setIsDeleteConfirmOpen(true);
   };
 
-  const hasReviews = mockReviews.length > 0;
+  const handleDeleteConfirm = async () => {
+    if (selectedReviewId) {
+      try {
+        await deleteReviewMutation.mutateAsync(selectedReviewId);
+      } catch (error) {
+        console.error('리뷰 삭제 실패:', error);
+      }
+    }
+    setIsDeleteConfirmOpen(false);
+    setSelectedReviewId(null);
+  };
+
+  const allReviews = data?.pages.flatMap((page) => page.content) ?? [];
+  const hasReviews = allReviews.length > 0;
+
+  const currentSortLabel = SORT_OPTIONS.find((opt) => opt.value === sortType)?.label ?? '최신순';
+
+  if (isLoading) {
+    return (
+      <div className='flex min-h-screen flex-col bg-white'>
+        <NavigationBar title='리뷰 히스토리' onBack={handleBack} />
+        <div className='flex flex-1 items-center justify-center'>
+          <div className='border-t-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-gray-200' />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='flex min-h-screen flex-col bg-white'>
@@ -46,22 +114,30 @@ export default function ReviewHistoryPage() {
       {hasReviews ? (
         <div className='flex flex-col pt-6'>
           <div className='flex items-center justify-between px-5'>
-            <SortDropdown value='최신순' />
+            <SortDropdown value={currentSortLabel} onClick={handleSortClick} />
           </div>
 
           <div className='mt-4.5 flex flex-col gap-8 px-5'>
-            {mockReviews.map((review) => (
+            {allReviews.map((review) => (
               <ReviewItem
-                key={review.id}
-                placeName={review.placeName}
-                date={review.date}
+                key={review.reviewId}
+                placeName={review.userNickname}
+                date={formatDate(review.createdAt)}
                 content={review.content}
-                images={review.images}
-                tags={review.tags}
-                onMoreClick={handleMoreClick}
-                onClick={() => handleReviewClick(review.id)}
+                images={review.images.map((img) => img.imageUrl)}
+                tags={review.tags.map((tag) => tag.name)}
+                onMoreClick={() => handleMoreClick(review.reviewId)}
+                onClick={() => handleReviewClick(review.reviewId)}
               />
             ))}
+          </div>
+
+          <div ref={loadMoreRef} className='h-10'>
+            {isFetchingNextPage && (
+              <div className='flex justify-center py-4'>
+                <div className='border-t-primary-500 h-6 w-6 animate-spin rounded-full border-4 border-gray-200' />
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -69,13 +145,32 @@ export default function ReviewHistoryPage() {
       )}
 
       <ActionMenuBottomSheet
+        isOpen={isSortSheetOpen}
+        onClose={() => setIsSortSheetOpen(false)}
+        title='정렬'
+        items={SORT_OPTIONS.map((opt) => ({
+          label: opt.label,
+          onClick: () => handleSortSelect(opt.value),
+        }))}
+      />
+
+      <ActionMenuBottomSheet
         isOpen={isManageSheetOpen}
         onClose={() => setIsManageSheetOpen(false)}
         title='리뷰 관리'
         items={[
           { label: '리뷰 수정', onClick: handleEdit },
-          { label: '삭제', onClick: handleDelete, variant: 'danger' },
+          { label: '삭제', onClick: handleDeleteClick, variant: 'danger' },
         ]}
+      />
+
+      <ConfirmBottomSheet
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        title='리뷰 삭제'
+        message='이 리뷰를 삭제하시겠습니까?'
+        confirmText='삭제'
+        onConfirm={handleDeleteConfirm}
       />
     </div>
   );

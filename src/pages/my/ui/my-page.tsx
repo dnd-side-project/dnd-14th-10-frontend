@@ -2,21 +2,24 @@ import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
+import { useMyHistoriesQuery } from '@/entities/history/model/use-my-histories-query';
+import { useUserQuery } from '@/entities/user/model/use-user-query';
 import { logout } from '@/features/auth/api/auth.api';
-import { useAuthStore } from '@/features/auth/model/use-auth-store';
-import { createStatsData, mockMenuItems, mockRecentPlaces } from '@/features/my/model/mock-data';
+import { createStatsData, mockMenuItems } from '@/features/my/model/mock-data';
 import MenuSection from '@/features/my/ui/MenuSection';
 import ProfileSection from '@/features/my/ui/ProfileSection';
 import RecentPlacesSection from '@/features/my/ui/RecentPlacesSection';
 import StatsSection from '@/features/my/ui/StatsSection';
-import { useUserQuery } from '@/features/user/model/use-user-query';
 import { getErrorMessage } from '@/shared/api/error.utils';
+import { getImageUrl } from '@/shared/lib/image-utils';
+import { useAuthStore } from '@/shared/store/use-auth-store';
 import ConfirmBottomSheet from '@/shared/ui/bottom-sheet/ConfirmBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 export default function MyPage() {
   const [isLogoutSheetOpen, setIsLogoutSheetOpen] = useState(false);
-  const { data: user, isLoading } = useUserQuery();
+  const { data: user, isLoading: isUserLoading } = useUserQuery();
+  const { data: historiesData, isLoading: isHistoriesLoading } = useMyHistoriesQuery(10);
 
   const navigate = useNavigate();
 
@@ -75,11 +78,25 @@ export default function MyPage() {
     }
   };
 
-  const statsData = createStatsData({ placeCount: 0, reviewCount: 0, badgeCount: 0 });
+  const statsData = createStatsData({
+    placeCount: user?.placeCount ?? 0,
+    reviewCount: user?.reviewCount ?? 0,
+    badgeCount: user?.badgeCount ?? 0,
+  });
+
+  const recentPlaces = (historiesData?.content ?? []).map((history) => ({
+    id: String(history.placeId),
+    name: history.placeName,
+    imageUrl: getImageUrl(history.representativeImageKey),
+    likeCount: 0,
+  }));
+
   const menuItemsWithHandlers = mockMenuItems.map((item) => ({
     ...item,
     onClick: () => handleMenuClick(item.label),
   }));
+
+  const isLoading = isUserLoading || isHistoriesLoading;
 
   if (isLoading) {
     return (
@@ -106,7 +123,7 @@ export default function MyPage() {
           <StatsSection stats={statsData} onStatClick={handleStatClick} />
         </div>
 
-        <RecentPlacesSection places={mockRecentPlaces} onPlaceClick={handlePlaceClick} />
+        <RecentPlacesSection places={recentPlaces} onPlaceClick={handlePlaceClick} />
 
         <MenuSection items={menuItemsWithHandlers} />
       </div>
