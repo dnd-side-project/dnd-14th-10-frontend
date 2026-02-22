@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { useAuthStore } from '@/features/auth/model/use-auth-store';
-import { getMe } from '@/features/user/api/user.api';
+import { useAuthStore } from '@/shared/store/use-auth-store';
 import type { UserProfile } from '@/shared/types/user';
 
 import { userKeys } from './query-keys';
+import { getMe } from '../api/user.api';
 
 export const useUserQuery = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);

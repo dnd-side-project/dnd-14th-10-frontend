@@ -1,26 +1,62 @@
-import { apiClient } from '@/shared/api/client';
+import { apiClient, authClient } from '@/shared/api/client';
+import type { UserProfile, WithdrawReason, WithdrawReasonItem } from '@/shared/types/user';
 
-// GET /api/users/{user-id} (정보 조회)
+export interface NicknameCheckResponse {
+  available: boolean;
+}
+
+export interface PresignedUrlItem {
+  filename: string;
+  url: string;
+  objectKey: string;
+}
+
+export interface PresignedUrlResponse {
+  urls: PresignedUrlItem[];
+}
+
+export const getMe = () => {
+  return apiClient.get<UserProfile>('/users/me');
+};
+
 export const getUserInfo = (userId: string) => {
   return apiClient.get(`/users/${userId}`);
 };
 
-// PATCH /api/users/me (정보 수정)
-export const updateMyInfo = (data: unknown) => {
-  return apiClient.patch('/users/me', data);
+export const checkNickname = (nickname: string) => {
+  return authClient.get<NicknameCheckResponse>('/users/nickname/check', {
+    params: { nickname },
+  });
 };
 
-// GET /api/users/me/badges (배지 조회)
-export const getMyBadges = () => {
-  return apiClient.get('/users/me/badges');
+export const updateNickname = (nickname: string) => {
+  return apiClient.patch('/users/me/nickname', { nickname });
 };
 
-// GET /api/users/me/wishlist (위시리스트 조회)
-export const getMyWishlist = () => {
-  return apiClient.get('/users/me/wishlist');
+export const updateBirth = (birth: string) => {
+  return apiClient.patch('/users/me/birth', { birth });
 };
 
-// GET /api/users/me/histories (최근 본 장소)
-export const getMyHistories = () => {
-  return apiClient.get('/users/me/histories');
+export const updateGender = (gender: 'MALE' | 'FEMALE') => {
+  return apiClient.patch('/users/me/gender', { gender });
+};
+
+export const updateRegion = (regionCode: number) => {
+  return apiClient.patch('/users/me/region', { regionCode });
+};
+
+export const updateProfileImage = (objectKey: string | null) => {
+  return apiClient.patch('/users/me/profile-image', { objectKey });
+};
+
+export const getPresignedUrl = (filenames: string[]) => {
+  return apiClient.post<PresignedUrlResponse>('/users/images/presigned-url', { filenames });
+};
+
+export const getWithdrawReasons = () => {
+  return apiClient.get<WithdrawReasonItem[]>('/users/withdraw-reasons');
+};
+
+export const withdraw = (reason: WithdrawReason, detail?: string) => {
+  return apiClient.post('/users/me/withdraw', { reason, detail });
 };
