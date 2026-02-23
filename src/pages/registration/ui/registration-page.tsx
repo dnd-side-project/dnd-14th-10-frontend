@@ -37,7 +37,7 @@ function RegistrationPage() {
     initialStep: 'type',
   });
 
-  const { formData, setCategory, setLocation, setDetail } = useRegistrationStore();
+  const { formData, setCategory, setLocation, setDetail, reset } = useRegistrationStore();
   const [registeredPlaceId, setRegisteredPlaceId] = useState<number | null>(null);
 
   const { mutate: registerPlace, isPending: isRegistering } = useRegisterPlaceMutation();
@@ -116,6 +116,7 @@ function RegistrationPage() {
   };
 
   const handleCompleteClose = () => {
+    reset();
     navigate(`/place/${registeredPlaceId}`, { replace: true });
   };
 
