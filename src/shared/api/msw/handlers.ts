@@ -32,6 +32,9 @@ const createMockPlaceDetail = (id: string): PlaceDetail => ({
     { label: '이용자들이 대부분 성인이에요', percentage: 60 },
     { label: '사장님이 친절해요', percentage: 46 },
     { label: '아늑해요', percentage: 46 },
+    { label: '콘센트가 많아요', percentage: 38 },
+    { label: '조용해요', percentage: 30 },
+    { label: '주차가 편해요', percentage: 22 },
   ],
   reviews: [
     {
@@ -223,6 +226,15 @@ export const handlers = [
 
   http.get('/api/places/:placeId', ({ params }) => {
     const { placeId } = params;
+    const VALID_PLACE_IDS = ['1', '2', '3', '4', '5'];
+
+    if (!VALID_PLACE_IDS.includes(placeId as string)) {
+      return HttpResponse.json(
+        { message: '존재하지 않는 장소입니다.' },
+        { status: 404 },
+      );
+    }
+
     return HttpResponse.json(createMockPlaceDetail(placeId as string));
   }),
 

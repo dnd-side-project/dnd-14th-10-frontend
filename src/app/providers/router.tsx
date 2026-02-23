@@ -22,6 +22,7 @@ import RegisteredPlacesPage from '@/pages/registered-places/ui/registered-places
 import RegistrationPage from '@/pages/registration/ui/registration-page';
 import ReviewCreationPage from '@/pages/review-creation/ui/review-creation-page';
 import ReviewHistoryPage from '@/pages/review-history/ui/review-history-page';
+import ReviewListPage from '@/pages/review-list/ui/review-list-page';
 import WishlistPage from '@/pages/wishlist/ui/wishlist-page';
 import WithdrawalPage from '@/pages/withdrawal/ui/withdrawal-page';
 
@@ -92,6 +93,10 @@ export const router = createBrowserRouter([
       {
         path: '/review-creation/:id',
         element: <ReviewCreationPage />,
+      },
+      {
+        path: '/place/:id/reviews',
+        element: <ReviewListPage />,
       },
       {
         path: '/announcement',

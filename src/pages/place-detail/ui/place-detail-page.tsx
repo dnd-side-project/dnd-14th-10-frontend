@@ -1,11 +1,18 @@
-import { Suspense } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
 
 import type { PlaceDetail, ReviewTag } from '@/entities/place/model/place.types';
 import { usePlaceDetailQuery } from '@/entities/place/model/use-place-detail-query';
 import { ReviewCard } from '@/entities/place/ui/ReviewCard';
+import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
+import calmnessCalm from '@/shared/assets/images/calm-3d.png';
+import calmnessChatty from '@/shared/assets/images/chatty-3d.png';
+import calmnessNoisy from '@/shared/assets/images/noisy-3d.png';
+import calmnessSilent from '@/shared/assets/images/silent-3d.png';
+import PlaceErrorBoundary from '@/shared/ui/error-boundary/PlaceErrorBoundary';
 import BuildingIcon from '@/shared/ui/icons/Building.svg?react';
+import ChevronDownIcon from '@/shared/ui/icons/ChevronDown.svg?react';
 import ChevronRightIcon from '@/shared/ui/icons/ChevronRight.svg?react';
 import HeartIcon from '@/shared/ui/icons/Heart.svg?react';
 import MapPinIcon from '@/shared/ui/icons/MapPin.svg?react';
@@ -58,10 +65,21 @@ function BasicInfoSection({ place }: { place: PlaceDetail }) {
   );
 }
 
+function getCalmnessInfo(index: number) {
+  if (index <= 25) return { image: calmnessNoisy, label: '소란스러움' };
+  if (index <= 50) return { image: calmnessChatty, label: '대화하는 분위기' };
+  if (index <= 75) return { image: calmnessCalm, label: '잔잔한 분위기' };
+  return { image: calmnessSilent, label: '고요해요' };
+}
+
 function DetailInfoSection({ place }: { place: PlaceDetail }) {
+  const calmness = useMemo(() => {
+    return getCalmnessInfo(place.calmnessIndex);
+  }, [place.calmnessIndex]);
+
   return (
     <section className='border-b border-gray-200 px-5 py-8'>
-      <div className='mb-[18px] flex items-center justify-between rounded-lg bg-gray-50 px-6 py-5'>
+      <div className='mb-[18px] flex items-center justify-between rounded-lg bg-gray-50 px-[24px] py-5'>
         <div className='flex flex-col gap-4'>
           <div className='flex items-start gap-[8px]'>
             <OutletIcon className='h-5 w-5 text-gray-800' />
@@ -79,11 +97,11 @@ function DetailInfoSection({ place }: { place: PlaceDetail }) {
           </div>
         </div>
 
-        <div className='flex w-[95px] flex-col items-center gap-3'>
-          <div className='relative flex h-[90px] w-[90px] items-center justify-center rounded-full border border-gray-400'>
-            <span className='text-2xl font-bold'>{place.calmnessIndex}</span>
-          </div>
-          <span className='text-center text-sm'>차분함 지수</span>
+        <div className='flex flex-col items-center gap-2'>
+          <img src={calmness.image} alt={calmness.label} className='h-[72px] object-contain' />
+          <span className='text-body1 text-primary-700 text-center font-medium'>
+            {calmness.label}
+          </span>
         </div>
       </div>
 
@@ -145,9 +163,14 @@ function ReviewTagBar({
   );
 }
 
+// 바 5개 + gap 포함: (32px * 5) + (gap 4px * 5) = 180px, gap 영역에서 잘려 경계선 방지
+const COLLAPSED_TAG_HEIGHT = 180;
+
 function ReviewSection({ place }: { place: PlaceDetail }) {
   const navigate = useNavigate();
+  const [isTagsExpanded, setIsTagsExpanded] = useState(false);
   const maxPercentage = Math.max(...place.reviewTags.map((t) => t.percentage));
+  const hasMoreTags = place.reviewTags.length > 5;
 
   return (
     <section className='px-5 py-8'>
@@ -161,10 +184,38 @@ function ReviewSection({ place }: { place: PlaceDetail }) {
         </button>
       </div>
 
-      <div className='mb-8 flex flex-col gap-1'>
-        {place.reviewTags.map((tag, index) => (
-          <ReviewTagBar key={tag.label} tag={tag} index={index} maxPercentage={maxPercentage} />
-        ))}
+      <div className='mb-8'>
+        <div
+          className='relative overflow-hidden transition-[max-height] duration-300'
+          style={{ maxHeight: isTagsExpanded ? '600px' : `${COLLAPSED_TAG_HEIGHT}px` }}
+        >
+          <div className='flex flex-col gap-1'>
+            {place.reviewTags.map((tag, index) => (
+              <ReviewTagBar key={tag.label} tag={tag} index={index} maxPercentage={maxPercentage} />
+            ))}
+          </div>
+
+          {hasMoreTags && !isTagsExpanded && (
+            <div
+              className='pointer-events-none absolute right-0 bottom-0 left-0 h-[84px]'
+              style={{
+                background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, #FFF 100%)',
+              }}
+            />
+          )}
+        </div>
+
+        {hasMoreTags && (
+          <button
+            type='button'
+            onClick={() => setIsTagsExpanded((prev) => !prev)}
+            className='mt-2 flex w-full items-center justify-center'
+          >
+            <ChevronDownIcon
+              className={`h-6 w-6 text-gray-600 transition-transform duration-300 ${isTagsExpanded ? 'rotate-180' : ''}`}
+            />
+          </button>
+        )}
       </div>
 
       <div>
@@ -173,7 +224,10 @@ function ReviewSection({ place }: { place: PlaceDetail }) {
             <StarIcon className='text-primary-700 h-6 w-6' />
             <span className='text-lg font-medium'>{place.rating}</span>
           </div>
-          <button className='flex items-center gap-1 text-gray-700'>
+          <button
+            onClick={() => navigate(`/place/${place.id}/reviews`)}
+            className='flex items-center gap-1 text-gray-700'
+          >
             <span>리뷰 전체보기 ({place.reviewCount})</span>
             <ChevronRightIcon className='h-6 w-6 text-gray-700' />
           </button>
@@ -219,25 +273,22 @@ function PlaceDetailContent({ id }: { id: string }) {
 function PlaceDetailPage() {
   const { id } = useParams<{ id: string }>();
 
-  // TODO: not found 페이지 구현
   if (!id) {
-    return (
-      <div className='flex min-h-screen items-center justify-center'>
-        <span>페이지를 찾을 수 없습니다.</span>
-      </div>
-    );
+    return <PlaceNotFoundPage />;
   }
 
   return (
-    <Suspense
-      fallback={
-        <div className='flex min-h-screen items-center justify-center'>
-          <span>로딩 중...</span>
-        </div>
-      }
-    >
-      <PlaceDetailContent id={id} />
-    </Suspense>
+    <PlaceErrorBoundary>
+      <Suspense
+        fallback={
+          <div className='flex min-h-screen items-center justify-center'>
+            <span>로딩 중...</span>
+          </div>
+        }
+      >
+        <PlaceDetailContent id={id} />
+      </Suspense>
+    </PlaceErrorBoundary>
   );
 }
 
