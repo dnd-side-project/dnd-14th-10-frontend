@@ -35,6 +35,7 @@ jobs:
           echo "VITE_NAVER_CLIENT_ID=${{ secrets.VITE_NAVER_CLIENT_ID }}" >> .env
           echo "VITE_NAVER_SEARCH_CLIENT_ID=${{ secrets.VITE_NAVER_SEARCH_CLIENT_ID }}" >> .env
           echo "VITE_NAVER_SEARCH_CLIENT_SECRET=${{ secrets.VITE_NAVER_SEARCH_CLIENT_SECRET }}" >> .env
+          echo "VITE_KAKAO_CLIENT_ID=${{ secrets.VITE_KAKAO_CLIENT_ID }}" >> .env
 
       - name: Build project
         run: pnpm run build
