@@ -15,6 +15,7 @@ import type { Category } from '@/features/home/ui/CategoryTabs';
 import HomeHeader from '@/features/home/ui/HomeHeader';
 import PlaceSection from '@/features/home/ui/PlaceSection';
 import type { PlaceItem } from '@/features/home/ui/PlaceSection';
+import SearchDialog from '@/features/home/ui/SearchDialog';
 import SearchInput from '@/shared/ui/inputs/SearchInput';
 
 const userName = '홍길동';
@@ -23,6 +24,7 @@ const userLocation = '강남구';
 function HomePage() {
   const [category, setCategory] = useState<Category>('cafe');
   const [likedPlaces, setLikedPlaces] = useState<Set<string>>(new Set());
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -43,7 +45,7 @@ function HomePage() {
   };
 
   const handleSearchClick = () => {
-    navigate('/map');
+    setIsSearchOpen(true);
   };
 
   const handlePlaceClick = (id: string) => {
@@ -101,6 +103,7 @@ function HomePage() {
           onLikeClick={handleLikeClick}
         />
       </div>
+      <SearchDialog isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </div>
   );
 }
