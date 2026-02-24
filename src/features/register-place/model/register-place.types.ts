@@ -42,7 +42,24 @@ export interface PlaceRegisterRequest {
 
 // 장소 등록 응답
 export interface PlaceRegisterResponse {
-  id: number;
+  placeId: number;
+}
+
+// Presigned URL 요청
+export interface PresignedUrlRequest {
+  filenames: string[];
+}
+
+// Presigned URL 응답 아이템
+export interface PresignedUrlItem {
+  filename: string;
+  url: string;
+  objectKey: string;
+}
+
+// Presigned URL 응답
+export interface PresignedUrlResponse {
+  urls: PresignedUrlItem[];
 }
 
 // UI에서 사용하는 옵션 라벨

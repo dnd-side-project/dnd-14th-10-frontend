@@ -1,8 +1,27 @@
 import { apiClient } from '@/shared/api/client';
 
-// POST /api/places/{place-id}/reviews (리뷰 등록)
-export const createReview = (placeId: string, data: unknown) => {
-  return apiClient.post(`/places/${placeId}/reviews`, data);
+export interface CreateReviewRequest {
+  placeId: number;
+  rating: number;
+  tagIds: number[];
+  mood: string;
+  spaceSize: string;
+  outletScore: string;
+  crowdStatus: string;
+  content: string;
+  images: { imageKey: string; sequence: number; isPrimary: boolean }[];
+  visitedAt: string;
+}
+
+export interface CreateReviewResponse {
+  reviewId: number;
+  representativeImageUrl: string;
+  reviewOrder: number;
+}
+
+// POST /api/reviews (리뷰 작성)
+export const createReview = (data: CreateReviewRequest) => {
+  return apiClient.post<CreateReviewResponse>('/reviews', data);
 };
 
 // PATCH /api/places/{place-id}/reviews/{review-id} (수정)

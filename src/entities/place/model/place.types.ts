@@ -1,3 +1,11 @@
+import type {
+  CrowdStatus,
+  Mood,
+  OutletScore,
+  PlaceCategory,
+  SpaceSize,
+} from '@/features/register-place/model/register-place.types';
+
 export interface Review {
   id: string;
   authorName: string;
@@ -12,22 +20,104 @@ export interface ReviewTag {
   percentage: number;
 }
 
-export interface PlaceDetail {
-  id: string;
+// 리뷰 목록 API 응답 타입
+export interface ReviewImage {
+  imageId: number;
+  imageUrl: string;
+  sequence: number;
+  isPrimary: boolean;
+}
+
+export interface ReviewTagItem {
+  tagId: number;
+  code: string;
   name: string;
-  category: string;
+}
+
+export interface PlaceReview {
+  reviewId: number;
+  placeId: number;
+  userId: number;
+  userNickname: string;
+  userProfileImg: string;
   rating: number;
+  mood: Mood;
+  spaceSize: SpaceSize;
+  outletScore: OutletScore;
+  crowdStatus: CrowdStatus;
+  content: string;
+  tags: ReviewTagItem[];
+  images: ReviewImage[];
+  visitedAt: string;
+  createdAt: string;
+}
+
+export interface PageableSort {
+  sorted: boolean;
+  unsorted: boolean;
+  empty: boolean;
+}
+
+export interface Pageable {
+  pageNumber: number;
+  paged: boolean;
+  pageSize: number;
+  unpaged: boolean;
+  offset: number;
+  sort: PageableSort;
+}
+
+export interface ReviewTagStat {
+  tagId: number;
+  code: string;
+  name: string;
+  count: number;
+}
+
+export interface ReviewRatingStat {
+  averageRating: number;
   reviewCount: number;
-  tags: string[];
-  images: string[];
-  address: string;
-  outletStatus: string;
-  crowdedness: string;
-  calmnessIndex: number;
-  restroomInfo: string;
-  floorInfo: string;
-  mapImageUrl: string;
-  locationPoint: { lat: number; lng: number };
+}
+
+export interface PlaceReviewsResponse {
+  totalElements: number;
+  totalPages: number;
+  pageable: Pageable;
+  numberOfElements: number;
+  size: number;
+  number: number;
+  content: PlaceReview[];
+  sort: PageableSort;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
+
+interface PlaceImage {
+  url: string;
+  sequence: number;
+  representativeFlag: boolean;
+}
+
+export interface PlaceDetail {
+  id: number;
+  name: string;
+  category: PlaceCategory;
+  addressDetail: string;
+  latitude: number;
+  longitude: number;
+  images: PlaceImage[];
+  averageRating: number;
+  reviewCount: number;
+  spaceSize: SpaceSize;
+  mood: Mood;
+  outletScore: OutletScore;
+  crowdStatus: CrowdStatus;
+  openTime: string | null;
+  closeTime: string | null;
+  floorInfo: number | null;
+  restroomInfo: string | null;
+  isWished: boolean;
   reviewTags: ReviewTag[];
   reviews: Review[];
 }
@@ -39,7 +129,7 @@ export interface NearbyParams {
 }
 
 export interface Place {
-  id: string;
+  id: number;
   name: string;
   locationPoint: { lat: number; lng: number };
   outletScore: number;
