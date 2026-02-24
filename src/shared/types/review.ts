@@ -4,7 +4,7 @@ export type OutletScore = 'FEW' | 'AVERAGE' | 'MANY';
 export type CrowdStatus = 'RELAX' | 'NORMAL' | 'FULL';
 
 export interface ReviewTagResponse {
-  id: number;
+  tagId: number;
   code: string;
   name: string;
 }
@@ -13,6 +13,7 @@ export interface ReviewImageResponse {
   imageId: number;
   imageUrl: string;
   sequence: number;
+  isPrimary: boolean;
 }
 
 export interface ReviewDetailResponse {
