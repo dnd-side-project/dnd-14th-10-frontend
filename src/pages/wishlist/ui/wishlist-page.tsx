@@ -55,10 +55,6 @@ export default function WishlistPage() {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleSortClick = () => {
     setIsSortSheetOpen(true);
   };
@@ -95,7 +91,7 @@ export default function WishlistPage() {
   if (isLoading) {
     return (
       <div className='flex min-h-screen flex-col bg-white'>
-        <NavigationBar title='위시리스트' onBack={handleBack} />
+        <NavigationBar title='위시리스트' backPath='/' />
         <div className='flex flex-1 items-center justify-center'>
           <div className='border-t-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-gray-200' />
         </div>
@@ -105,7 +101,7 @@ export default function WishlistPage() {
 
   return (
     <div className='flex min-h-screen flex-col bg-white'>
-      <NavigationBar title='위시리스트' onBack={handleBack} />
+      <NavigationBar title='위시리스트' backPath='/' />
 
       {hasItems ? (
         <div className='flex flex-col pt-6'>

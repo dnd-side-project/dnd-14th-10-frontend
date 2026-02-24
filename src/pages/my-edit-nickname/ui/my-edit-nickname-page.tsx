@@ -9,10 +9,6 @@ export default function MyEditNicknamePage() {
   const { data: user } = useUserQuery();
   const updateNicknameMutation = useUpdateNicknameMutation();
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleSave = async (nickname: string) => {
     try {
       await updateNicknameMutation.mutateAsync(nickname);
@@ -25,7 +21,7 @@ export default function MyEditNicknamePage() {
   return (
     <NicknameStep
       onComplete={handleSave}
-      onBack={handleBack}
+      onBack={() => navigate('/my/edit')}
       initialValue={user?.nickname || ''}
       buttonText='수정하기'
     />

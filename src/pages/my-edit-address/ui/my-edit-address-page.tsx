@@ -9,10 +9,6 @@ export default function MyEditAddressPage() {
   const { data: user } = useUserQuery();
   const updateRegionMutation = useUpdateRegionMutation();
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleSave = async (regionCode: number) => {
     try {
       await updateRegionMutation.mutateAsync(regionCode);
@@ -25,7 +21,7 @@ export default function MyEditAddressPage() {
   return (
     <AddressStep
       onNext={handleSave}
-      onBack={handleBack}
+      onBack={() => navigate('/my/edit')}
       initialRegionCode={user?.regionCode}
       buttonText='수정하기'
     />

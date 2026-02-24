@@ -14,10 +14,6 @@ export default function MyEditBirthdayPage() {
   const updateBirthMutation = useUpdateBirthMutation();
   const updateGenderMutation = useUpdateGenderMutation();
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleSave = async (birthday: string, gender: Gender) => {
     try {
       await Promise.all([
@@ -33,7 +29,7 @@ export default function MyEditBirthdayPage() {
   return (
     <BirthdayStep
       onNext={handleSave}
-      onBack={handleBack}
+      onBack={() => navigate('/my/edit')}
       initialValue={user?.birth || ''}
       initialGender={user?.gender}
       buttonText='수정하기'

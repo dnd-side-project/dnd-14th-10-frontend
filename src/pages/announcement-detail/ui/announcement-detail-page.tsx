@@ -1,22 +1,17 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { mockAnnouncements } from '@/features/announcement/model/mock-data';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 export default function AnnouncementDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
 
   const announcement = mockAnnouncements.find((item) => item.id === id);
-
-  const handleBack = () => {
-    navigate(-1);
-  };
 
   if (!announcement) {
     return (
       <div className='flex min-h-screen flex-col bg-white'>
-        <NavigationBar title='공지사항 상세' onBack={handleBack} />
+        <NavigationBar title='공지사항 상세' backPath='/announcement' />
         <div className='flex flex-1 items-center justify-center'>
           <p className='text-body1 text-gray-500'>공지사항을 찾을 수 없습니다.</p>
         </div>
@@ -26,7 +21,7 @@ export default function AnnouncementDetailPage() {
 
   return (
     <div className='flex min-h-screen flex-col bg-white'>
-      <NavigationBar title='공지사항 상세' onBack={handleBack} />
+      <NavigationBar title='공지사항 상세' backPath='/announcement' />
 
       <div className='flex flex-col pt-6'>
         <div className='border-gray-150 flex flex-col gap-4 border-b px-5 py-5'>

@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { usePlaceDetailQuery } from '@/entities/place/model/use-place-detail-query';
 import { usePlaceReviewsQuery } from '@/entities/place/model/use-place-reviews-query';
@@ -11,13 +11,12 @@ import StarIcon from '@/shared/ui/icons/Star.svg?react';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 function ReviewListContent({ id }: { id: string }) {
-  const navigate = useNavigate();
   const { data: place } = usePlaceDetailQuery(id);
   const { data: reviewsData } = usePlaceReviewsQuery(id, { page: 0, size: 20 });
 
   return (
     <div className='min-h-screen bg-white'>
-      <NavigationBar onBack={() => navigate(-1)} title={`${place.name} 리뷰`} />
+      <NavigationBar backPath={`/place/${id}`} title={`${place.name} 리뷰`} />
 
       <div className='flex flex-col gap-5 p-5'>
         <div className='flex items-center justify-between'>

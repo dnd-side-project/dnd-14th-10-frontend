@@ -1,5 +1,3 @@
-import { useNavigate } from 'react-router-dom';
-
 import { getBadgeIcon, lockedBadgeIcon, categoryNames } from '@/entities/badge/lib/badge-icon-map';
 import { useBadgeProgressQuery } from '@/entities/badge/model/use-badge-progress-query';
 import type { BadgeCategory } from '@/features/badge/model/types';
@@ -32,17 +30,12 @@ const transformToBadgeCategory = (progress: CategoryProgress): BadgeCategory => 
 };
 
 export default function BadgePage() {
-  const navigate = useNavigate();
   const { data: badgeProgress, isLoading } = useBadgeProgressQuery();
-
-  const handleBack = () => {
-    navigate(-1);
-  };
 
   if (isLoading) {
     return (
       <div className='flex min-h-screen flex-col bg-white'>
-        <NavigationBar title='배지' onBack={handleBack} />
+        <NavigationBar title='배지' backPath='/my' />
         <div className='flex flex-1 items-center justify-center'>
           <div className='border-t-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-gray-200' />
         </div>
@@ -54,7 +47,7 @@ export default function BadgePage() {
 
   return (
     <div className='flex min-h-screen flex-col bg-white'>
-      <NavigationBar title='배지' onBack={handleBack} />
+      <NavigationBar title='배지' backPath='/my' />
 
       <div className='flex flex-col gap-8 px-5 pt-6'>
         {badgeCategories.map((category) => (

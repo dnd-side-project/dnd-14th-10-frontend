@@ -23,10 +23,6 @@ export default function MyPage() {
 
   const navigate = useNavigate();
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleEditProfile = () => {
     navigate('/my/edit');
   };
@@ -101,7 +97,7 @@ export default function MyPage() {
   if (isLoading) {
     return (
       <div className='flex min-h-screen flex-col bg-white'>
-        <NavigationBar title='MY' onBack={handleBack} />
+        <NavigationBar title='MY' backPath='/' />
         <div className='flex flex-1 items-center justify-center'>
           <div className='border-t-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-gray-200' />
         </div>
@@ -111,7 +107,7 @@ export default function MyPage() {
 
   return (
     <div className='flex min-h-screen flex-col bg-white'>
-      <NavigationBar title='MY' onBack={handleBack} />
+      <NavigationBar title='MY' backPath='/' />
 
       <div className='flex flex-col pt-6'>
         <div className='flex flex-col gap-7 px-5'>

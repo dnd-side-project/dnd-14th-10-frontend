@@ -22,10 +22,6 @@ const MapRecommendedContent = ({ category }: MapRecommendedContentProps) => {
   const navigate = useNavigate();
   const { data: places } = useRecommendedPlacesQuery();
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleFilter = () => {
     // TODO: 필터 모달 열기
     console.log('필터 클릭');
@@ -45,7 +41,7 @@ const MapRecommendedContent = ({ category }: MapRecommendedContentProps) => {
       <div className='absolute top-[72px] right-5 left-5 z-10'>
         <PlaceListHeader
           title={`'${category}' 리스트`}
-          onBack={handleBack}
+          onBack={() => navigate('/map')}
           onFilter={handleFilter}
         />
       </div>

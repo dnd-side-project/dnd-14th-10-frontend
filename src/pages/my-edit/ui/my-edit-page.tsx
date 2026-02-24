@@ -49,10 +49,6 @@ export default function MyEditPage() {
 
   const navigate = useNavigate();
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleEditImage = () => {
     fileInputRef.current?.click();
   };
@@ -99,7 +95,7 @@ export default function MyEditPage() {
   if (isLoading) {
     return (
       <div className='flex min-h-screen flex-col bg-white'>
-        <NavigationBar title='내 정보 수정' onBack={handleBack} />
+        <NavigationBar title='내 정보 수정' backPath='/my' />
         <div className='flex flex-1 items-center justify-center'>
           <div className='border-t-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-gray-200' />
         </div>
@@ -109,7 +105,7 @@ export default function MyEditPage() {
 
   return (
     <div className='flex min-h-screen flex-col bg-white'>
-      <NavigationBar title='내 정보 수정' onBack={handleBack} />
+      <NavigationBar title='내 정보 수정' backPath='/my' />
 
       <input
         ref={fileInputRef}
