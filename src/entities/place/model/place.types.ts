@@ -67,6 +67,18 @@ export interface Pageable {
   sort: PageableSort;
 }
 
+export interface ReviewTagStat {
+  tagId: number;
+  code: string;
+  name: string;
+  count: number;
+}
+
+export interface ReviewRatingStat {
+  averageRating: number;
+  reviewCount: number;
+}
+
 export interface PlaceReviewsResponse {
   totalElements: number;
   totalPages: number;

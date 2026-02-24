@@ -6,6 +6,8 @@ import type {
   PlaceDetail,
   PlaceReviewsResponse,
   RecommendedPlace,
+  ReviewRatingStat,
+  ReviewTagStat,
 } from '../model/place.types';
 export type { Review, ReviewTag } from '../model/place.types';
 
@@ -40,5 +42,19 @@ export const getPlaceReviews = async (
   const { data } = await apiClient.get<PlaceReviewsResponse>(`/places/${placeId}/reviews`, {
     params,
   });
+  return data;
+};
+
+// GET /api/places/{placeId}/reviews/tag-stats (리뷰 태그 통계)
+export const getReviewTagStats = async (placeId: string): Promise<ReviewTagStat[]> => {
+  const { data } = await apiClient.get<ReviewTagStat[]>(`/places/${placeId}/reviews/tag-stats`);
+  return data;
+};
+
+// GET /api/places/{placeId}/reviews/rating-stats (리뷰 별점 통계)
+export const getReviewRatingStats = async (placeId: string): Promise<ReviewRatingStat> => {
+  const { data } = await apiClient.get<ReviewRatingStat>(
+    `/places/${placeId}/reviews/rating-stats`,
+  );
   return data;
 };
