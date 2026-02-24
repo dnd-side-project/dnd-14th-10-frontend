@@ -129,7 +129,7 @@ export interface NearbyParams {
 }
 
 export interface Place {
-  id: string;
+  id: number;
   name: string;
   locationPoint: { lat: number; lng: number };
   outletScore: number;
