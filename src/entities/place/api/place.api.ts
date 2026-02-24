@@ -4,10 +4,14 @@ import type {
   NearbyParams,
   Place,
   PlaceDetail,
+  PlaceRecommendation,
+  PlaceRecommendationResponse,
   PlaceReviewsResponse,
+  PopularPlacesParams,
   RecommendedPlace,
   ReviewRatingStat,
   ReviewTagStat,
+  SimilarPlacesParams,
 } from '../model/place.types';
 export type { Review, ReviewTag } from '../model/place.types';
 
@@ -55,6 +59,49 @@ export const getReviewTagStats = async (placeId: string): Promise<ReviewTagStat[
 export const getReviewRatingStats = async (placeId: string): Promise<ReviewRatingStat> => {
   const { data } = await apiClient.get<ReviewRatingStat>(
     `/places/${placeId}/reviews/rating-stats`,
+  );
+  return data;
+};
+
+// GET /api/places/recommendations/popular (인기 공간 조회)
+export const getPopularPlaces = async (
+  params: PopularPlacesParams,
+): Promise<PlaceRecommendation[]> => {
+  const { data } = await apiClient.get<PlaceRecommendation[]>(
+    '/places/recommendations/popular',
+    { params },
+  );
+  return data;
+};
+
+// GET /api/places/recommendations/similar (비슷한 성향 공간 조회)
+export const getSimilarPlaces = async (
+  params: SimilarPlacesParams,
+): Promise<PlaceRecommendation[]> => {
+  const { data } = await apiClient.get<PlaceRecommendation[]>(
+    '/places/recommendations/similar',
+    { params },
+  );
+  return data;
+};
+
+// GET /api/places/recommendations/new (주변 신규 공간 조회)
+export const getNewPlaces = async (
+  params: SimilarPlacesParams,
+): Promise<PlaceRecommendation[]> => {
+  const { data } = await apiClient.get<PlaceRecommendation[]>('/places/recommendations/new', {
+    params,
+  });
+  return data;
+};
+
+// GET /api/places/recommendations/random-theme (랜덤 태그 추천)
+export const getRandomThemePlaces = async (
+  params: PopularPlacesParams,
+): Promise<PlaceRecommendationResponse> => {
+  const { data } = await apiClient.get<PlaceRecommendationResponse>(
+    '/places/recommendations/random-theme',
+    { params },
   );
   return data;
 };

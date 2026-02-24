@@ -145,3 +145,37 @@ export interface RecommendedPlace {
   tags: string[];
   images: string[];
 }
+
+export interface PlaceRecommendation {
+  id: number;
+  name: string;
+  category: PlaceCategory;
+  addressDetail: string;
+  regionCode: number;
+  representativeImageUrl: string;
+  latitude: number;
+  longitude: number;
+  mood: Mood;
+  spaceSize: SpaceSize;
+  isWished: boolean;
+}
+
+export interface PlaceRecommendationResponse {
+  themeType: string;
+  themeValue: string;
+  places: PlaceRecommendation[];
+}
+
+export interface PopularPlacesParams {
+  longitude: number;
+  latitude: number;
+  category: PlaceCategory;
+  radiusMeters?: number;
+}
+
+export interface SimilarPlacesParams {
+  regionCode: number;
+  category: PlaceCategory;
+  longitude: number;
+  latitude: number;
+}

@@ -3,16 +3,22 @@ import { useEffect, useRef } from 'react';
 import type { Place } from '@/entities/place/model/place.types';
 import { useNaverMapScript } from '@/shared/lib/naver-map/use-naver-map-script';
 
-interface MapViewerProps {
-  currentLocation: { lat: number; lng: number; address: string } | null;
-  places: Place[];
+export interface MapMarker {
+  lat: number;
+  lng: number;
+  name: string;
 }
 
-export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
+interface MapViewerProps {
+  currentLocation: { lat: number; lng: number; address: string } | null;
+  places?: Place[];
+  markers?: MapMarker[];
+}
+
+export const MapViewer = ({ currentLocation, places = [], markers = [] }: MapViewerProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const naverMapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
-  const currentLocationMarkerRef = useRef<naver.maps.Marker | null>(null);
   const isLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
 
   useEffect(
@@ -35,32 +41,11 @@ export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
   );
 
   useEffect(
-    function updateCurrentLocationMarker() {
+    function updateCenter() {
       if (!naverMapRef.current || !currentLocation) return;
 
-      const map = naverMapRef.current;
       const latLng = new window.naver.maps.LatLng(currentLocation.lat, currentLocation.lng);
-      map.setCenter(latLng);
-
-      if (currentLocationMarkerRef.current) {
-        currentLocationMarkerRef.current.setMap(null);
-      }
-
-      currentLocationMarkerRef.current = new window.naver.maps.Marker({
-        position: latLng,
-        map: map,
-        icon: {
-          content:
-            '<div style="width:12px; height:12px; background:blue; border-radius:50%; border:2px solid white;"></div>',
-        },
-      });
-
-      return () => {
-        if (currentLocationMarkerRef.current) {
-          currentLocationMarkerRef.current.setMap(null);
-          currentLocationMarkerRef.current = null;
-        }
-      };
+      naverMapRef.current.setCenter(latLng);
     },
     [currentLocation],
   );
@@ -72,7 +57,8 @@ export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
       const map = naverMapRef.current;
 
       markersRef.current.forEach((marker) => marker.setMap(null));
-      markersRef.current = places.map(
+
+      const placeMarkers = places.map(
         (place) =>
           new window.naver.maps.Marker({
             position: new window.naver.maps.LatLng(
@@ -84,12 +70,23 @@ export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
           }),
       );
 
+      const customMarkers = markers.map(
+        (m) =>
+          new window.naver.maps.Marker({
+            position: new window.naver.maps.LatLng(m.lat, m.lng),
+            map: map,
+            title: m.name,
+          }),
+      );
+
+      markersRef.current = [...placeMarkers, ...customMarkers];
+
       return () => {
         markersRef.current.forEach((marker) => marker.setMap(null));
         markersRef.current = [];
       };
     },
-    [places],
+    [places, markers],
   );
 
   return (
