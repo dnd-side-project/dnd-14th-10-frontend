@@ -4,6 +4,6 @@ import { toggleWishlist } from '../api/toggle-wishlist.api';
 
 export const useToggleWishlistMutation = () => {
   return useMutation({
-    mutationFn: (placeId: string) => toggleWishlist(placeId),
+    mutationFn: (placeId: number) => toggleWishlist(placeId),
   });
 };

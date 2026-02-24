@@ -1,8 +1,10 @@
 import { Suspense, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import type { PlaceDetail, ReviewTagStat } from '@/entities/place/model/place.types';
+import { placeKeys } from '@/entities/place/model/query-keys';
 import { usePlaceDetailQuery } from '@/entities/place/model/use-place-detail-query';
 import { usePlaceReviewsQuery } from '@/entities/place/model/use-place-reviews-query';
 import { useReviewRatingStatsQuery } from '@/entities/place/model/use-review-rating-stats-query';
@@ -15,6 +17,7 @@ import {
 } from '@/features/register-place/model/register-place.types';
 import type { Mood } from '@/features/register-place/model/register-place.types';
 import ReviewItem from '@/features/review-history/ui/ReviewItem';
+import { useToggleWishlistMutation } from '@/features/toggle-wishlist/model/use-toggle-wishlist-mutation';
 import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
 import calmnessCalm from '@/shared/assets/images/calm-3d.png';
 import calmnessChatty from '@/shared/assets/images/chatty-3d.png';
@@ -25,6 +28,7 @@ import BuildingIcon from '@/shared/ui/icons/Building.svg?react';
 import ChevronDownIcon from '@/shared/ui/icons/ChevronDown.svg?react';
 import ChevronRightIcon from '@/shared/ui/icons/ChevronRight.svg?react';
 import HeartIcon from '@/shared/ui/icons/Heart.svg?react';
+import HeartFilledIcon from '@/shared/ui/icons/HeartFilled.svg?react';
 import MapPinIcon from '@/shared/ui/icons/MapPin.svg?react';
 import OutletIcon from '@/shared/ui/icons/Outlet.svg?react';
 import PeopleIcon from '@/shared/ui/icons/People.svg?react';
@@ -298,7 +302,19 @@ function ReviewSection({ place }: { place: PlaceDetail }) {
 
 function PlaceDetailContent({ id }: { id: string }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: place } = usePlaceDetailQuery(id);
+  const [isWished, setIsWished] = useState(place.isWished);
+  const { mutate: toggleWishlist } = useToggleWishlistMutation();
+
+  const handleWishlistToggle = () => {
+    toggleWishlist(place.id, {
+      onSuccess: () => {
+        setIsWished((prev) => !prev);
+        queryClient.invalidateQueries({ queryKey: placeKeys.detail(id) });
+      },
+    });
+  };
 
   return (
     <div className='min-h-screen bg-white'>
@@ -309,8 +325,12 @@ function PlaceDetailContent({ id }: { id: string }) {
             <button>
               <ShareIcon className='h-[24px] w-[24px] text-gray-950' />
             </button>
-            <button>
-              <HeartIcon className='h-[24px] w-[24px] text-gray-950' />
+            <button onClick={handleWishlistToggle}>
+              {isWished ? (
+                <HeartFilledIcon className='h-[24px] w-[24px] text-black' />
+              ) : (
+                <HeartIcon className='h-[24px] w-[24px] text-gray-950' />
+              )}
             </button>
           </div>
         }
