@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { usePlaceDetailQuery } from '@/entities/place/model/use-place-detail-query';
 import { usePlaceReviewsQuery } from '@/entities/place/model/use-place-reviews-query';
-import ReviewItem from '@/features/review-history/ui/ReviewItem';
+import { ReviewCard } from '@/entities/place/ui/ReviewCard';
 import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
 import PlaceErrorBoundary from '@/shared/ui/error-boundary/PlaceErrorBoundary';
 import StarIcon from '@/shared/ui/icons/Star.svg?react';
@@ -30,15 +30,7 @@ function ReviewListContent({ id }: { id: string }) {
 
         <div className='flex flex-col gap-5'>
           {reviewsData.content.map((review) => (
-            <ReviewItem
-              key={review.reviewId}
-              placeName={review.userNickname}
-              date={new Date(review.createdAt).toLocaleDateString('ko-KR')}
-              content={review.content}
-              images={review.images.map((img) => img.imageUrl)}
-              tags={review.tags.map((tag) => tag.name)}
-              onMoreClick={() => {}}
-            />
+            <ReviewCard key={review.reviewId} review={review} />
           ))}
         </div>
       </div>

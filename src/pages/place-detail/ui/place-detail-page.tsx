@@ -9,6 +9,7 @@ import { usePlaceDetailQuery } from '@/entities/place/model/use-place-detail-que
 import { usePlaceReviewsQuery } from '@/entities/place/model/use-place-reviews-query';
 import { useReviewRatingStatsQuery } from '@/entities/place/model/use-review-rating-stats-query';
 import { useReviewTagStatsQuery } from '@/entities/place/model/use-review-tag-stats-query';
+import { ReviewCard } from '@/entities/place/ui/ReviewCard';
 import {
   CROWD_STATUS_OPTIONS,
   MOOD_OPTIONS,
@@ -16,7 +17,6 @@ import {
   SPACE_SIZE_OPTIONS,
 } from '@/features/register-place/model/register-place.types';
 import type { Mood } from '@/features/register-place/model/register-place.types';
-import ReviewItem from '@/features/review-history/ui/ReviewItem';
 import { useToggleWishlistMutation } from '@/features/toggle-wishlist/model/use-toggle-wishlist-mutation';
 import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
 import calmnessCalm from '@/shared/assets/images/calm-3d.png';
@@ -202,7 +202,7 @@ function ReviewSection({ place }: { place: PlaceDetail }) {
   const navigate = useNavigate();
   const [isTagsExpanded, setIsTagsExpanded] = useState(false);
   const placeId = String(place.id);
-  const { data: reviewsData } = usePlaceReviewsQuery(placeId, { page: 0, size: 3 });
+  const { data: reviewsData } = usePlaceReviewsQuery(placeId, { page: 0, size: 4 });
   const { data: tagStats } = useReviewTagStatsQuery(placeId);
   const { data: ratingStats } = useReviewRatingStatsQuery(placeId);
   const maxCount = Math.max(...tagStats.map((t) => t.count), 1);
@@ -282,15 +282,7 @@ function ReviewSection({ place }: { place: PlaceDetail }) {
 
             <div className='flex flex-col gap-5'>
               {reviewsData.content.map((review) => (
-                <ReviewItem
-                  key={review.reviewId}
-                  placeName={review.userNickname}
-                  date={new Date(review.createdAt).toLocaleDateString('ko-KR')}
-                  content={review.content}
-                  images={review.images.map((img) => img.imageUrl)}
-                  tags={review.tags.map((tag) => tag.name)}
-                  onMoreClick={() => {}}
-                />
+                <ReviewCard key={review.reviewId} review={review} />
               ))}
             </div>
           </div>
