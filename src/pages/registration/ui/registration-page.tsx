@@ -97,7 +97,7 @@ function RegistrationPage() {
           },
           {
             onSuccess: (response) => {
-              const placeId = response.data?.placeId ?? 0;
+              const placeId = response.data.placeId;
               history.replace('complete', { placeId });
             },
             onError: (error) => {
