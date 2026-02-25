@@ -14,9 +14,21 @@ const createMockPlaceDetail = (id: string): PlaceDetail => ({
   latitude: 37.5665,
   longitude: 126.978,
   images: [
-    { url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400', sequence: 0, representativeFlag: true },
-    { url: 'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=400', sequence: 1, representativeFlag: false },
-    { url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400', sequence: 2, representativeFlag: false },
+    {
+      url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
+      sequence: 0,
+      representativeFlag: true,
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=400',
+      sequence: 1,
+      representativeFlag: false,
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
+      sequence: 2,
+      representativeFlag: false,
+    },
   ],
   averageRating: 4.8,
   reviewCount: 16,
@@ -29,6 +41,7 @@ const createMockPlaceDetail = (id: string): PlaceDetail => ({
   floorInfo: 3,
   restroomInfo: '1층 로비 옆',
   isWished: false,
+  tagIds: [1, 2, 3],
   reviewTags: [
     { label: '집중하기 좋아요', percentage: 76 },
     { label: '칸막이가 있어요', percentage: 68 },
