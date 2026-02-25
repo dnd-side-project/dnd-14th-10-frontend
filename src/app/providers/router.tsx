@@ -84,7 +84,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/registration',
-        element: <RegistrationPage />,
+        element: (
+          <ProtectedRoute>
+            <RegistrationPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/place/:id',
@@ -92,7 +96,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/review-creation/:id',
-        element: <ReviewCreationPage />,
+        element: (
+          <ProtectedRoute>
+            <ReviewCreationPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/place/:id/reviews',
