@@ -74,7 +74,7 @@ function PlaceEditForm({ placeDetail }: { placeDetail: PlaceDetail }) {
       spaceSize: placeDetail.spaceSize,
       crowdStatus: placeDetail.crowdStatus,
       mood: placeDetail.mood,
-      tagIds: [],
+      tagIds: placeDetail.tagIds ?? [],
       openTime: placeDetail.openTime || '',
       closeTime: placeDetail.closeTime || '',
       floorInfo: placeDetail.floorInfo?.toString() || '',
@@ -193,8 +193,6 @@ function PlaceEditForm({ placeDetail }: { placeDetail: PlaceDetail }) {
       restroomInfo: data.restroomInfo || undefined,
       images: allImages,
     };
-
-    console.log('[장소 수정 요청]', { placeId: placeDetail.id, requestData });
 
     updatePlace(
       {

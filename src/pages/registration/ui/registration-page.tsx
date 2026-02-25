@@ -1,4 +1,5 @@
 import { useFunnel } from '@use-funnel/react-router-dom';
+import type { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 import type { PlaceCategory } from '@/features/register-place/model/register-place.types';
@@ -102,7 +103,24 @@ function RegistrationPage() {
             },
             onError: (error) => {
               console.error('등록 실패:', error);
-              alert('장소 등록에 실패했습니다. 다시 시도해주세요.');
+
+              const axiosError = error as AxiosError<{
+                code: string;
+                message: string;
+                data: { existingPlaceId?: number; existingPlaceName?: string };
+              }>;
+
+              if (axiosError.response?.status === 409) {
+                const existingPlaceName = axiosError.response.data.data?.existingPlaceName;
+
+                if (existingPlaceName) {
+                  alert(`이미 등록된 장소입니다: ${existingPlaceName}`);
+                } else {
+                  alert('이미 등록된 장소입니다.\n다른 장소를 등록해주세요.');
+                }
+              } else {
+                alert('장소 등록에 실패했습니다. 다시 시도해주세요.');
+              }
             },
           },
         );

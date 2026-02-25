@@ -6,6 +6,9 @@ import { getPlaceDetail } from '../api/place.api';
 export const usePlaceDetailQuery = (placeId: string) => {
   return useSuspenseQuery({
     queryKey: placeKeys.detail(placeId),
-    queryFn: () => getPlaceDetail(placeId),
+    queryFn: async () => {
+      const result = await getPlaceDetail(placeId);
+      return result;
+    },
   });
 };

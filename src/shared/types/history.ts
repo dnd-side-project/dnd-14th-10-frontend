@@ -1,3 +1,5 @@
+import type { Mood, SpaceSize } from '@/features/register-place/model/register-place.types';
+
 import type { PlaceCategory } from './wishlist';
 
 export interface HistoryItemResponse {
@@ -7,10 +9,13 @@ export interface HistoryItemResponse {
   category: PlaceCategory;
   addressDetail: string;
   regionCode: number;
-  representativeImageKey: string | null;
+  representativeImageUrl: string | null;
   latitude: number;
   longitude: number;
   viewedAt: string;
+  wishCount: number;
+  mood: Mood;
+  spaceSize: SpaceSize;
 }
 
 export interface PagedHistoryResponse {

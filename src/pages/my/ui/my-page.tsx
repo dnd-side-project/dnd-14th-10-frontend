@@ -11,7 +11,6 @@ import ProfileSection from '@/features/my/ui/ProfileSection';
 import RecentPlacesSection from '@/features/my/ui/RecentPlacesSection';
 import StatsSection from '@/features/my/ui/StatsSection';
 import { getErrorMessage } from '@/shared/api/error.utils';
-import { getImageUrl } from '@/shared/lib/image-utils';
 import { useAuthStore } from '@/shared/store/use-auth-store';
 import ConfirmBottomSheet from '@/shared/ui/bottom-sheet/ConfirmBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
@@ -83,8 +82,8 @@ export default function MyPage() {
   const recentPlaces = (historiesData?.content ?? []).map((history) => ({
     id: String(history.placeId),
     name: history.placeName,
-    imageUrl: getImageUrl(history.representativeImageKey),
-    likeCount: 0,
+    imageUrl: history.representativeImageUrl || '',
+    likeCount: history.wishCount,
   }));
 
   const menuItemsWithHandlers = mockMenuItems.map((item) => ({
