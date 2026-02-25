@@ -60,7 +60,7 @@ export default function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
     }
 
     onClose();
-    navigate(`/map?${params.toString()}`);
+    navigate(`/map/search?${params.toString()}`);
   };
 
   const handleClose = () => {

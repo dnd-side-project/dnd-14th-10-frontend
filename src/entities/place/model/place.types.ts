@@ -93,7 +93,7 @@ export interface PlaceReviewsResponse {
   empty: boolean;
 }
 
-interface PlaceImage {
+export interface PlaceImage {
   url: string;
   sequence: number;
   representativeFlag: boolean;
@@ -178,4 +178,35 @@ export interface SimilarPlacesParams {
   category: PlaceCategory;
   longitude: number;
   latitude: number;
+}
+
+export interface PlaceSearchItem {
+  id: number;
+  name: string;
+  category: PlaceCategory;
+  addressDetail: string;
+  regionCode: number;
+  images: PlaceImage[];
+  latitude: number;
+  longitude: number;
+  mood: Mood;
+  spaceSize: SpaceSize;
+  wishCount: number;
+}
+
+export interface PlaceSearchResponse {
+  places: PlaceSearchItem[];
+  lastDistance: number;
+  hasNext: boolean;
+}
+
+export interface PlaceSearchParams {
+  longitude: number;
+  latitude: number;
+  category?: PlaceCategory;
+  spaceSize?: SpaceSize;
+  moods?: string;
+  regionCodes?: number[];
+  lastDistance?: number;
+  size?: number;
 }

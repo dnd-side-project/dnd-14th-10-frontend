@@ -81,6 +81,17 @@ export const MapViewer = ({ currentLocation, places = [], markers = [] }: MapVie
 
       markersRef.current = [...placeMarkers, ...customMarkers];
 
+      if (markersRef.current.length > 0) {
+        const bounds = new window.naver.maps.LatLngBounds(
+          markersRef.current[0].getPosition() as naver.maps.LatLng,
+          markersRef.current[0].getPosition() as naver.maps.LatLng,
+        );
+        markersRef.current.forEach((marker) => {
+          bounds.extend(marker.getPosition() as naver.maps.LatLng);
+        });
+        map.fitBounds(bounds, { top: 100, right: 50, bottom: 772, left: 50 });
+      }
+
       return () => {
         markersRef.current.forEach((marker) => marker.setMap(null));
         markersRef.current = [];

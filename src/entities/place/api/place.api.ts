@@ -7,6 +7,8 @@ import type {
   PlaceRecommendation,
   PlaceRecommendationResponse,
   PlaceReviewsResponse,
+  PlaceSearchParams,
+  PlaceSearchResponse,
   PopularPlacesParams,
   RecommendedPlace,
   ReviewRatingStat,
@@ -21,9 +23,10 @@ export const getPlaceDetail = async (placeId: string): Promise<PlaceDetail> => {
   return data;
 };
 
-// GET /api/places (필터 검색)
-export const searchPlaces = (params: unknown) => {
-  return apiClient.get('/places', { params });
+// GET /api/places/search (필터 검색)
+export const searchPlaces = async (params: PlaceSearchParams): Promise<PlaceSearchResponse> => {
+  const { data } = await apiClient.get<PlaceSearchResponse>('/places/search', { params });
+  return data;
 };
 
 // GET /api/places/nearby (주변 조회)

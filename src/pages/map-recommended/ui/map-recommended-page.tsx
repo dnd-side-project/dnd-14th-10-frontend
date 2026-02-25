@@ -7,6 +7,10 @@ import { useNewPlacesQuery } from '@/entities/place/model/use-new-places-query';
 import { usePopularPlacesQuery } from '@/entities/place/model/use-popular-places-query';
 import { useRandomThemePlacesQuery } from '@/entities/place/model/use-random-theme-places-query';
 import { useSimilarPlacesQuery } from '@/entities/place/model/use-similar-places-query';
+import {
+  MOOD_OPTIONS,
+  SPACE_SIZE_OPTIONS,
+} from '@/features/register-place/model/register-place.types';
 import Loading from '@/shared/ui/loading/loading';
 import type { MapMarker } from '@/widgets/map-viewer/ui/MapViewer';
 import { MapViewer } from '@/widgets/map-viewer/ui/MapViewer';
@@ -35,7 +39,10 @@ function toDrawerPlaces(places: PlaceRecommendation[]) {
     name: p.name,
     location: p.addressDetail.split(' ').slice(0, 2).join(' '),
     likeCount: 0,
-    tags: [p.mood, p.spaceSize],
+    tags: [
+      MOOD_OPTIONS.find((o) => o.value === p.mood)?.label ?? p.mood,
+      SPACE_SIZE_OPTIONS.find((o) => o.value === p.spaceSize)?.label ?? p.spaceSize,
+    ],
     images: p.representativeImageUrl ? [p.representativeImageUrl] : [],
   }));
 }
