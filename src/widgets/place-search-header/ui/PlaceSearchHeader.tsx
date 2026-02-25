@@ -59,11 +59,13 @@ export function PlaceSearchHeader({
         <ArrowLeftIcon className='size-6' />
       </button>
 
-      <div className='flex flex-1 flex-col items-center'>
-        <span className='text-body1 font-medium tracking-tight text-gray-950'>{primary}</span>
+      <div className='flex min-w-0 flex-1 flex-col items-center'>
+        <span className='text-body1 w-full truncate text-center font-medium tracking-tight text-gray-950'>
+          {primary}
+        </span>
         {secondary && (
           <span
-            className='text-center text-gray-950'
+            className='w-full truncate text-center text-gray-950'
             style={{ fontSize: 10, fontWeight: 400, lineHeight: '13px' }}
           >
             {secondary}
