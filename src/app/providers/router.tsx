@@ -17,10 +17,12 @@ import MyEditNicknamePage from '@/pages/my-edit-nickname/ui/my-edit-nickname-pag
 import OAuthKakaoCallbackPage from '@/pages/oauth-kakao-callback/ui/oauth-kakao-callback-page';
 import OnboardingPage from '@/pages/onboarding/ui/onboarding-page';
 import PlaceDetailPage from '@/pages/place-detail/ui/place-detail-page';
+import PlaceEditPage from '@/pages/place-edit/ui/place-edit-page';
 import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
 import RegisteredPlacesPage from '@/pages/registered-places/ui/registered-places-page';
 import RegistrationPage from '@/pages/registration/ui/registration-page';
 import ReviewCreationPage from '@/pages/review-creation/ui/review-creation-page';
+import ReviewEditPage from '@/pages/review-edit/ui/review-edit-page';
 import ReviewHistoryPage from '@/pages/review-history/ui/review-history-page';
 import ReviewListPage from '@/pages/review-list/ui/review-list-page';
 import WishlistPage from '@/pages/wishlist/ui/wishlist-page';
@@ -91,6 +93,14 @@ export const router = createBrowserRouter([
         element: <PlaceDetailPage />,
       },
       {
+        path: '/place/:placeId/edit',
+        element: (
+          <ProtectedRoute>
+            <PlaceEditPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: '/review-creation/:id',
         element: <ReviewCreationPage />,
       },
@@ -119,6 +129,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ReviewHistoryPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/reviews/:reviewId/edit',
+        element: (
+          <ProtectedRoute>
+            <ReviewEditPage />
           </ProtectedRoute>
         ),
       },

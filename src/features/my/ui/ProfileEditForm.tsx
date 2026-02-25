@@ -5,12 +5,9 @@ interface ProfileEditFormProps {
   birthday: string;
   residence: string;
   gender: 'male' | 'female' | null;
-  hideGender: boolean;
   onEditName?: () => void;
   onEditBirthday?: () => void;
   onEditResidence?: () => void;
-  onGenderChange?: (gender: 'male' | 'female' | null) => void;
-  onHideGenderChange?: (hide: boolean) => void;
 }
 
 export default function ProfileEditForm({
@@ -18,12 +15,9 @@ export default function ProfileEditForm({
   birthday,
   residence,
   gender,
-  hideGender,
   onEditName,
   onEditBirthday,
   onEditResidence,
-  onGenderChange,
-  onHideGenderChange,
 }: ProfileEditFormProps) {
   return (
     <div className='flex flex-col gap-10'>
@@ -79,39 +73,27 @@ export default function ProfileEditForm({
         <span className='text-body1 w-[76px] font-bold tracking-tight text-gray-950'>성별</span>
         <div className='flex flex-1 flex-col gap-2'>
           <div className='flex items-center gap-9'>
-            <label className='flex cursor-pointer items-center gap-2'>
+            <label className='flex items-center gap-2'>
               <input
                 type='radio'
                 name='gender'
-                checked={gender === 'male' && !hideGender}
-                onChange={() => onGenderChange?.('male')}
-                disabled={hideGender}
-                className='accent-primary-700 size-3'
+                checked={gender === 'male'}
+                readOnly
+                className='accent-primary-700 size-3 cursor-default'
               />
               <span className='text-body1 tracking-tight text-gray-950'>남자</span>
             </label>
-            <label className='flex cursor-pointer items-center gap-2'>
+            <label className='flex items-center gap-2'>
               <input
                 type='radio'
                 name='gender'
-                checked={gender === 'female' && !hideGender}
-                onChange={() => onGenderChange?.('female')}
-                disabled={hideGender}
-                className='accent-primary-700 size-3'
+                checked={gender === 'female'}
+                readOnly
+                className='accent-primary-700 size-3 cursor-default'
               />
               <span className='text-body1 tracking-tight text-gray-950'>여자</span>
             </label>
           </div>
-          <div className='h-px w-full bg-gray-300' />
-          <label className='flex cursor-pointer items-center gap-3'>
-            <input
-              type='checkbox'
-              checked={hideGender}
-              onChange={(e) => onHideGenderChange?.(e.target.checked)}
-              className='accent-primary-700 size-3'
-            />
-            <span className='text-body1 tracking-tight text-gray-950'>성별 정보 저장하지 않기</span>
-          </label>
         </div>
       </div>
     </div>

@@ -1,26 +1,28 @@
 import { useNavigate } from 'react-router-dom';
 
-import { mockUserDetailData } from '@/features/my/model/mock-data';
+import { useUpdateRegionMutation } from '@/entities/user/model/use-user-mutations';
+import { useUserQuery } from '@/entities/user/model/use-user-query';
 import AddressStep from '@/features/onboarding/ui/AddressStep';
 
 export default function MyEditAddressPage() {
   const navigate = useNavigate();
+  const { data: user } = useUserQuery();
+  const updateRegionMutation = useUpdateRegionMutation();
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
-  const handleSave = (address: string) => {
-    // TODO: API 호출로 거주지 업데이트
-    console.log('거주지 업데이트:', address);
-    navigate('/my/edit');
+  const handleSave = async (regionCode: number) => {
+    try {
+      await updateRegionMutation.mutateAsync(regionCode);
+      navigate('/my/edit');
+    } catch (error) {
+      console.error('거주지 업데이트 실패:', error);
+    }
   };
 
   return (
     <AddressStep
       onNext={handleSave}
-      onBack={handleBack}
-      initialValue={mockUserDetailData.residence}
+      onBack={() => navigate('/my/edit')}
+      initialRegionCode={user?.regionCode}
       buttonText='수정하기'
     />
   );

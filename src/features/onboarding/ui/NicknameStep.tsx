@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { checkNickname } from '@/entities/user/api/user.api';
 import OnboardingLayout from '@/features/onboarding/ui/OnboardingLayout';
 import PrimaryButton from '@/shared/ui/buttons/PrimaryButton';
 import FormLabel from '@/shared/ui/forms/FormLabel';
@@ -12,12 +13,9 @@ interface NicknameStepProps {
   isSubmitting?: boolean;
 }
 
-const getKoreanLength = (str: string): number => {
-  return str.replace(/[^ㄱ-ㅎㅏ-ㅣ가-힣]/g, '').length;
-};
-
-const getEnglishLength = (str: string): number => {
-  return str.replace(/[^a-zA-Z]/g, '').length;
+const hasSpecialCharacters = (str: string): boolean => {
+  const specialCharPattern = /[^a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ\s]/;
+  return specialCharPattern.test(str);
 };
 
 export default function NicknameStep({
@@ -29,26 +27,23 @@ export default function NicknameStep({
 }: NicknameStepProps) {
   const [nickname, setNickname] = useState(initialValue);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isDuplicateChecking, setIsDuplicateChecking] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const koreanLength = getKoreanLength(nickname);
-  const englishLength = getEnglishLength(nickname);
+  const isOverLimit = nickname.length > 10;
+  const hasSpecialChars = hasSpecialCharacters(nickname);
+  const hasValidationError = isOverLimit || hasSpecialChars;
+  const isValid = nickname.length > 0 && !hasValidationError;
 
-  const isKoreanOverLimit = koreanLength > 6;
-  const isEnglishOverLimit = englishLength > 10;
-  const hasError = isKoreanOverLimit || isEnglishOverLimit;
-  const isValid = nickname.length > 0 && !hasError;
-
-  const getErrorMessage = (): string | null => {
-    if (isKoreanOverLimit) {
-      return '한글 6자를 넘기면 안됩니다.';
+  const getValidationErrorMessage = (): string | null => {
+    if (isOverLimit) {
+      return '글자 수 10자를 넘기면 안됩니다.';
     }
-    if (isEnglishOverLimit) {
-      return '영문 10자를 넘기면 안됩니다.';
+    if (hasSpecialChars) {
+      return '닉네임에 특수문자는 사용할 수 없습니다.';
     }
     return null;
   };
-
-  const errorMessage = getErrorMessage();
 
   useEffect(() => {
     const handleResize = () => {
@@ -75,11 +70,29 @@ export default function NicknameStep({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
+    setErrorMessage(null);
   };
 
-  const handleComplete = () => {
-    if (isValid) {
+  const handleComplete = async () => {
+    if (!isValid) return;
+
+    try {
+      setIsDuplicateChecking(true);
+      setErrorMessage(null);
+
+      const response = await checkNickname(nickname);
+
+      if (!response.data.available) {
+        setErrorMessage('이미 사용 중인 닉네임입니다.');
+        return;
+      }
+
       onComplete(nickname);
+    } catch (error) {
+      console.error('닉네임 중복 검사 실패:', error);
+      setErrorMessage('닉네임 확인 중 오류가 발생했습니다.');
+    } finally {
+      setIsDuplicateChecking(false);
     }
   };
 
@@ -100,8 +113,11 @@ export default function NicknameStep({
             paddingBottom: keyboardHeight > 0 ? keyboardHeight + 16 : 0,
           }}
         >
-          <PrimaryButton onClick={handleComplete} disabled={!isValid || isSubmitting}>
-            {isSubmitting ? '처리 중...' : buttonText}
+          <PrimaryButton
+            onClick={handleComplete}
+            disabled={!isValid || isSubmitting || isDuplicateChecking}
+          >
+            {isSubmitting ? '처리 중...' : isDuplicateChecking ? '확인 중...' : buttonText}
           </PrimaryButton>
         </div>
       }
@@ -109,7 +125,7 @@ export default function NicknameStep({
       <div className='mt-10'>
         <div className='flex items-baseline gap-2'>
           <FormLabel>닉네임</FormLabel>
-          <span className='text-[16px] text-gray-500'>( 최대 한글 6자, 영문 10자 )</span>
+          <span className='text-[16px] text-gray-500'>( 최대 글자 수 10자 제한 )</span>
         </div>
         <input
           type='text'
@@ -117,10 +133,14 @@ export default function NicknameStep({
           onChange={handleChange}
           placeholder='예) 고심하는 작업'
           className={`mt-4 h-12 w-full rounded-lg bg-gray-100 px-4 text-[16px] text-gray-900 placeholder:text-gray-500 focus:outline-none ${
-            hasError ? 'border-warning-default border' : ''
+            hasValidationError || errorMessage ? 'border-warning-default border' : ''
           }`}
         />
-        {errorMessage && <p className='text-warning-default mt-2 text-[12px]'>{errorMessage}</p>}
+        {(getValidationErrorMessage() || errorMessage) && (
+          <p className='text-warning-default mt-2 text-[12px]'>
+            {getValidationErrorMessage() || errorMessage}
+          </p>
+        )}
       </div>
     </OnboardingLayout>
   );

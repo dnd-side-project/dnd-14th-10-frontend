@@ -1,4 +1,4 @@
-import { apiClient } from '@/shared/api/client';
+import { apiClient, authClient } from '@/shared/api/client';
 import type { User } from '@/shared/types/user';
 
 export interface OAuthInfo {
@@ -22,7 +22,7 @@ export interface OAuthResponse {
 }
 
 export const kakaoOAuthLogin = (data: OAuthRequest) => {
-  return apiClient.post<OAuthResponse>('/auth/oauth/kakao', data);
+  return authClient.post<OAuthResponse>('/auth/oauth/kakao', data);
 };
 
 /** OAuth 로그인 (kakaoOAuthLogin alias) */
@@ -47,7 +47,7 @@ export interface SignupResponse {
 }
 
 export const signup = (data: SignupRequest) => {
-  return apiClient.post<SignupResponse>('/auth/signup', data);
+  return authClient.post<SignupResponse>('/auth/signup', data);
 };
 
 /** 카카오 회원가입 (signup alias) */
@@ -60,7 +60,7 @@ export interface RefreshResponse {
 }
 
 export const refreshToken = () => {
-  return apiClient.post<RefreshResponse>('/auth/refresh');
+  return authClient.post<RefreshResponse>('/auth/refresh');
 };
 
 // POST /api/auth/logout - 로그아웃

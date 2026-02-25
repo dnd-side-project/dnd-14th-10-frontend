@@ -9,7 +9,18 @@ export interface User {
 export interface UserProfile extends User {
   name: string;
   birth: string;
-  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  gender: 'MALE' | 'FEMALE';
   locationConsent: boolean;
   regionCode: number;
+  reviewCount: number;
+  placeCount: number;
+  badgeCount: number;
+}
+
+// 회원탈퇴 사유
+export type WithdrawReason = 'LOW_USAGE' | 'PRIVACY_CONCERN' | 'OTHER';
+
+export interface WithdrawReasonItem {
+  code: WithdrawReason;
+  description: string;
 }

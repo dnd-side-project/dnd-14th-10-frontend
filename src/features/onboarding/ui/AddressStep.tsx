@@ -1,31 +1,50 @@
 import { useState } from 'react';
 
-import { KOREAN_CITIES, KOREAN_DISTRICTS } from '@/features/onboarding/model/onboarding.types';
+import {
+  KOREAN_CITIES,
+  KOREAN_DISTRICTS,
+  REGION_CODES,
+} from '@/features/onboarding/model/onboarding.types';
 import OnboardingLayout from '@/features/onboarding/ui/OnboardingLayout';
 import PrimaryButton from '@/shared/ui/buttons/PrimaryButton';
 import FormLabel from '@/shared/ui/forms/FormLabel';
 import AddressPicker from '@/shared/ui/inputs/AddressPicker';
 
 interface AddressStepProps {
-  onNext: (address: string) => void;
+  onNext: (regionCode: number) => void;
   onBack: () => void;
-  initialValue?: string;
+  initialRegionCode?: number;
   buttonText?: string;
 }
 
-const parseInitialAddress = (value?: string): { city: string | null; district: string | null } => {
-  if (!value) return { city: null, district: null };
-  const parts = value.split(' ');
-  return { city: parts[0] || null, district: parts[1] || null };
+const findCityDistrictByRegionCode = (
+  regionCode?: number,
+): { city: string | null; district: string | null } => {
+  if (!regionCode) return { city: null, district: null };
+
+  for (const [city, districts] of Object.entries(REGION_CODES)) {
+    for (const [district, code] of Object.entries(districts)) {
+      if (code === regionCode) {
+        return { city, district };
+      }
+    }
+  }
+  return { city: null, district: null };
 };
 
 export default function AddressStep({
   onNext,
   onBack,
-  initialValue,
+  initialRegionCode,
   buttonText = '다음 단계',
 }: AddressStepProps) {
-  const initialAddress = parseInitialAddress(initialValue);
+  const initialAddress = findCityDistrictByRegionCode(initialRegionCode);
+  console.log(
+    '[AddressStep] initialRegionCode:',
+    initialRegionCode,
+    'initialAddress:',
+    initialAddress,
+  );
   const [selectedCity, setSelectedCity] = useState<string | null>(initialAddress.city);
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(initialAddress.district);
 
@@ -40,7 +59,12 @@ export default function AddressStep({
 
   const handleNext = () => {
     if (selectedCity && selectedDistrict) {
-      onNext(`${selectedCity} ${selectedDistrict}`);
+      const regionCode = REGION_CODES[selectedCity]?.[selectedDistrict];
+      if (regionCode !== undefined) {
+        onNext(regionCode);
+      } else {
+        console.error('지역 코드를 찾을 수 없습니다:', selectedCity, selectedDistrict);
+      }
     }
   };
 
