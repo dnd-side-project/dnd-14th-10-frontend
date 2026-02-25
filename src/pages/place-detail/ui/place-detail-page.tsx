@@ -1,10 +1,8 @@
 import { Suspense, useState } from 'react';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import type { PlaceDetail, ReviewTagStat } from '@/entities/place/model/place.types';
-import { placeKeys } from '@/entities/place/model/query-keys';
 import { usePlaceDetailQuery } from '@/entities/place/model/use-place-detail-query';
 import { usePlaceReviewsQuery } from '@/entities/place/model/use-place-reviews-query';
 import { useReviewRatingStatsQuery } from '@/entities/place/model/use-review-rating-stats-query';
@@ -294,18 +292,11 @@ function ReviewSection({ place }: { place: PlaceDetail }) {
 
 function PlaceDetailContent({ id }: { id: string }) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { data: place } = usePlaceDetailQuery(id);
-  const [isWished, setIsWished] = useState(place.isWished);
   const { mutate: toggleWishlist } = useToggleWishlistMutation();
 
   const handleWishlistToggle = () => {
-    toggleWishlist(place.id, {
-      onSuccess: () => {
-        setIsWished((prev) => !prev);
-        queryClient.invalidateQueries({ queryKey: placeKeys.detail(id) });
-      },
-    });
+    toggleWishlist({ placeId: place.id, isWished: place.isWished });
   };
 
   return (
@@ -318,7 +309,7 @@ function PlaceDetailContent({ id }: { id: string }) {
               <ShareIcon className='h-[24px] w-[24px] text-gray-950' />
             </button>
             <button onClick={handleWishlistToggle}>
-              {isWished ? (
+              {place.isWished ? (
                 <HeartFilledIcon className='h-[24px] w-[24px] text-black' />
               ) : (
                 <HeartIcon className='h-[24px] w-[24px] text-gray-950' />
