@@ -35,8 +35,16 @@ export default function SearchDialog({
   onSearch,
 }: SearchDialogProps) {
   const navigate = useNavigate();
-  const { category, setCategory, selectedDistricts, atmospheres, sizes, searchTerm, reset } =
-    useSearchStore();
+  const {
+    category,
+    setCategory,
+    selectedDistricts,
+    atmospheres,
+    sizes,
+    searchTerm,
+    setSearchTerm,
+    reset,
+  } = useSearchStore();
   const [expandedSection, setExpandedSection] = useState<ExpandedSection>('region');
 
   const handleToggleSection = (section: ExpandedSection) => {
@@ -71,6 +79,7 @@ export default function SearchDialog({
 
   const handleSearch = () => {
     const params = buildParams();
+    setSearchTerm('');
     onClose();
 
     if (onSearch) {

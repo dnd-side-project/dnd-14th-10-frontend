@@ -3,6 +3,29 @@ interface GeocodeResult {
   longitude: number;
 }
 
+interface NaverLocalItem {
+  address: string;
+  roadAddress: string;
+}
+
+interface NaverLocalResponse {
+  total: number;
+  items: NaverLocalItem[];
+}
+
+/** 키워드 → 첫 번째 결과 주소 반환 (네이버 지역 검색 API) */
+export async function localSearchAddress(query: string): Promise<string | null> {
+  const params = new URLSearchParams({ query, display: '1' });
+  const res = await fetch(`/naver-search/local.json?${params.toString()}`);
+  if (!res.ok) return null;
+
+  const data: NaverLocalResponse = await res.json();
+  if (!data.total || !data.items.length) return null;
+
+  const { roadAddress, address } = data.items[0];
+  return roadAddress || address || null;
+}
+
 /** 주소 → 좌표 변환 (geocode) */
 export function geocodeAddress(address: string): Promise<GeocodeResult> {
   return new Promise((resolve, reject) => {

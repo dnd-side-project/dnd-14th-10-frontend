@@ -3,6 +3,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import type { PlaceSearchItem } from '@/entities/place/model/place.types';
+import { useGeocodeRegionCodesQuery } from '@/entities/place/model/use-geocode-region-codes-query';
 import { useSearchPlacesQuery } from '@/entities/place/model/use-search-places-query';
 import {
   ATMOSPHERE_TO_MOOD,
@@ -10,10 +11,12 @@ import {
   SIZE_TO_SPACE_SIZE,
 } from '@/features/home/lib/filter-mappings';
 import SearchDialog from '@/features/home/ui/SearchDialog';
+import { REGION_CODES } from '@/features/onboarding/model/onboarding.types';
 import {
   MOOD_OPTIONS,
   SPACE_SIZE_OPTIONS,
 } from '@/features/register-place/model/register-place.types';
+import { useNaverMapScript } from '@/shared/lib/naver-map/use-naver-map-script';
 import { useLocationStore } from '@/shared/model/use-location-store';
 import Loading from '@/shared/ui/loading/loading';
 import type { MapMarker } from '@/widgets/map-viewer/ui/MapViewer';
@@ -21,7 +24,17 @@ import { MapViewer } from '@/widgets/map-viewer/ui/MapViewer';
 import { PlaceListDrawer } from '@/widgets/place-list-drawer/ui/PlaceListDrawer';
 import { PlaceSearchHeader } from '@/widgets/place-search-header/ui/PlaceSearchHeader';
 
-function parseDistricts(raw: string): string {
+function parseDistrictRegionCodes(raw: string): number[] {
+  if (!raw) return [];
+  return raw.split('|').flatMap((group) => {
+    const [city, districts] = group.split(':');
+    return (districts?.split(',') ?? [])
+      .map((d) => REGION_CODES[city]?.[d])
+      .filter((code): code is number => code !== undefined);
+  });
+}
+
+function parseDistrictsDisplay(raw: string): string {
   return raw
     .split('|')
     .flatMap((group) => {
@@ -53,15 +66,21 @@ function toDrawerPlaces(places: PlaceSearchItem[]) {
   }));
 }
 
-interface SearchContentProps {
+interface PlacesContentProps {
+  regionCodes: number[] | undefined;
   category?: string;
   atmospheres: string[];
   sizes: string[];
   isFilterOpen: boolean;
-  // TODO: 지역 코드, 검색어 연결
 }
 
-function SearchContent({ category, atmospheres, sizes, isFilterOpen }: SearchContentProps) {
+function PlacesContent({
+  regionCodes,
+  category,
+  atmospheres,
+  sizes,
+  isFilterOpen,
+}: PlacesContentProps) {
   const navigate = useNavigate();
   const { lat, lng, address } = useLocationStore();
 
@@ -78,6 +97,7 @@ function SearchContent({ category, atmospheres, sizes, isFilterOpen }: SearchCon
     category: apiCategory,
     moods: apiMoods || undefined,
     spaceSize: apiSpaceSize,
+    regionCodes,
   });
 
   const places = data.places;
@@ -86,9 +106,7 @@ function SearchContent({ category, atmospheres, sizes, isFilterOpen }: SearchCon
 
   const handlePlaceClick = (index: number) => {
     const place = places[index];
-    if (place) {
-      navigate(`/place/${place.id}`);
-    }
+    if (place) navigate(`/place/${place.id}`);
   };
 
   return (
@@ -96,9 +114,67 @@ function SearchContent({ category, atmospheres, sizes, isFilterOpen }: SearchCon
       <div className='absolute top-0 right-0 left-0 h-[calc(30vh+92px)]'>
         <MapViewer currentLocation={{ lat, lng, address }} markers={markers} />
       </div>
-
       <PlaceListDrawer open={!isFilterOpen} places={drawerPlaces} onPlaceClick={handlePlaceClick} />
     </>
+  );
+}
+
+interface SearchContentProps {
+  category?: string;
+  atmospheres: string[];
+  sizes: string[];
+  isFilterOpen: boolean;
+  query?: string;
+  rawDistricts: string;
+}
+
+function SearchContent({
+  category,
+  atmospheres,
+  sizes,
+  isFilterOpen,
+  query,
+  rawDistricts,
+}: SearchContentProps) {
+  const isNaverLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+  const { lat, lng, address } = useLocationStore();
+
+  const districtRegionCodes = useMemo(() => parseDistrictRegionCodes(rawDistricts), [rawDistricts]);
+  const hasDistrictFilter = districtRegionCodes.length > 0;
+
+  const {
+    data: geocodedRegionCodes,
+    isSuccess: geocodeSuccess,
+    isError: geocodeError,
+  } = useGeocodeRegionCodesQuery(query, hasDistrictFilter, isNaverLoaded);
+
+  const geocodeReady = !query || hasDistrictFilter || geocodeSuccess || geocodeError;
+  const regionCodes = hasDistrictFilter ? districtRegionCodes : geocodedRegionCodes;
+
+  if (!geocodeReady) return <Loading />;
+
+  // 검색어로 조회했지만 naver-search 결과 없음 → places API 호출 없이 빈 상태 표시
+  if (query && !hasDistrictFilter && geocodeSuccess && regionCodes?.length === 0) {
+    return (
+      <>
+        <div className='absolute top-0 right-0 left-0 h-[calc(30vh+92px)]'>
+          <MapViewer currentLocation={{ lat, lng, address }} markers={[]} />
+        </div>
+        <PlaceListDrawer open={!isFilterOpen} places={[]} />
+      </>
+    );
+  }
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <PlacesContent
+        regionCodes={regionCodes}
+        category={category}
+        atmospheres={atmospheres}
+        sizes={sizes}
+        isFilterOpen={isFilterOpen}
+      />
+    </Suspense>
   );
 }
 
@@ -113,7 +189,7 @@ function MapSearchPage() {
   const rawSizes = searchParams.get('sizes') || '';
   const query = searchParams.get('query') || undefined;
 
-  const districts = rawDistricts ? parseDistricts(rawDistricts) : '';
+  const districts = rawDistricts ? parseDistrictsDisplay(rawDistricts) : '';
   const atmospheres = rawAtmospheres ? rawAtmospheres.split(',') : [];
   const sizes = rawSizes ? rawSizes.split(',') : [];
 
@@ -140,14 +216,14 @@ function MapSearchPage() {
         />
       </div>
 
-      <Suspense fallback={<Loading />}>
-        <SearchContent
-          category={category}
-          atmospheres={atmospheres}
-          sizes={sizes}
-          isFilterOpen={isFilterOpen}
-        />
-      </Suspense>
+      <SearchContent
+        category={category}
+        atmospheres={atmospheres}
+        sizes={sizes}
+        isFilterOpen={isFilterOpen}
+        query={query}
+        rawDistricts={rawDistricts}
+      />
 
       <SearchDialog
         isOpen={isFilterOpen}

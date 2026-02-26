@@ -46,11 +46,17 @@ export function PlaceListDrawer({ open, places, onPlaceClick }: PlaceListDrawerP
             'max-h-[calc((100vh-var(--snap-point-height)-72px)-16px)]',
           )}
         >
-          {places.map((place, index) => (
-            <div key={place.id} className='py-5 first:pt-0 last:pb-0'>
-              <PlaceListItem {...place} onClick={() => onPlaceClick?.(index)} />
+          {places.length === 0 ? (
+            <div className='text-body2 flex flex-1 items-center justify-center py-16 text-gray-400'>
+              해당하는 장소가 없습니다
             </div>
-          ))}
+          ) : (
+            places.map((place, index) => (
+              <div key={place.id} className='py-5 first:pt-0 last:pb-0'>
+                <PlaceListItem {...place} onClick={() => onPlaceClick?.(index)} />
+              </div>
+            ))
+          )}
         </div>
       </DrawerContent>
     </Drawer>
