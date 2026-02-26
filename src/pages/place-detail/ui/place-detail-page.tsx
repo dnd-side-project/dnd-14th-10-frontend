@@ -21,6 +21,7 @@ import calmnessCalm from '@/shared/assets/images/calm-3d.png';
 import calmnessChatty from '@/shared/assets/images/chatty-3d.png';
 import calmnessNoisy from '@/shared/assets/images/noisy-3d.png';
 import calmnessSilent from '@/shared/assets/images/silent-3d.png';
+import { useAuthStore } from '@/shared/store/use-auth-store';
 import PlaceErrorBoundary from '@/shared/ui/error-boundary/PlaceErrorBoundary';
 import BuildingIcon from '@/shared/ui/icons/Building.svg?react';
 import ChevronDownIcon from '@/shared/ui/icons/ChevronDown.svg?react';
@@ -294,8 +295,13 @@ function PlaceDetailContent({ id }: { id: string }) {
   const navigate = useNavigate();
   const { data: place } = usePlaceDetailQuery(id);
   const { mutate: toggleWishlist } = useToggleWishlistMutation();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const handleWishlistToggle = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     toggleWishlist({ placeId: place.id, isWished: place.isWished });
   };
 
