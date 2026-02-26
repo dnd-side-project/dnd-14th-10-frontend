@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import type { PlaceSearchItem } from '@/entities/place/model/place.types';
 import { useGeocodeRegionCodesQuery } from '@/entities/place/model/use-geocode-region-codes-query';
-import { useSearchPlacesQuery } from '@/entities/place/model/use-search-places-query';
+import { useSearchPlacesInfiniteQuery } from '@/entities/place/model/use-search-places-infinite-query';
 import {
   ATMOSPHERE_TO_MOOD,
   CATEGORY_TO_API,
@@ -30,7 +30,8 @@ function parseDistrictRegionCodes(raw: string): number[] {
     const [city, districts] = group.split(':');
     return (districts?.split(',') ?? [])
       .map((d) => REGION_CODES[city]?.[d])
-      .filter((code): code is number => code !== undefined);
+      .filter((code): code is number => code !== undefined)
+      .map((code) => Math.floor(code / 100000));
   });
 }
 
@@ -70,7 +71,7 @@ interface PlacesContentProps {
   regionCodes: number[] | undefined;
   category?: string;
   atmospheres: string[];
-  sizes: string[];
+  size?: string;
   isFilterOpen: boolean;
 }
 
@@ -78,7 +79,7 @@ function PlacesContent({
   regionCodes,
   category,
   atmospheres,
-  sizes,
+  size,
   isFilterOpen,
 }: PlacesContentProps) {
   const navigate = useNavigate();
@@ -89,9 +90,9 @@ function PlacesContent({
     .map((a) => ATMOSPHERE_TO_MOOD[a])
     .filter(Boolean)
     .join(',');
-  const apiSpaceSize = sizes.length === 1 ? SIZE_TO_SPACE_SIZE[sizes[0]] : undefined;
+  const apiSpaceSize = size ? SIZE_TO_SPACE_SIZE[size] : undefined;
 
-  const { data } = useSearchPlacesQuery({
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useSearchPlacesInfiniteQuery({
     longitude: lng,
     latitude: lat,
     category: apiCategory,
@@ -100,7 +101,7 @@ function PlacesContent({
     regionCodes,
   });
 
-  const places = data.places;
+  const places = data.pages.flatMap((page) => page.places);
   const markers = useMemo(() => toMapMarkers(places), [places]);
   const drawerPlaces = useMemo(() => toDrawerPlaces(places), [places]);
 
@@ -109,12 +110,28 @@ function PlacesContent({
     if (place) navigate(`/place/${place.id}`);
   };
 
+  const handleScrollEnd = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
   return (
     <>
       <div className='absolute top-0 right-0 left-0 h-[calc(30vh+92px)]'>
         <MapViewer currentLocation={{ lat, lng, address }} markers={markers} />
       </div>
-      <PlaceListDrawer open={!isFilterOpen} places={drawerPlaces} onPlaceClick={handlePlaceClick} />
+      <PlaceListDrawer
+        open={!isFilterOpen}
+        places={drawerPlaces}
+        onPlaceClick={handlePlaceClick}
+        onScrollEnd={handleScrollEnd}
+        footer={
+          isFetchingNextPage ? (
+            <div className='flex justify-center py-4 text-sm text-gray-400'>로딩 중...</div>
+          ) : null
+        }
+      />
     </>
   );
 }
@@ -122,7 +139,7 @@ function PlacesContent({
 interface SearchContentProps {
   category?: string;
   atmospheres: string[];
-  sizes: string[];
+  size?: string;
   isFilterOpen: boolean;
   query?: string;
   rawDistricts: string;
@@ -131,7 +148,7 @@ interface SearchContentProps {
 function SearchContent({
   category,
   atmospheres,
-  sizes,
+  size,
   isFilterOpen,
   query,
   rawDistricts,
@@ -171,7 +188,7 @@ function SearchContent({
         regionCodes={regionCodes}
         category={category}
         atmospheres={atmospheres}
-        sizes={sizes}
+        size={size}
         isFilterOpen={isFilterOpen}
       />
     </Suspense>
@@ -186,12 +203,12 @@ function MapSearchPage() {
   const category = searchParams.get('category') || undefined;
   const rawDistricts = searchParams.get('districts') || '';
   const rawAtmospheres = searchParams.get('atmospheres') || '';
-  const rawSizes = searchParams.get('sizes') || '';
+  const rawSize = searchParams.get('sizes') || '';
   const query = searchParams.get('query') || undefined;
 
   const districts = rawDistricts ? parseDistrictsDisplay(rawDistricts) : '';
   const atmospheres = rawAtmospheres ? rawAtmospheres.split(',') : [];
-  const sizes = rawSizes ? rawSizes.split(',') : [];
+  const size = rawSize || undefined;
 
   const handleBack = () => {
     navigate(-1);
@@ -210,7 +227,7 @@ function MapSearchPage() {
           query={query}
           districts={districts}
           atmospheres={atmospheres.join(', ')}
-          sizes={sizes.join(', ')}
+          sizes={size ?? ''}
           onBack={handleBack}
           onFilter={() => setIsFilterOpen(true)}
         />
@@ -219,7 +236,7 @@ function MapSearchPage() {
       <SearchContent
         category={category}
         atmospheres={atmospheres}
-        sizes={sizes}
+        size={size}
         isFilterOpen={isFilterOpen}
         query={query}
         rawDistricts={rawDistricts}

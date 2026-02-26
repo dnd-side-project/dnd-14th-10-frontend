@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
@@ -10,12 +10,29 @@ interface PlaceListDrawerProps {
   open: boolean;
   places: RecommendedPlace[];
   onPlaceClick?: (index: number) => void;
+  onScrollEnd?: () => void;
+  footer?: ReactNode;
 }
 
 const SNAP_POINTS = [0.7, 1];
 
-export function PlaceListDrawer({ open, places, onPlaceClick }: PlaceListDrawerProps) {
+export function PlaceListDrawer({
+  open,
+  places,
+  onPlaceClick,
+  onScrollEnd,
+  footer,
+}: PlaceListDrawerProps) {
   const [snap, setSnap] = useState<number | string | null>(SNAP_POINTS[0]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el || !onScrollEnd) return;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 100) {
+      onScrollEnd();
+    }
+  };
 
   return (
     <Drawer
@@ -40,7 +57,9 @@ export function PlaceListDrawer({ open, places, onPlaceClick }: PlaceListDrawerP
           <DrawerTitle>장소 리스트</DrawerTitle>
         </DrawerHeader>
         <div
+          ref={scrollRef}
           data-vaul-no-drag
+          onScroll={handleScroll}
           className={cn(
             'divide-gray-150 flex flex-1 flex-col divide-y overflow-y-auto overscroll-contain bg-white pt-5 pb-8',
             'max-h-[calc((100vh-var(--snap-point-height)-72px)-16px)]',
@@ -57,6 +76,7 @@ export function PlaceListDrawer({ open, places, onPlaceClick }: PlaceListDrawerP
               </div>
             ))
           )}
+          {footer}
         </div>
       </DrawerContent>
     </Drawer>
