@@ -1,5 +1,7 @@
+import FullPageSpinner from '../FullPageSpinner';
+
 function Loading() {
-  return <div>Loading...</div>;
+  return <FullPageSpinner />;
 }
 
 export default Loading;
