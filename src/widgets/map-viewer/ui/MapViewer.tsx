@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-import type { Place } from '@/entities/place/model/place.types';
 import { useNaverMapScript } from '@/shared/lib/naver-map/use-naver-map-script';
 
 export interface MapMarker {
@@ -11,10 +10,16 @@ export interface MapMarker {
 
 interface MapViewerProps {
   currentLocation: { lat: number; lng: number; address: string } | null;
-  places?: Place[];
   markers?: MapMarker[];
   onMapChange?: (center: { lat: number; lng: number }, radiusMeters: number) => void;
   disableFitBounds?: boolean;
+}
+
+function createMarkerContent(name: string): string {
+  return `<div style="transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;">
+    <div style="background:white;border-radius:9999px;padding:4px 10px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.25);color:#1a1a1a;line-height:1.4;">${name}</div>
+    <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid white;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.1));margin-top:-1px;"></div>
+  </div>`;
 }
 
 function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -29,7 +34,6 @@ function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number)
 
 export const MapViewer = ({
   currentLocation,
-  places = [],
   markers = [],
   onMapChange,
   disableFitBounds = false,
@@ -37,6 +41,7 @@ export const MapViewer = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const naverMapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
+  const hasFitOnceRef = useRef(false);
   const isLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
 
   const onMapChangeRef = useRef(onMapChange);
@@ -92,30 +97,23 @@ export const MapViewer = ({
 
       markersRef.current.forEach((marker) => marker.setMap(null));
 
-      const placeMarkers = places.map(
-        (place) =>
-          new window.naver.maps.Marker({
-            position: new window.naver.maps.LatLng(
-              place.locationPoint.lat,
-              place.locationPoint.lng,
-            ),
-            map: map,
-            title: place.name,
-          }),
-      );
-
       const customMarkers = markers.map(
         (m) =>
           new window.naver.maps.Marker({
             position: new window.naver.maps.LatLng(m.lat, m.lng),
             map: map,
             title: m.name,
+            icon: {
+              content: createMarkerContent(m.name),
+              anchor: new window.naver.maps.Point(0, 30),
+            },
           }),
       );
 
-      markersRef.current = [...placeMarkers, ...customMarkers];
+      markersRef.current = customMarkers;
 
-      if (!disableFitBounds && markersRef.current.length > 0) {
+      if ((!hasFitOnceRef.current || !disableFitBounds) && markersRef.current.length > 0) {
+        hasFitOnceRef.current = true;
         const bounds = new window.naver.maps.LatLngBounds(
           markersRef.current[0].getPosition() as naver.maps.LatLng,
           markersRef.current[0].getPosition() as naver.maps.LatLng,
@@ -131,7 +129,7 @@ export const MapViewer = ({
         markersRef.current = [];
       };
     },
-    [places, markers, disableFitBounds],
+    [markers, disableFitBounds],
   );
 
   return (
