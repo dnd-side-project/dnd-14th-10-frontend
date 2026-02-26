@@ -1,4 +1,4 @@
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -7,6 +7,7 @@ import { useNewPlacesQuery } from '@/entities/place/model/use-new-places-query';
 import { usePopularPlacesQuery } from '@/entities/place/model/use-popular-places-query';
 import { useRandomThemePlacesQuery } from '@/entities/place/model/use-random-theme-places-query';
 import { useSimilarPlacesQuery } from '@/entities/place/model/use-similar-places-query';
+import SearchDialog from '@/features/home/ui/SearchDialog';
 import {
   MOOD_OPTIONS,
   SPACE_SIZE_OPTIONS,
@@ -47,51 +48,57 @@ function toDrawerPlaces(places: PlaceRecommendation[]) {
   }));
 }
 
-const PopularContent = ({ category }: { category: string }) => {
+const DEFAULT_REGION_CODE = 1168000000; // 서울특별시 강남구
+
+interface ContentProps {
+  category: string;
+  isFilterOpen: boolean;
+}
+
+const PopularContent = ({ category, isFilterOpen }: ContentProps) => {
   const { data } = usePopularPlacesQuery({
     latitude: DEFAULT_LOCATION.lat,
     longitude: DEFAULT_LOCATION.lng,
     category: category === 'PUBLIC' ? 'PUBLIC' : 'CAFE',
   });
-  return <RecommendedContent places={data} />;
+  return <RecommendedContent places={data} isFilterOpen={isFilterOpen} />;
 };
 
-const DEFAULT_REGION_CODE = 1168000000; // 서울특별시 강남구
-
-const SimilarContent = ({ category }: { category: string }) => {
+const SimilarContent = ({ category, isFilterOpen }: ContentProps) => {
   const { data } = useSimilarPlacesQuery({
     regionCode: DEFAULT_REGION_CODE,
     category: category === 'PUBLIC' ? 'PUBLIC' : 'CAFE',
     longitude: DEFAULT_LOCATION.lng,
     latitude: DEFAULT_LOCATION.lat,
   });
-  return <RecommendedContent places={data} />;
+  return <RecommendedContent places={data} isFilterOpen={isFilterOpen} />;
 };
 
-const NewContent = ({ category }: { category: string }) => {
+const NewContent = ({ category, isFilterOpen }: ContentProps) => {
   const { data } = useNewPlacesQuery({
     regionCode: DEFAULT_REGION_CODE,
     category: category === 'PUBLIC' ? 'PUBLIC' : 'CAFE',
     longitude: DEFAULT_LOCATION.lng,
     latitude: DEFAULT_LOCATION.lat,
   });
-  return <RecommendedContent places={data} />;
+  return <RecommendedContent places={data} isFilterOpen={isFilterOpen} />;
 };
 
-const RandomThemeContent = ({ category }: { category: string }) => {
+const RandomThemeContent = ({ category, isFilterOpen }: ContentProps) => {
   const { data } = useRandomThemePlacesQuery({
     latitude: DEFAULT_LOCATION.lat,
     longitude: DEFAULT_LOCATION.lng,
     category: category === 'PUBLIC' ? 'PUBLIC' : 'CAFE',
   });
-  return <RecommendedContent places={data} />;
+  return <RecommendedContent places={data} isFilterOpen={isFilterOpen} />;
 };
 
 interface RecommendedContentInnerProps {
   places: PlaceRecommendation[];
+  isFilterOpen: boolean;
 }
 
-const RecommendedContent = ({ places }: RecommendedContentInnerProps) => {
+const RecommendedContent = ({ places, isFilterOpen }: RecommendedContentInnerProps) => {
   const navigate = useNavigate();
   const markers = useMemo(() => toMapMarkers(places), [places]);
   const drawerPlaces = useMemo(() => toDrawerPlaces(places), [places]);
@@ -109,7 +116,7 @@ const RecommendedContent = ({ places }: RecommendedContentInnerProps) => {
         <MapViewer currentLocation={DEFAULT_LOCATION} markers={markers} />
       </div>
 
-      <PlaceListDrawer open places={drawerPlaces} onPlaceClick={handlePlaceClick} />
+      <PlaceListDrawer open={!isFilterOpen} places={drawerPlaces} onPlaceClick={handlePlaceClick} />
     </>
   );
 };
@@ -121,12 +128,10 @@ function MapRecommendedPage() {
   const placeCategory = searchParams.get('placeCategory') || 'CAFE';
   const navigate = useNavigate();
 
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   const handleBack = () => {
     navigate(-1);
-  };
-
-  const handleFilter = () => {
-    console.log('필터 클릭');
   };
 
   return (
@@ -135,16 +140,29 @@ function MapRecommendedPage() {
         <PlaceListHeader
           title={`'${category}' 리스트`}
           onBack={handleBack}
-          onFilter={handleFilter}
+          onFilter={() => setIsFilterOpen(true)}
         />
       </div>
 
       <Suspense fallback={<Loading />}>
-        {type === 'popular' && <PopularContent category={placeCategory} />}
-        {type === 'similar' && <SimilarContent category={placeCategory} />}
-        {type === 'new' && <NewContent category={placeCategory} />}
-        {type === 'random-theme' && <RandomThemeContent category={placeCategory} />}
+        {type === 'popular' && (
+          <PopularContent category={placeCategory} isFilterOpen={isFilterOpen} />
+        )}
+        {type === 'similar' && (
+          <SimilarContent category={placeCategory} isFilterOpen={isFilterOpen} />
+        )}
+        {type === 'new' && <NewContent category={placeCategory} isFilterOpen={isFilterOpen} />}
+        {type === 'random-theme' && (
+          <RandomThemeContent category={placeCategory} isFilterOpen={isFilterOpen} />
+        )}
       </Suspense>
+
+      <SearchDialog
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onSearch={(params) => navigate(`/map/search?${params.toString()}`)}
+        disableCategory
+      />
     </div>
   );
 }

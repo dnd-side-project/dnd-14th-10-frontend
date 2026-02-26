@@ -1,4 +1,4 @@
-import { Suspense, useMemo } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ import {
   CATEGORY_TO_API,
   SIZE_TO_SPACE_SIZE,
 } from '@/features/home/lib/filter-mappings';
+import SearchDialog from '@/features/home/ui/SearchDialog';
 import {
   MOOD_OPTIONS,
   SPACE_SIZE_OPTIONS,
@@ -56,10 +57,11 @@ interface SearchContentProps {
   category?: string;
   atmospheres: string[];
   sizes: string[];
+  isFilterOpen: boolean;
   // TODO: 지역 코드, 검색어 연결
 }
 
-function SearchContent({ category, atmospheres, sizes }: SearchContentProps) {
+function SearchContent({ category, atmospheres, sizes, isFilterOpen }: SearchContentProps) {
   const navigate = useNavigate();
   const { lat, lng, address } = useLocationStore();
 
@@ -95,7 +97,7 @@ function SearchContent({ category, atmospheres, sizes }: SearchContentProps) {
         <MapViewer currentLocation={{ lat, lng, address }} markers={markers} />
       </div>
 
-      <PlaceListDrawer open places={drawerPlaces} onPlaceClick={handlePlaceClick} />
+      <PlaceListDrawer open={!isFilterOpen} places={drawerPlaces} onPlaceClick={handlePlaceClick} />
     </>
   );
 }
@@ -103,6 +105,7 @@ function SearchContent({ category, atmospheres, sizes }: SearchContentProps) {
 function MapSearchPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const category = searchParams.get('category') || undefined;
   const rawDistricts = searchParams.get('districts') || '';
@@ -118,9 +121,11 @@ function MapSearchPage() {
     navigate(-1);
   };
 
-  const handleFilter = () => {
-    navigate(-1);
-  };
+  useEffect(() => {
+    if (!isFilterOpen) {
+      document.body.style.removeProperty('pointer-events');
+    }
+  }, [isFilterOpen]);
 
   return (
     <div className='relative h-screen w-full overflow-hidden bg-white'>
@@ -131,13 +136,24 @@ function MapSearchPage() {
           atmospheres={atmospheres.join(', ')}
           sizes={sizes.join(', ')}
           onBack={handleBack}
-          onFilter={handleFilter}
+          onFilter={() => setIsFilterOpen(true)}
         />
       </div>
 
       <Suspense fallback={<Loading />}>
-        <SearchContent category={category} atmospheres={atmospheres} sizes={sizes} />
+        <SearchContent
+          category={category}
+          atmospheres={atmospheres}
+          sizes={sizes}
+          isFilterOpen={isFilterOpen}
+        />
       </Suspense>
+
+      <SearchDialog
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onSearch={(params) => navigate(`/map/search?${params.toString()}`)}
+      />
     </div>
   );
 }

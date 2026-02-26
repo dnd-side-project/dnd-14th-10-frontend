@@ -22,11 +22,18 @@ import SizeSection from './SizeSection';
 interface SearchDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  disableCategory?: boolean;
+  onSearch?: (params: URLSearchParams) => void;
 }
 
 type ExpandedSection = 'region' | 'atmosphere' | 'size' | null;
 
-export default function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
+export default function SearchDialog({
+  isOpen,
+  onClose,
+  disableCategory = false,
+  onSearch,
+}: SearchDialogProps) {
   const navigate = useNavigate();
   const { category, setCategory, selectedDistricts, atmospheres, sizes, searchTerm, reset } =
     useSearchStore();
@@ -36,7 +43,7 @@ export default function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
     setExpandedSection((prev) => (prev === section ? null : section));
   };
 
-  const handleSearch = () => {
+  const buildParams = () => {
     const params = new URLSearchParams();
     params.append('category', category);
 
@@ -59,8 +66,18 @@ export default function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
       params.append('query', searchTerm);
     }
 
+    return params;
+  };
+
+  const handleSearch = () => {
+    const params = buildParams();
     onClose();
-    navigate(`/map/search?${params.toString()}`);
+
+    if (onSearch) {
+      onSearch(params);
+    } else {
+      navigate(`/map/search?${params.toString()}`);
+    }
   };
 
   const handleClose = () => {
@@ -94,7 +111,9 @@ export default function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
           />
 
           <div className='flex-1 overflow-y-auto'>
-            <CategoryTabs activeCategory={category} onCategoryChange={setCategory} />
+            <div className={cn(disableCategory && 'pointer-events-none opacity-[0.15]')}>
+              <CategoryTabs activeCategory={category} onCategoryChange={setCategory} />
+            </div>
 
             <div className='flex flex-col gap-5 px-5'>
               <RegionSection
