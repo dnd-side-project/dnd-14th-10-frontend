@@ -97,18 +97,22 @@ export const MapViewer = ({
 
       markersRef.current.forEach((marker) => marker.setMap(null));
 
-      const customMarkers = markers.map(
-        (m) =>
-          new window.naver.maps.Marker({
-            position: new window.naver.maps.LatLng(m.lat, m.lng),
-            map: map,
-            title: m.name,
-            icon: {
-              content: createMarkerContent(m.name),
-              anchor: new window.naver.maps.Point(0, 30),
-            },
-          }),
-      );
+      const customMarkers = markers.map((m) => {
+        const marker = new window.naver.maps.Marker({
+          position: new window.naver.maps.LatLng(m.lat, m.lng),
+          map: map,
+          title: m.name,
+          icon: {
+            content: createMarkerContent(m.name),
+            anchor: new window.naver.maps.Point(0, 30),
+          },
+        });
+        window.naver.maps.Event.addListener(marker, 'click', () => {
+          map.setCenter(marker.getPosition() as naver.maps.LatLng);
+          map.setZoom(17);
+        });
+        return marker;
+      });
 
       markersRef.current = customMarkers;
 
@@ -121,7 +125,7 @@ export const MapViewer = ({
         markersRef.current.forEach((marker) => {
           bounds.extend(marker.getPosition() as naver.maps.LatLng);
         });
-        map.fitBounds(bounds, { top: 100, right: 50, bottom: 772, left: 50 });
+        map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
       }
 
       return () => {

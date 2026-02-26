@@ -93,7 +93,7 @@ function SearchContent({ category, atmospheres, sizes, isFilterOpen }: SearchCon
 
   return (
     <>
-      <div className='absolute inset-0'>
+      <div className='absolute top-0 right-0 left-0 h-[calc(30vh+92px)]'>
         <MapViewer currentLocation={{ lat, lng, address }} markers={markers} />
       </div>
 

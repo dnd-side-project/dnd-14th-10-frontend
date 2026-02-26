@@ -12,10 +12,10 @@ interface PlaceListDrawerProps {
   onPlaceClick?: (index: number) => void;
 }
 
-const SNAP_POINTS = [0.4, 0.7, 1];
+const SNAP_POINTS = [0.7, 1];
 
 export function PlaceListDrawer({ open, places, onPlaceClick }: PlaceListDrawerProps) {
-  const [snap, setSnap] = useState<number | string | null>(SNAP_POINTS[1]);
+  const [snap, setSnap] = useState<number | string | null>(SNAP_POINTS[0]);
 
   return (
     <Drawer
