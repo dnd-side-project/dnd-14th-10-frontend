@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { kakaoOAuthLogin } from '@/features/auth/api/auth.api';
-import { useAuthStore } from '@/features/auth/model/use-auth-store';
 import { getErrorMessage, getErrorStatus } from '@/shared/api/error.utils';
+import { useAuthStore } from '@/shared/store/use-auth-store';
 
 export default function OAuthKakaoCallbackPage() {
   const [searchParams] = useSearchParams();

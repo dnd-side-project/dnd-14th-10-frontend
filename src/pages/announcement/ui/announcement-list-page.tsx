@@ -7,17 +7,13 @@ import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 export default function AnnouncementListPage() {
   const navigate = useNavigate();
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleItemClick = (id: string) => {
     navigate(`/announcement/${id}`);
   };
 
   return (
     <div className='flex min-h-screen flex-col bg-white'>
-      <NavigationBar title='공지사항' onBack={handleBack} />
+      <NavigationBar title='공지사항' backPath='/my' />
 
       <div className='flex flex-col px-5 pt-6'>
         {mockAnnouncements.map((announcement) => (

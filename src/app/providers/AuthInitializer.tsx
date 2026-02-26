@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 
 import { refreshToken } from '@/features/auth/api/auth.api';
-import { useAuthStore } from '@/features/auth/model/use-auth-store';
+import { useAuthStore } from '@/shared/store/use-auth-store';
 import FullPageSpinner from '@/shared/ui/FullPageSpinner';
 
 interface AuthInitializerProps {

@@ -118,6 +118,7 @@ export interface PlaceDetail {
   floorInfo: number | null;
   restroomInfo: string | null;
   isWished: boolean;
+  tagIds: number[];
   reviewTags: ReviewTag[];
   reviews: Review[];
 }

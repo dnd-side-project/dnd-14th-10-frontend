@@ -108,7 +108,9 @@ export default function AddressPicker({
                         onClick={() => handleDistrictSelect(district)}
                         className='flex w-[80px] items-center justify-between py-2.5'
                       >
-                        <span className='text-[14px] font-medium text-gray-950'>{district}</span>
+                        <span className='text-[14px] font-medium whitespace-pre-line text-gray-950'>
+                          {district.replace(' ', '\n')}
+                        </span>
                         <div
                           className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
                             selectedDistrict === district ? 'border-gray-500' : 'border-gray-300'
