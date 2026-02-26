@@ -104,6 +104,7 @@ export default function SearchDialog({
           'data-[state=open]:!zoom-in-100 data-[state=closed]:!zoom-out-100',
           'data-[state=open]:!slide-in-from-top-0 data-[state=closed]:!slide-out-to-top-0',
           '[&>button]:hidden',
+          'z-102',
         )}
       >
         <DialogHeader className='sr-only'>
