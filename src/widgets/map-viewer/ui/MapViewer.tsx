@@ -13,13 +13,36 @@ interface MapViewerProps {
   currentLocation: { lat: number; lng: number; address: string } | null;
   places?: Place[];
   markers?: MapMarker[];
+  onMapChange?: (center: { lat: number; lng: number }, radiusMeters: number) => void;
+  disableFitBounds?: boolean;
 }
 
-export const MapViewer = ({ currentLocation, places = [], markers = [] }: MapViewerProps) => {
+function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371000;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+export const MapViewer = ({
+  currentLocation,
+  places = [],
+  markers = [],
+  onMapChange,
+  disableFitBounds = false,
+}: MapViewerProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const naverMapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
   const isLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+
+  const onMapChangeRef = useRef(onMapChange);
+  useEffect(() => {
+    onMapChangeRef.current = onMapChange;
+  });
 
   useEffect(
     function initializeMap() {
@@ -32,7 +55,18 @@ export const MapViewer = ({ currentLocation, places = [], markers = [] }: MapVie
         });
       }
 
+      const idleListener = window.naver.maps.Event.addListener(naverMapRef.current, 'idle', () => {
+        const map = naverMapRef.current;
+        if (!map) return;
+        const center = map.getCenter() as naver.maps.LatLng;
+        const bounds = map.getBounds() as naver.maps.LatLngBounds;
+        const ne = bounds.getNE() as naver.maps.LatLng;
+        const radiusMeters = haversineMeters(center.lat(), center.lng(), ne.lat(), ne.lng());
+        onMapChangeRef.current?.({ lat: center.lat(), lng: center.lng() }, radiusMeters);
+      });
+
       return () => {
+        window.naver.maps.Event.removeListener(idleListener);
         naverMapRef.current?.destroy();
         naverMapRef.current = null;
       };
@@ -81,7 +115,7 @@ export const MapViewer = ({ currentLocation, places = [], markers = [] }: MapVie
 
       markersRef.current = [...placeMarkers, ...customMarkers];
 
-      if (markersRef.current.length > 0) {
+      if (!disableFitBounds && markersRef.current.length > 0) {
         const bounds = new window.naver.maps.LatLngBounds(
           markersRef.current[0].getPosition() as naver.maps.LatLng,
           markersRef.current[0].getPosition() as naver.maps.LatLng,
@@ -97,7 +131,7 @@ export const MapViewer = ({ currentLocation, places = [], markers = [] }: MapVie
         markersRef.current = [];
       };
     },
-    [places, markers],
+    [places, markers, disableFitBounds],
   );
 
   return (

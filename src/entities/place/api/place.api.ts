@@ -7,6 +7,7 @@ import type {
   PlaceRecommendation,
   PlaceRecommendationResponse,
   PlaceReviewsResponse,
+  PlaceSearchItem,
   PlaceSearchParams,
   PlaceSearchResponse,
   PopularPlacesParams,
@@ -106,5 +107,12 @@ export const getRandomThemePlaces = async (
     '/places/recommendations/random-theme',
     { params },
   );
+  return data;
+};
+
+// GET /api/places/batch (일괄 조회)
+export const getBatchPlaces = async (ids: number[]): Promise<PlaceSearchItem[]> => {
+  const queryString = ids.map((id) => `ids=${id}`).join('&');
+  const { data } = await apiClient.get<PlaceSearchItem[]>(`/places/batch?${queryString}`);
   return data;
 };

@@ -1,18 +1,23 @@
-import { Suspense, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import type { PlaceRecommendation } from '@/entities/place/model/place.types';
-import { useNewPlacesQuery } from '@/entities/place/model/use-new-places-query';
-import { usePopularPlacesQuery } from '@/entities/place/model/use-popular-places-query';
-import { useRandomThemePlacesQuery } from '@/entities/place/model/use-random-theme-places-query';
-import { useSimilarPlacesQuery } from '@/entities/place/model/use-similar-places-query';
+import {
+  getNewPlaces,
+  getPopularPlaces,
+  getRandomThemePlaces,
+  getSimilarPlaces,
+} from '@/entities/place/api/place.api';
+import type { PlaceSearchItem } from '@/entities/place/model/place.types';
+import { placeKeys } from '@/entities/place/model/query-keys';
+import { useBatchPlacesQuery } from '@/entities/place/model/use-batch-places-query';
 import SearchDialog from '@/features/home/ui/SearchDialog';
+import type { PlaceCategory } from '@/features/register-place/model/register-place.types';
 import {
   MOOD_OPTIONS,
   SPACE_SIZE_OPTIONS,
 } from '@/features/register-place/model/register-place.types';
-import Loading from '@/shared/ui/loading/loading';
 import type { MapMarker } from '@/widgets/map-viewer/ui/MapViewer';
 import { MapViewer } from '@/widgets/map-viewer/ui/MapViewer';
 import { PlaceListDrawer } from '@/widgets/place-list-drawer/ui/PlaceListDrawer';
@@ -24,9 +29,17 @@ const DEFAULT_LOCATION = {
   address: '서울특별시 강남구',
 };
 
+const DEFAULT_REGION_CODE = 1168000000;
+
 type RecommendationType = 'popular' | 'similar' | 'random-theme' | 'new';
 
-function toMapMarkers(places: PlaceRecommendation[]): MapMarker[] {
+interface MapState {
+  lat: number;
+  lng: number;
+  radiusMeters: number;
+}
+
+function toMapMarkers(places: PlaceSearchItem[]): MapMarker[] {
   return places.map((p) => ({
     lat: p.latitude,
     lng: p.longitude,
@@ -34,108 +47,211 @@ function toMapMarkers(places: PlaceRecommendation[]): MapMarker[] {
   }));
 }
 
-function toDrawerPlaces(places: PlaceRecommendation[]) {
+function toDrawerPlaces(places: PlaceSearchItem[]) {
   return places.map((p) => ({
     id: String(p.id),
     name: p.name,
     location: p.addressDetail.split(' ').slice(0, 2).join(' '),
-    likeCount: 0,
+    likeCount: p.wishCount,
     tags: [
       MOOD_OPTIONS.find((o) => o.value === p.mood)?.label ?? p.mood,
       SPACE_SIZE_OPTIONS.find((o) => o.value === p.spaceSize)?.label ?? p.spaceSize,
     ],
-    images: p.representativeImageUrl ? [p.representativeImageUrl] : [],
+    images: p.images.filter((img) => img.representativeFlag).map((img) => img.url),
   }));
 }
 
-const DEFAULT_REGION_CODE = 1168000000; // 서울특별시 강남구
-
-interface ContentProps {
-  category: string;
+interface RecommendedContentProps {
+  ids: number[];
   isFilterOpen: boolean;
+  onMarkersChange: (markers: MapMarker[]) => void;
 }
 
-const PopularContent = ({ category, isFilterOpen }: ContentProps) => {
-  const { data } = usePopularPlacesQuery({
-    latitude: DEFAULT_LOCATION.lat,
-    longitude: DEFAULT_LOCATION.lng,
-    category: category === 'PUBLIC' ? 'PUBLIC' : 'CAFE',
-  });
-  return <RecommendedContent places={data} isFilterOpen={isFilterOpen} />;
-};
-
-const SimilarContent = ({ category, isFilterOpen }: ContentProps) => {
-  const { data } = useSimilarPlacesQuery({
-    regionCode: DEFAULT_REGION_CODE,
-    category: category === 'PUBLIC' ? 'PUBLIC' : 'CAFE',
-    longitude: DEFAULT_LOCATION.lng,
-    latitude: DEFAULT_LOCATION.lat,
-  });
-  return <RecommendedContent places={data} isFilterOpen={isFilterOpen} />;
-};
-
-const NewContent = ({ category, isFilterOpen }: ContentProps) => {
-  const { data } = useNewPlacesQuery({
-    regionCode: DEFAULT_REGION_CODE,
-    category: category === 'PUBLIC' ? 'PUBLIC' : 'CAFE',
-    longitude: DEFAULT_LOCATION.lng,
-    latitude: DEFAULT_LOCATION.lat,
-  });
-  return <RecommendedContent places={data} isFilterOpen={isFilterOpen} />;
-};
-
-const RandomThemeContent = ({ category, isFilterOpen }: ContentProps) => {
-  const { data } = useRandomThemePlacesQuery({
-    latitude: DEFAULT_LOCATION.lat,
-    longitude: DEFAULT_LOCATION.lng,
-    category: category === 'PUBLIC' ? 'PUBLIC' : 'CAFE',
-  });
-  return <RecommendedContent places={data} isFilterOpen={isFilterOpen} />;
-};
-
-interface RecommendedContentInnerProps {
-  places: PlaceRecommendation[];
-  isFilterOpen: boolean;
-}
-
-const RecommendedContent = ({ places, isFilterOpen }: RecommendedContentInnerProps) => {
+function RecommendedContent({ ids, isFilterOpen, onMarkersChange }: RecommendedContentProps) {
   const navigate = useNavigate();
+  const { data: batchData } = useBatchPlacesQuery(ids);
+
+  const places = useMemo(() => batchData ?? [], [batchData]);
   const markers = useMemo(() => toMapMarkers(places), [places]);
   const drawerPlaces = useMemo(() => toDrawerPlaces(places), [places]);
 
+  useEffect(() => {
+    onMarkersChange(markers);
+  }, [markers, onMarkersChange]);
+
   const handlePlaceClick = (index: number) => {
     const place = places[index];
-    if (place) {
-      navigate(`/place/${place.id}`);
-    }
+    if (place) navigate(`/place/${place.id}`);
   };
 
   return (
-    <>
-      <div className='absolute inset-0'>
-        <MapViewer currentLocation={DEFAULT_LOCATION} markers={markers} />
-      </div>
-
-      <PlaceListDrawer open={!isFilterOpen} places={drawerPlaces} onPlaceClick={handlePlaceClick} />
-    </>
+    <PlaceListDrawer open={!isFilterOpen} places={drawerPlaces} onPlaceClick={handlePlaceClick} />
   );
-};
+}
+
+const PLACE_CATEGORIES: PlaceCategory[] = ['CAFE', 'PUBLIC'];
+
+function toPlaceCategory(value: string): PlaceCategory {
+  return (PLACE_CATEGORIES as string[]).includes(value) ? (value as PlaceCategory) : 'CAFE';
+}
+
+interface ContentProps {
+  mapState: MapState;
+  placeCategory: PlaceCategory;
+  isFilterOpen: boolean;
+  onMarkersChange: (markers: MapMarker[]) => void;
+}
+
+function PopularContent({ mapState, placeCategory, isFilterOpen, onMarkersChange }: ContentProps) {
+  const { data } = useQuery({
+    queryKey: placeKeys.popular({
+      latitude: mapState.lat,
+      longitude: mapState.lng,
+      category: placeCategory,
+      radiusMeters: Math.round(mapState.radiusMeters),
+    }),
+    queryFn: () =>
+      getPopularPlaces({
+        latitude: mapState.lat,
+        longitude: mapState.lng,
+        category: placeCategory,
+        radiusMeters: Math.round(mapState.radiusMeters),
+      }),
+    placeholderData: keepPreviousData,
+  });
+
+  const ids = useMemo(() => (data ?? []).map((p) => p.id), [data]);
+  return (
+    <RecommendedContent ids={ids} isFilterOpen={isFilterOpen} onMarkersChange={onMarkersChange} />
+  );
+}
+
+function SimilarContent({ mapState, placeCategory, isFilterOpen, onMarkersChange }: ContentProps) {
+  const { data } = useQuery({
+    queryKey: placeKeys.similar({
+      regionCode: DEFAULT_REGION_CODE,
+      category: placeCategory,
+      longitude: mapState.lng,
+      latitude: mapState.lat,
+    }),
+    queryFn: () =>
+      getSimilarPlaces({
+        regionCode: DEFAULT_REGION_CODE,
+        category: placeCategory,
+        longitude: mapState.lng,
+        latitude: mapState.lat,
+      }),
+    placeholderData: keepPreviousData,
+  });
+
+  const ids = useMemo(() => (data ?? []).map((p) => p.id), [data]);
+  return (
+    <RecommendedContent ids={ids} isFilterOpen={isFilterOpen} onMarkersChange={onMarkersChange} />
+  );
+}
+
+function NewContent({ mapState, placeCategory, isFilterOpen, onMarkersChange }: ContentProps) {
+  const { data } = useQuery({
+    queryKey: placeKeys.new({
+      regionCode: DEFAULT_REGION_CODE,
+      category: placeCategory,
+      longitude: mapState.lng,
+      latitude: mapState.lat,
+    }),
+    queryFn: () =>
+      getNewPlaces({
+        regionCode: DEFAULT_REGION_CODE,
+        category: placeCategory,
+        longitude: mapState.lng,
+        latitude: mapState.lat,
+      }),
+    placeholderData: keepPreviousData,
+  });
+
+  const ids = useMemo(() => (data ?? []).map((p) => p.id), [data]);
+  return (
+    <RecommendedContent ids={ids} isFilterOpen={isFilterOpen} onMarkersChange={onMarkersChange} />
+  );
+}
+
+function RandomThemeContent({
+  mapState,
+  placeCategory,
+  isFilterOpen,
+  onMarkersChange,
+}: ContentProps) {
+  const { data } = useQuery({
+    queryKey: placeKeys.randomTheme({
+      latitude: mapState.lat,
+      longitude: mapState.lng,
+      category: placeCategory,
+      radiusMeters: Math.round(mapState.radiusMeters),
+    }),
+    queryFn: () =>
+      getRandomThemePlaces({
+        latitude: mapState.lat,
+        longitude: mapState.lng,
+        category: placeCategory,
+        radiusMeters: Math.round(mapState.radiusMeters),
+      }),
+    placeholderData: keepPreviousData,
+  });
+
+  const ids = useMemo(() => (data?.places ?? []).map((p) => p.id), [data]);
+  return (
+    <RecommendedContent ids={ids} isFilterOpen={isFilterOpen} onMarkersChange={onMarkersChange} />
+  );
+}
 
 function MapRecommendedPage() {
   const [searchParams] = useSearchParams();
   const type = (searchParams.get('type') || 'popular') as RecommendationType;
   const category = searchParams.get('category') || '인기있는 작업 공간';
-  const placeCategory = searchParams.get('placeCategory') || 'CAFE';
+  const placeCategory = toPlaceCategory(searchParams.get('placeCategory') || 'CAFE');
   const navigate = useNavigate();
 
+  const [mapState, setMapState] = useState<MapState>({
+    lat: DEFAULT_LOCATION.lat,
+    lng: DEFAULT_LOCATION.lng,
+    radiusMeters: 1000,
+  });
+  const [markers, setMarkers] = useState<MapMarker[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const handleMarkersChange = useCallback((newMarkers: MapMarker[]) => {
+    setMarkers(newMarkers);
+  }, []);
+
+  useEffect(() => {
+    if (!isFilterOpen) {
+      document.body.style.removeProperty('pointer-events');
+    }
+  }, [isFilterOpen]);
 
   const handleBack = () => {
     navigate(-1);
   };
 
+  const contentProps: ContentProps = {
+    mapState,
+    placeCategory,
+    isFilterOpen,
+    onMarkersChange: handleMarkersChange,
+  };
+
   return (
     <div className='relative h-screen w-full overflow-hidden bg-white'>
+      <div className='absolute inset-0'>
+        <MapViewer
+          currentLocation={DEFAULT_LOCATION}
+          markers={markers}
+          disableFitBounds
+          onMapChange={(center, radiusMeters) =>
+            setMapState({ lat: center.lat, lng: center.lng, radiusMeters })
+          }
+        />
+      </div>
+
       <div className='absolute top-[72px] right-5 left-5 z-10'>
         <PlaceListHeader
           title={`'${category}' 리스트`}
@@ -144,18 +260,10 @@ function MapRecommendedPage() {
         />
       </div>
 
-      <Suspense fallback={<Loading />}>
-        {type === 'popular' && (
-          <PopularContent category={placeCategory} isFilterOpen={isFilterOpen} />
-        )}
-        {type === 'similar' && (
-          <SimilarContent category={placeCategory} isFilterOpen={isFilterOpen} />
-        )}
-        {type === 'new' && <NewContent category={placeCategory} isFilterOpen={isFilterOpen} />}
-        {type === 'random-theme' && (
-          <RandomThemeContent category={placeCategory} isFilterOpen={isFilterOpen} />
-        )}
-      </Suspense>
+      {type === 'popular' && <PopularContent {...contentProps} />}
+      {type === 'similar' && <SimilarContent {...contentProps} />}
+      {type === 'new' && <NewContent {...contentProps} />}
+      {type === 'random-theme' && <RandomThemeContent {...contentProps} />}
 
       <SearchDialog
         isOpen={isFilterOpen}

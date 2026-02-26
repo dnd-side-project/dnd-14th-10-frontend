@@ -9,6 +9,7 @@ export const placeKeys = {
   similar: (params: unknown) => [...placeKeys.lists(), 'similar', params] as const,
   new: (params: unknown) => [...placeKeys.lists(), 'new', params] as const,
   randomTheme: (params: unknown) => [...placeKeys.lists(), 'random-theme', params] as const,
+  batch: (ids: number[]) => [...placeKeys.lists(), 'batch', ids] as const,
   reviews: (placeId: string, page: number) => [...placeKeys.all, 'reviews', placeId, page] as const,
   reviewTagStats: (placeId: string) => [...placeKeys.all, 'reviews', 'tag-stats', placeId] as const,
   reviewRatingStats: (placeId: string) => [...placeKeys.all, 'reviews', 'rating-stats', placeId] as const,
