@@ -19,6 +19,7 @@ export const getCurrentAddress = (): Promise<{ lat: number; lng: number; address
             if (status !== window.naver.maps.Service.Status.OK) {
               return reject(new Error('주소 변환 실패'));
             }
+            console.log('주소: ', response);
 
             const address = response.v2.address.jibunAddress;
             resolve({ lat, lng, address });

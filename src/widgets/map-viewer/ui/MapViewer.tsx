@@ -1,19 +1,53 @@
 import { useEffect, useRef } from 'react';
 
-import type { Place } from '@/entities/place/model/place.types';
 import { useNaverMapScript } from '@/shared/lib/naver-map/use-naver-map-script';
+
+export interface MapMarker {
+  lat: number;
+  lng: number;
+  name: string;
+}
 
 interface MapViewerProps {
   currentLocation: { lat: number; lng: number; address: string } | null;
-  places: Place[];
+  markers?: MapMarker[];
+  onMapChange?: (center: { lat: number; lng: number }, radiusMeters: number) => void;
+  disableFitBounds?: boolean;
 }
 
-export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
+function createMarkerContent(name: string): string {
+  return `<div style="transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;">
+    <div style="background:white;border-radius:9999px;padding:4px 10px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.25);color:#1a1a1a;line-height:1.4;">${name}</div>
+    <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid white;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.1));margin-top:-1px;"></div>
+  </div>`;
+}
+
+function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371000;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+export const MapViewer = ({
+  currentLocation,
+  markers = [],
+  onMapChange,
+  disableFitBounds = false,
+}: MapViewerProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const naverMapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
-  const currentLocationMarkerRef = useRef<naver.maps.Marker | null>(null);
+  const hasFitOnceRef = useRef(false);
   const isLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+
+  const onMapChangeRef = useRef(onMapChange);
+  useEffect(() => {
+    onMapChangeRef.current = onMapChange;
+  });
 
   useEffect(
     function initializeMap() {
@@ -26,7 +60,18 @@ export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
         });
       }
 
+      const idleListener = window.naver.maps.Event.addListener(naverMapRef.current, 'idle', () => {
+        const map = naverMapRef.current;
+        if (!map) return;
+        const center = map.getCenter() as naver.maps.LatLng;
+        const bounds = map.getBounds() as naver.maps.LatLngBounds;
+        const ne = bounds.getNE() as naver.maps.LatLng;
+        const radiusMeters = haversineMeters(center.lat(), center.lng(), ne.lat(), ne.lng());
+        onMapChangeRef.current?.({ lat: center.lat(), lng: center.lng() }, radiusMeters);
+      });
+
       return () => {
+        window.naver.maps.Event.removeListener(idleListener);
         naverMapRef.current?.destroy();
         naverMapRef.current = null;
       };
@@ -35,32 +80,11 @@ export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
   );
 
   useEffect(
-    function updateCurrentLocationMarker() {
+    function updateCenter() {
       if (!naverMapRef.current || !currentLocation) return;
 
-      const map = naverMapRef.current;
       const latLng = new window.naver.maps.LatLng(currentLocation.lat, currentLocation.lng);
-      map.setCenter(latLng);
-
-      if (currentLocationMarkerRef.current) {
-        currentLocationMarkerRef.current.setMap(null);
-      }
-
-      currentLocationMarkerRef.current = new window.naver.maps.Marker({
-        position: latLng,
-        map: map,
-        icon: {
-          content:
-            '<div style="width:12px; height:12px; background:blue; border-radius:50%; border:2px solid white;"></div>',
-        },
-      });
-
-      return () => {
-        if (currentLocationMarkerRef.current) {
-          currentLocationMarkerRef.current.setMap(null);
-          currentLocationMarkerRef.current = null;
-        }
-      };
+      naverMapRef.current.setCenter(latLng);
     },
     [currentLocation],
   );
@@ -72,24 +96,44 @@ export const MapViewer = ({ currentLocation, places }: MapViewerProps) => {
       const map = naverMapRef.current;
 
       markersRef.current.forEach((marker) => marker.setMap(null));
-      markersRef.current = places.map(
-        (place) =>
-          new window.naver.maps.Marker({
-            position: new window.naver.maps.LatLng(
-              place.locationPoint.lat,
-              place.locationPoint.lng,
-            ),
-            map: map,
-            title: place.name,
-          }),
-      );
+
+      const customMarkers = markers.map((m) => {
+        const marker = new window.naver.maps.Marker({
+          position: new window.naver.maps.LatLng(m.lat, m.lng),
+          map: map,
+          title: m.name,
+          icon: {
+            content: createMarkerContent(m.name),
+            anchor: new window.naver.maps.Point(0, 30),
+          },
+        });
+        window.naver.maps.Event.addListener(marker, 'click', () => {
+          map.setCenter(marker.getPosition() as naver.maps.LatLng);
+          map.setZoom(17);
+        });
+        return marker;
+      });
+
+      markersRef.current = customMarkers;
+
+      if ((!hasFitOnceRef.current || !disableFitBounds) && markersRef.current.length > 0) {
+        hasFitOnceRef.current = true;
+        const bounds = new window.naver.maps.LatLngBounds(
+          markersRef.current[0].getPosition() as naver.maps.LatLng,
+          markersRef.current[0].getPosition() as naver.maps.LatLng,
+        );
+        markersRef.current.forEach((marker) => {
+          bounds.extend(marker.getPosition() as naver.maps.LatLng);
+        });
+        map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
+      }
 
       return () => {
         markersRef.current.forEach((marker) => marker.setMap(null));
         markersRef.current = [];
       };
     },
-    [places],
+    [markers, disableFitBounds],
   );
 
   return (

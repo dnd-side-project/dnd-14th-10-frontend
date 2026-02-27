@@ -16,6 +16,7 @@ import HomeHeader from '@/features/home/ui/HomeHeader';
 import PlaceSection from '@/features/home/ui/PlaceSection';
 import type { PlaceItem } from '@/features/home/ui/PlaceSection';
 import SearchDialog from '@/features/home/ui/SearchDialog';
+import { useAuthStore } from '@/shared/store/use-auth-store';
 import SearchInput from '@/shared/ui/inputs/SearchInput';
 
 const userName = '홍길동';
@@ -27,6 +28,7 @@ function HomePage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const popularPlaces = category === 'cafe' ? mockPopularCafePlaces : mockPopularPublicPlaces;
   const recommendedPlaces =
@@ -64,8 +66,15 @@ function HomePage() {
     });
   };
 
-  const handleMoreClick = () => {
-    navigate('/map');
+  const placeCategory = category === 'cafe' ? 'CAFE' : 'PUBLIC';
+
+  const handleMoreClick = (type: string, title: string) => {
+    const params = new URLSearchParams({
+      type,
+      category: title,
+      placeCategory,
+    });
+    navigate(`/map/recommended?${params.toString()}`);
   };
 
   return (
@@ -82,23 +91,35 @@ function HomePage() {
         <PlaceSection
           title='인기있는 작업 공간'
           places={applyLikedStatus(popularPlaces)}
-          onMoreClick={handleMoreClick}
+          onMoreClick={() => handleMoreClick('popular', '인기있는 작업 공간')}
           onPlaceClick={handlePlaceClick}
           onLikeClick={handleLikeClick}
         />
 
-        <PlaceSection
-          title={`'${userName}'과 비슷한 분들이 좋아한 공간이에요`}
-          places={applyLikedStatus(recommendedPlaces)}
-          onMoreClick={handleMoreClick}
-          onPlaceClick={handlePlaceClick}
-          onLikeClick={handleLikeClick}
-        />
+        {isAuthenticated ? (
+          <PlaceSection
+            title={`'${userName}'과 비슷한 분들이 좋아한 공간이에요`}
+            places={applyLikedStatus(recommendedPlaces)}
+            onMoreClick={() =>
+              handleMoreClick('similar', `'${userName}'과 비슷한 분들이 좋아한 공간이에요`)
+            }
+            onPlaceClick={handlePlaceClick}
+            onLikeClick={handleLikeClick}
+          />
+        ) : (
+          <PlaceSection
+            title={`${userLocation} 주변 랜덤 추천`}
+            places={applyLikedStatus(newPlaces)}
+            onMoreClick={() => handleMoreClick('random-theme', `${userLocation} 주변 랜덤 추천`)}
+            onPlaceClick={handlePlaceClick}
+            onLikeClick={handleLikeClick}
+          />
+        )}
 
         <PlaceSection
           title={`${userLocation} 주변에 새로 생겼어요`}
           places={applyLikedStatus(newPlaces)}
-          onMoreClick={handleMoreClick}
+          onMoreClick={() => handleMoreClick('new', `${userLocation} 주변에 새로 생겼어요`)}
           onPlaceClick={handlePlaceClick}
           onLikeClick={handleLikeClick}
         />
