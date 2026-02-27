@@ -13,6 +13,7 @@ interface SearchState {
   selectAllDistricts: (city: string, districts: string[]) => void;
   toggleAtmosphere: (atmosphere: string) => void;
   toggleSize: (size: string) => void;
+  setSize: (size: string) => void;
   setSearchTerm: (term: string) => void;
   reset: () => void;
 }
@@ -79,6 +80,8 @@ export const useSearchStore = create<SearchState>((set) => ({
         ? state.sizes.filter((s) => s !== size)
         : [...state.sizes, size],
     })),
+
+  setSize: (size) => set((state) => ({ sizes: state.sizes.includes(size) ? [] : [size] })),
 
   setSearchTerm: (term) => set({ searchTerm: term }),
 

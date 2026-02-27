@@ -24,9 +24,24 @@ export const getPlaceDetail = async (placeId: string): Promise<PlaceDetail> => {
   return data;
 };
 
+function serializeSearchParams(params: Record<string, unknown>): string {
+  const searchParams = new URLSearchParams();
+  for (const [key, val] of Object.entries(params)) {
+    if (Array.isArray(val)) {
+      val.forEach((v) => searchParams.append(key, String(v)));
+    } else if (val !== undefined && val !== null) {
+      searchParams.set(key, String(val));
+    }
+  }
+  return searchParams.toString();
+}
+
 // GET /api/places/search (필터 검색)
 export const searchPlaces = async (params: PlaceSearchParams): Promise<PlaceSearchResponse> => {
-  const { data } = await apiClient.get<PlaceSearchResponse>('/places/search', { params });
+  const { data } = await apiClient.get<PlaceSearchResponse>('/places/search', {
+    params,
+    paramsSerializer: { serialize: serializeSearchParams },
+  });
   return data;
 };
 
@@ -61,9 +76,7 @@ export const getReviewTagStats = async (placeId: string): Promise<ReviewTagStat[
 
 // GET /api/places/{placeId}/reviews/rating-stats (리뷰 별점 통계)
 export const getReviewRatingStats = async (placeId: string): Promise<ReviewRatingStat> => {
-  const { data } = await apiClient.get<ReviewRatingStat>(
-    `/places/${placeId}/reviews/rating-stats`,
-  );
+  const { data } = await apiClient.get<ReviewRatingStat>(`/places/${placeId}/reviews/rating-stats`);
   return data;
 };
 
@@ -71,10 +84,9 @@ export const getReviewRatingStats = async (placeId: string): Promise<ReviewRatin
 export const getPopularPlaces = async (
   params: PopularPlacesParams,
 ): Promise<PlaceRecommendation[]> => {
-  const { data } = await apiClient.get<PlaceRecommendation[]>(
-    '/places/recommendations/popular',
-    { params },
-  );
+  const { data } = await apiClient.get<PlaceRecommendation[]>('/places/recommendations/popular', {
+    params,
+  });
   return data;
 };
 
@@ -82,17 +94,14 @@ export const getPopularPlaces = async (
 export const getSimilarPlaces = async (
   params: SimilarPlacesParams,
 ): Promise<PlaceRecommendation[]> => {
-  const { data } = await apiClient.get<PlaceRecommendation[]>(
-    '/places/recommendations/similar',
-    { params },
-  );
+  const { data } = await apiClient.get<PlaceRecommendation[]>('/places/recommendations/similar', {
+    params,
+  });
   return data;
 };
 
 // GET /api/places/recommendations/new (주변 신규 공간 조회)
-export const getNewPlaces = async (
-  params: SimilarPlacesParams,
-): Promise<PlaceRecommendation[]> => {
+export const getNewPlaces = async (params: SimilarPlacesParams): Promise<PlaceRecommendation[]> => {
   const { data } = await apiClient.get<PlaceRecommendation[]>('/places/recommendations/new', {
     params,
   });

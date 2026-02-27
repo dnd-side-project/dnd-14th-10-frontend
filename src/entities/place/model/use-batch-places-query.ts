@@ -9,5 +9,6 @@ export const useBatchPlacesQuery = (ids: number[]) => {
     queryFn: () => getBatchPlaces(ids),
     enabled: ids.length > 0,
     placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
   });
 };
