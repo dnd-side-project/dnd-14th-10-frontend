@@ -3,55 +3,55 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 const DRAG_THRESHOLD = 5;
 
 interface UseDragScrollReturn<T extends HTMLElement> {
-  ref: React.RefObject<T | null>;
+  ref: (node: T | null) => void;
   isDragged: boolean;
 }
 
 export const useDragScroll = <T extends HTMLElement>(): UseDragScrollReturn<T> => {
-  const ref = useRef<T>(null);
+  const elementRef = useRef<T | null>(null);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
   const movedDistance = useRef(0);
   const [isDragged, setIsDragged] = useState(false);
-
-  const handleMouseDown = useCallback((e: MouseEvent) => {
-    if (!ref.current) return;
-    isDragging.current = true;
-    movedDistance.current = 0;
-    setIsDragged(false);
-    startX.current = e.pageX - ref.current.offsetLeft;
-    scrollLeft.current = ref.current.scrollLeft;
-    ref.current.style.cursor = 'grabbing';
-    ref.current.style.userSelect = 'none';
-  }, []);
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging.current || !ref.current) return;
-    e.preventDefault();
-    const x = e.pageX - ref.current.offsetLeft;
-    const walk = x - startX.current;
-    movedDistance.current = Math.abs(walk);
-
-    if (movedDistance.current > DRAG_THRESHOLD) {
-      setIsDragged(true);
-    }
-
-    ref.current.scrollLeft = scrollLeft.current - walk * 1.5;
-  }, []);
-
-  const handleMouseUp = useCallback(() => {
-    if (!ref.current) return;
-    isDragging.current = false;
-    ref.current.style.cursor = 'grab';
-    ref.current.style.removeProperty('user-select');
-
-    setTimeout(() => setIsDragged(false), 0);
-  }, []);
+  const [, setMounted] = useState(false);
 
   useEffect(() => {
-    const element = ref.current;
+    const element = elementRef.current;
     if (!element) return;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      isDragging.current = true;
+      movedDistance.current = 0;
+      setIsDragged(false);
+      const rect = element.getBoundingClientRect();
+      startX.current = e.clientX - rect.left;
+      scrollLeft.current = element.scrollLeft;
+      element.style.cursor = 'grabbing';
+      element.style.userSelect = 'none';
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      e.preventDefault();
+      const rect = element.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const walk = x - startX.current;
+      movedDistance.current = Math.abs(walk);
+
+      if (movedDistance.current > DRAG_THRESHOLD) {
+        setIsDragged(true);
+      }
+
+      element.scrollLeft = scrollLeft.current - walk * 1.5;
+    };
+
+    const handleMouseUp = () => {
+      isDragging.current = false;
+      element.style.cursor = 'grab';
+      element.style.removeProperty('user-select');
+      setTimeout(() => setIsDragged(false), 0);
+    };
 
     element.style.cursor = 'grab';
     element.addEventListener('mousedown', handleMouseDown);
@@ -65,7 +65,12 @@ export const useDragScroll = <T extends HTMLElement>(): UseDragScrollReturn<T> =
       document.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('mouseleave', handleMouseUp);
     };
-  }, [handleMouseDown, handleMouseMove, handleMouseUp]);
+  });
+
+  const ref = useCallback((node: T | null) => {
+    elementRef.current = node;
+    setMounted((prev) => !prev);
+  }, []);
 
   return { ref, isDragged };
 };
