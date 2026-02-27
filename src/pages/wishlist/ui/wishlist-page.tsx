@@ -6,26 +6,38 @@ import { useNavigate } from 'react-router-dom';
 import {
   useMyWishlistsInfiniteQuery,
   useRemoveWishlistMutation,
-  useWishCountsQueries,
   type WishlistSortType,
 } from '@/entities/wishlist/model/use-wishlist-query';
 import SortDropdown from '@/features/registered-places/ui/SortDropdown';
 import EmptyWishlist from '@/features/wishlist/ui/EmptyWishlist';
-import { getImageUrl } from '@/shared/lib/image-utils';
 import ActionMenuBottomSheet from '@/shared/ui/bottom-sheet/ActionMenuBottomSheet';
 import ConfirmBottomSheet from '@/shared/ui/bottom-sheet/ConfirmBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 import PlaceListItem from '@/shared/ui/place-list-item/PlaceListItem';
 
+const MOOD_LABELS: Record<string, string> = {
+  NOISY: '시끌벅적',
+  CHATTING: '대화하기 좋은',
+  CALM: '잔잔한',
+  SILENT: '조용한',
+};
+
+const SIZE_LABELS: Record<string, string> = {
+  SMALL: '소형',
+  MEDIUM: '중형',
+  LARGE: '대형',
+};
+
 const SORT_OPTIONS: { label: string; value: WishlistSortType }[] = [
-  { label: '최신순', value: 'latest' },
-  { label: '인기순', value: 'popularity' },
+  { label: '최신순', value: 'LATEST' },
+  { label: '이름순', value: 'NAME' },
+  { label: '인기순', value: 'POPULAR' },
 ];
 
 export default function WishlistPage() {
-  const [sortType, setSortType] = useState<WishlistSortType>('latest');
+  const [sortType, setSortType] = useState<WishlistSortType>('LATEST');
   const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
-  const [isDeleteSheetOpen, setIsDeleteSheetOpen] = useState(false);
+  const [isManageSheetOpen, setIsManageSheetOpen] = useState(false);
   const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
 
   const navigate = useNavigate();
@@ -36,18 +48,6 @@ export default function WishlistPage() {
   const removeWishlistMutation = useRemoveWishlistMutation();
 
   const allItems = useMemo(() => data?.pages.flatMap((page) => page.content) ?? [], [data]);
-  const placeIds = useMemo(() => allItems.map((item) => item.placeId), [allItems]);
-  const wishCountsQueries = useWishCountsQueries(placeIds);
-
-  const wishCountMap = useMemo(() => {
-    const map = new Map<number, number>();
-    wishCountsQueries.forEach((query) => {
-      if (query.data) {
-        map.set(query.data.placeId, query.data.wishCount);
-      }
-    });
-    return map;
-  }, [wishCountsQueries]);
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -68,12 +68,12 @@ export default function WishlistPage() {
     navigate(`/place/${placeId}`);
   };
 
-  const handleHeartClick = (placeId: number) => {
+  const handleMoreClick = (placeId: number) => {
     setSelectedPlaceId(placeId);
-    setIsDeleteSheetOpen(true);
+    setIsManageSheetOpen(true);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDelete = async () => {
     if (selectedPlaceId) {
       try {
         await removeWishlistMutation.mutateAsync(selectedPlaceId);
@@ -81,7 +81,7 @@ export default function WishlistPage() {
         console.error('위시리스트 삭제 실패:', error);
       }
     }
-    setIsDeleteSheetOpen(false);
+    setIsManageSheetOpen(false);
     setSelectedPlaceId(null);
   };
 
@@ -110,19 +110,26 @@ export default function WishlistPage() {
           </div>
 
           <div className='mt-4.5 flex flex-col gap-5 px-5'>
-            {allItems.map((item) => (
-              <PlaceListItem
-                key={item.wishlistId}
-                name={item.placeName}
-                imageUrl={getImageUrl(item.representativeImageKey)}
-                likeCount={wishCountMap.get(item.placeId) ?? 0}
-                tags={[item.addressDetail]}
-                isLiked={true}
-                showMoreButton={false}
-                onHeartClick={() => handleHeartClick(item.placeId)}
-                onClick={() => handlePlaceClick(item.placeId)}
-              />
-            ))}
+            {allItems.map((item) => {
+              const tags = [
+                `#${MOOD_LABELS[item.mood] || item.mood}`,
+                `#${SIZE_LABELS[item.spaceSize] || item.spaceSize}`,
+              ];
+
+              return (
+                <PlaceListItem
+                  key={item.wishlistId}
+                  name={item.placeName}
+                  imageUrl={item.representativeImageUrl || undefined}
+                  likeCount={item.wishCount}
+                  tags={tags}
+                  isLiked={true}
+                  showMoreButton
+                  onMoreClick={() => handleMoreClick(item.placeId)}
+                  onClick={() => handlePlaceClick(item.placeId)}
+                />
+              );
+            })}
           </div>
 
           <div ref={loadMoreRef} className='h-10'>
@@ -148,12 +155,12 @@ export default function WishlistPage() {
       />
 
       <ConfirmBottomSheet
-        isOpen={isDeleteSheetOpen}
-        onClose={() => setIsDeleteSheetOpen(false)}
-        title='위시리스트 삭제'
+        isOpen={isManageSheetOpen}
+        onClose={() => setIsManageSheetOpen(false)}
+        title='찜 삭제'
         message='위시리스트에서 삭제하시겠습니까?'
         confirmText='삭제'
-        onConfirm={handleDeleteConfirm}
+        onConfirm={handleDelete}
       />
     </div>
   );

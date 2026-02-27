@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import GojkLogo from '@/shared/ui/icons/GojkLogo.svg?react';
+import GojkHomeLogo from '@/shared/ui/icons/GojkHomeLogo.svg?react';
 import HeartFilledIcon from '@/shared/ui/icons/HeartFilled.svg?react';
 import PersonIcon from '@/shared/ui/icons/Person.svg?react';
 import PlusIcon from '@/shared/ui/icons/Plus.svg?react';
@@ -23,7 +23,7 @@ export default function HomeHeader() {
   return (
     <header className='flex h-[52px] items-center justify-between px-5 py-2'>
       <div className='h-9 w-[100px]'>
-        <GojkLogo className='h-full w-full' />
+        <GojkHomeLogo className='h-full w-full' />
       </div>
 
       <div className='flex items-center gap-4'>

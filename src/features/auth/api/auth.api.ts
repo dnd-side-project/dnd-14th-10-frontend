@@ -1,4 +1,4 @@
-import { apiClient, authClient } from '@/shared/api/client';
+import { authClient } from '@/shared/api/client';
 import type { User } from '@/shared/types/user';
 
 export interface OAuthInfo {
@@ -65,5 +65,5 @@ export const refreshToken = () => {
 
 // POST /api/auth/logout - 로그아웃
 export const logout = () => {
-  return apiClient.post('/auth/logout');
+  return authClient.post('/auth/logout');
 };

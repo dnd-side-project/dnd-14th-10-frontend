@@ -5,9 +5,10 @@ import type {
   Mood,
   OutletScore,
   PlaceCategory,
-  PlaceImageRequest,
   SpaceSize,
-} from './register-place.types';
+} from '@/shared/types/place';
+
+import type { PlaceImageRequest } from './register-place.types';
 
 export interface LocationData {
   address: string;

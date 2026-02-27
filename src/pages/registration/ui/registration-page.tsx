@@ -2,7 +2,6 @@ import { useFunnel } from '@use-funnel/react-router-dom';
 import type { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-import type { PlaceCategory } from '@/features/register-place/model/register-place.types';
 import { useRegisterPlaceMutation } from '@/features/register-place/model/use-register-place-mutation';
 import { useRegistrationStore } from '@/features/register-place/model/use-registration-store';
 import { useUploadImagesMutation } from '@/features/register-place/model/use-upload-images-mutation';
@@ -11,6 +10,7 @@ import type { DetailFormValues } from '@/features/register-place/ui/DetailInputS
 import { DetailInputStep } from '@/features/register-place/ui/DetailInputStep';
 import { LocationSearchStep } from '@/features/register-place/ui/LocationSearchStep';
 import { TypeSelectStep } from '@/features/register-place/ui/TypeSelectStep';
+import type { PlaceCategory } from '@/shared/types/place';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 type RegistrationSteps = {
@@ -185,7 +185,9 @@ function RegistrationPage() {
         <CompleteStep
           placeName={formData.location?.placeName || formData.detail.name}
           placeId={context.placeId}
-          placeCategory={formData.category ? CATEGORY_LABELS[formData.category] : ''}
+          placeCategory={
+            formData.category ? CATEGORY_LABELS[formData.category as PlaceCategory] : ''
+          }
         />
       )}
     />

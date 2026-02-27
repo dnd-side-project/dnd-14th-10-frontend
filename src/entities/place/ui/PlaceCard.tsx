@@ -28,7 +28,7 @@ export function PlaceCard({
       onClick={onClick}
     >
       <div className='relative h-[142px] w-full overflow-hidden rounded-[12px]'>
-        <img src={imageUrl} alt={name} className='size-full object-cover' />
+        <img src={imageUrl} alt={name} draggable={false} className='size-full object-cover' />
         <button
           type='button'
           onClick={onLikeClick}

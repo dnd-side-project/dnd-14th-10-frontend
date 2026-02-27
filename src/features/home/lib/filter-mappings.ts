@@ -1,4 +1,4 @@
-import type { Mood, PlaceCategory, SpaceSize } from '@/features/register-place/model/register-place.types';
+import type { Mood, PlaceCategory, SpaceSize } from '@/shared/types/place';
 
 export const ATMOSPHERE_TO_MOOD: Record<string, Mood> = {
   '소란스러움': 'NOISY',
