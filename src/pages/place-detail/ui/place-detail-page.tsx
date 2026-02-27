@@ -16,13 +16,13 @@ import {
   OUTLET_SCORE_OPTIONS,
   SPACE_SIZE_OPTIONS,
 } from '@/features/register-place/model/register-place.types';
-import type { Mood } from '@/features/register-place/model/register-place.types';
 import { useToggleWishlistMutation } from '@/features/toggle-wishlist/model/use-toggle-wishlist-mutation';
 import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
 import calmnessCalm from '@/shared/assets/images/calm-3d.png';
 import calmnessChatty from '@/shared/assets/images/chatty-3d.png';
 import calmnessNoisy from '@/shared/assets/images/noisy-3d.png';
 import calmnessSilent from '@/shared/assets/images/silent-3d.png';
+import type { Mood } from '@/shared/types/place';
 import PlaceErrorBoundary from '@/shared/ui/error-boundary/PlaceErrorBoundary';
 import BuildingIcon from '@/shared/ui/icons/Building.svg?react';
 import ChevronDownIcon from '@/shared/ui/icons/ChevronDown.svg?react';
@@ -300,12 +300,15 @@ function PlaceDetailContent({ id }: { id: string }) {
   const { mutate: toggleWishlist } = useToggleWishlistMutation();
 
   const handleWishlistToggle = () => {
-    toggleWishlist(place.id, {
-      onSuccess: () => {
-        setIsWished((prev) => !prev);
-        queryClient.invalidateQueries({ queryKey: placeKeys.detail(id) });
+    toggleWishlist(
+      { placeId: place.id, isWished },
+      {
+        onSuccess: () => {
+          setIsWished((prev) => !prev);
+          queryClient.invalidateQueries({ queryKey: placeKeys.detail(id) });
+        },
       },
-    });
+    );
   };
 
   return (

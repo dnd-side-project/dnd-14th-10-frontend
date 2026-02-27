@@ -14,6 +14,10 @@ export const getMyWishlists = (params: GetMyWishlistsParams = {}) => {
   });
 };
 
+export const addWishlist = (placeId: number) => {
+  return apiClient.post('/wishlists', { placeId });
+};
+
 export const removeWishlist = (placeId: number) => {
   return apiClient.delete(`/wishlists/places/${placeId}`);
 };
