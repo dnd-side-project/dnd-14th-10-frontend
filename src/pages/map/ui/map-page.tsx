@@ -1,9 +1,10 @@
 import { Suspense, useEffect, useState } from 'react';
 
 import { getCurrentAddress } from '@/entities/place/api/get-current-address';
-import { useNearbyPlacesQuery } from '@/entities/place/model/use-nearby-places-query';
+// import { useNearbyPlacesQuery } from '@/entities/place/model/use-nearby-places-query';
+import { geocodeAddress } from '@/features/register-place/api/geocode-place';
 import { useNaverMapScript } from '@/shared/lib/naver-map/use-naver-map-script';
-import { MapViewer } from '@/widgets/map-viewer/ui/MapViewer';
+// import { MapViewer } from '@/widgets/map-viewer/ui/MapViewer';
 
 // 서비스의 기준점이 되는 기본 위치 (예: 서울시청)
 const DEFAULT_LOCATION = {
@@ -19,10 +20,10 @@ type Location = {
 };
 
 function MapContent({ currentLocation }: { currentLocation: Location }) {
-  const { data: places = [] } = useNearbyPlacesQuery({
-    lat: currentLocation.lat,
-    lng: currentLocation.lng,
-  });
+  // const { data: places = [] } = useNearbyPlacesQuery({
+  //   lat: currentLocation.lat,
+  //   lng: currentLocation.lng,
+  // });
 
   return (
     <>
@@ -30,7 +31,7 @@ function MapContent({ currentLocation }: { currentLocation: Location }) {
         <span>현위치: {currentLocation.address}</span>
       </div>
       <div className='flex-1'>
-        <MapViewer currentLocation={currentLocation} places={places} />
+        {/* <MapViewer currentLocation={currentLocation} places={places} /> */}
       </div>
     </>
   );
@@ -47,6 +48,13 @@ function MapPage() {
       getCurrentAddress()
         .then((info) => {
           setCurrentLocation(info);
+          return info.address;
+        })
+        .then((address) => {
+          return geocodeAddress(address);
+        })
+        .then((coords) => {
+          console.log('현재 위치의 동 위경도:', coords);
         })
         .catch((err) => {
           console.error('실제 위치를 가져올 수 없어 기본 위치를 사용합니다.', err);

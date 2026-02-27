@@ -9,7 +9,7 @@ interface SizeSectionProps {
 }
 
 export default function SizeSection({ isExpanded, onToggle }: SizeSectionProps) {
-  const { sizes, toggleSize } = useSearchStore();
+  const { sizes, setSize } = useSearchStore();
 
   if (!isExpanded) {
     return (
@@ -44,7 +44,7 @@ export default function SizeSection({ isExpanded, onToggle }: SizeSectionProps) 
             <button
               key={item}
               type='button'
-              onClick={() => toggleSize(item)}
+              onClick={() => setSize(item)}
               className='flex items-center gap-2'
             >
               <CheckIcon className={`h-5 w-5 ${isSelected ? 'text-primary-700' : 'text-gray-300'}`} />

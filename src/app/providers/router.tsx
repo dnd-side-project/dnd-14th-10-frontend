@@ -9,6 +9,7 @@ import HomePage from '@/pages/home/ui/home-page';
 import LoginPage from '@/pages/login/ui/login-page';
 import MapPage from '@/pages/map/ui/map-page';
 import MapRecommendedPage from '@/pages/map-recommended/ui/map-recommended-page';
+import MapSearchPage from '@/pages/map-search/ui/map-search-page';
 import MyPage from '@/pages/my/ui/my-page';
 import MyEditPage from '@/pages/my-edit/ui/my-edit-page';
 import MyEditAddressPage from '@/pages/my-edit-address/ui/my-edit-address-page';
@@ -43,6 +44,10 @@ export const router = createBrowserRouter([
       {
         path: '/map/recommended',
         element: <MapRecommendedPage />,
+      },
+      {
+        path: '/map/search',
+        element: <MapSearchPage />,
       },
       {
         path: '/my',
@@ -86,7 +91,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/registration',
-        element: <RegistrationPage />,
+        element: (
+          <ProtectedRoute>
+            <RegistrationPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/place/:id',
@@ -102,7 +111,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/review-creation/:id',
-        element: <ReviewCreationPage />,
+        element: (
+          <ProtectedRoute>
+            <ReviewCreationPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/place/:id/reviews',

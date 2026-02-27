@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
-import type { PlaceSummaryResponse } from '@/entities/place/model/place.types';
+import type { PlaceRecommendation } from '@/entities/place/model/place.types';
 import { useNewPlacesQuery } from '@/entities/place/model/use-new-places-query';
 import { usePopularPlacesQuery } from '@/entities/place/model/use-popular-places-query';
 import { useRandomThemePlacesQuery } from '@/entities/place/model/use-random-theme-places-query';
@@ -23,7 +23,7 @@ const DEFAULT_COORDINATE = { latitude: 37.5172, longitude: 127.0473 };
 const DEFAULT_REGION_CODE = 1168000000;
 const MAX_ITEMS = 6;
 
-const mapToPlaceItem = (place: PlaceSummaryResponse): PlaceItem => ({
+const mapToPlaceItem = (place: PlaceRecommendation): PlaceItem => ({
   id: String(place.id),
   name: place.name,
   location: place.addressDetail,
@@ -106,14 +106,25 @@ function HomePage() {
   };
 
   const handleLikeClick = (id: string, isLiked: boolean) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     toggleWishlistMutation.mutate({
       placeId: Number(id),
       isWished: isLiked,
     });
   };
 
-  const handleMoreClick = () => {
-    navigate('/map');
+  const placeCategory = category === 'cafe' ? 'CAFE' : 'PUBLIC';
+
+  const handleMoreClick = (type: string, title: string) => {
+    const params = new URLSearchParams({
+      type,
+      category: title,
+      placeCategory,
+    });
+    navigate(`/map/recommended?${params.toString()}`);
   };
 
   return (
@@ -132,7 +143,7 @@ function HomePage() {
           places={popularPlaces}
           isLoading={popularQuery.isLoading}
           emptyMessage='주변에 인기 공간이 없습니다'
-          onMoreClick={handleMoreClick}
+          onMoreClick={() => handleMoreClick('popular', '인기있는 작업 공간')}
           onPlaceClick={handlePlaceClick}
           onLikeClick={(id) => {
             const place = popularPlaces.find((p) => p.id === id);
@@ -145,7 +156,7 @@ function HomePage() {
           places={recommendedPlaces}
           isLoading={isAuthenticated ? similarQuery.isLoading : randomThemeQuery.isLoading}
           emptyMessage='추천 공간이 없습니다'
-          onMoreClick={handleMoreClick}
+          onMoreClick={() => handleMoreClick(isAuthenticated ? 'similar' : 'random-theme', recommendedTitle)}
           onPlaceClick={handlePlaceClick}
           onLikeClick={(id) => {
             const place = recommendedPlaces.find((p) => p.id === id);
@@ -158,7 +169,7 @@ function HomePage() {
           places={newPlaces}
           isLoading={newQuery.isLoading}
           emptyMessage='주변에 신규 공간이 없습니다'
-          onMoreClick={handleMoreClick}
+          onMoreClick={() => handleMoreClick('new', '주변에 새로 생겼어요')}
           onPlaceClick={handlePlaceClick}
           onLikeClick={(id) => {
             const place = newPlaces.find((p) => p.id === id);

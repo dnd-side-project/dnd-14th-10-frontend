@@ -20,7 +20,6 @@ export interface ReviewTag {
   percentage: number;
 }
 
-// 리뷰 목록 API 응답 타입
 export interface ReviewImage {
   imageId: number;
   imageUrl: string;
@@ -93,7 +92,7 @@ export interface PlaceReviewsResponse {
   empty: boolean;
 }
 
-interface PlaceImage {
+export interface PlaceImage {
   url: string;
   sequence: number;
   representativeFlag: boolean;
@@ -126,7 +125,7 @@ export interface PlaceDetail {
 export interface NearbyParams {
   lat: number;
   lng: number;
-  radius?: number; // 미터 단위 반경
+  radius?: number;
 }
 
 export interface Place {
@@ -147,8 +146,7 @@ export interface RecommendedPlace {
   images: string[];
 }
 
-// 홈 화면 추천 API 응답 타입
-export interface PlaceSummaryResponse {
+export interface PlaceRecommendation {
   id: number;
   name: string;
   category: PlaceCategory;
@@ -162,16 +160,53 @@ export interface PlaceSummaryResponse {
   isWished: boolean;
 }
 
-export interface ThemeRecommendationResponse {
+export interface PlaceRecommendationResponse {
   themeType: string;
   themeValue: string;
-  places: PlaceSummaryResponse[];
+  places: PlaceRecommendation[];
 }
 
-export interface PlaceRecommendationParams {
+export interface PopularPlacesParams {
   longitude: number;
   latitude: number;
-  category: 'CAFE' | 'PUBLIC';
+  category: PlaceCategory;
   radiusMeters?: number;
-  regionCode?: number;
+}
+
+export interface SimilarPlacesParams {
+  regionCode: number;
+  category: PlaceCategory;
+  longitude: number;
+  latitude: number;
+}
+
+export interface PlaceSearchItem {
+  id: number;
+  name: string;
+  category: PlaceCategory;
+  addressDetail: string;
+  regionCode: number;
+  images: PlaceImage[];
+  latitude: number;
+  longitude: number;
+  mood: Mood;
+  spaceSize: SpaceSize;
+  wishCount: number;
+}
+
+export interface PlaceSearchResponse {
+  places: PlaceSearchItem[];
+  lastDistance: number;
+  hasNext: boolean;
+}
+
+export interface PlaceSearchParams {
+  longitude: number;
+  latitude: number;
+  category?: PlaceCategory;
+  spaceSize?: SpaceSize;
+  moods?: string;
+  regionCodes?: number[];
+  lastDistance?: number;
+  size?: number;
 }

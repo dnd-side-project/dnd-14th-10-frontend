@@ -4,13 +4,17 @@ import type {
   NearbyParams,
   Place,
   PlaceDetail,
-  PlaceRecommendationParams,
+  PlaceRecommendation,
+  PlaceRecommendationResponse,
   PlaceReviewsResponse,
-  PlaceSummaryResponse,
+  PlaceSearchItem,
+  PlaceSearchParams,
+  PlaceSearchResponse,
+  PopularPlacesParams,
   RecommendedPlace,
   ReviewRatingStat,
   ReviewTagStat,
-  ThemeRecommendationResponse,
+  SimilarPlacesParams,
 } from '../model/place.types';
 export type { Review, ReviewTag } from '../model/place.types';
 
@@ -20,9 +24,25 @@ export const getPlaceDetail = async (placeId: string): Promise<PlaceDetail> => {
   return data;
 };
 
-// GET /api/places (필터 검색)
-export const searchPlaces = (params: unknown) => {
-  return apiClient.get('/places', { params });
+function serializeSearchParams(params: Record<string, unknown>): string {
+  const searchParams = new URLSearchParams();
+  for (const [key, val] of Object.entries(params)) {
+    if (Array.isArray(val)) {
+      val.forEach((v) => searchParams.append(key, String(v)));
+    } else if (val !== undefined && val !== null) {
+      searchParams.set(key, String(val));
+    }
+  }
+  return searchParams.toString();
+}
+
+// GET /api/places/search (필터 검색)
+export const searchPlaces = async (params: PlaceSearchParams): Promise<PlaceSearchResponse> => {
+  const { data } = await apiClient.get<PlaceSearchResponse>('/places/search', {
+    params,
+    paramsSerializer: { serialize: serializeSearchParams },
+  });
+  return data;
 };
 
 // GET /api/places/nearby (주변 조회)
@@ -62,9 +82,9 @@ export const getReviewRatingStats = async (placeId: string): Promise<ReviewRatin
 
 // GET /api/places/recommendations/popular (인기 공간 조회)
 export const getPopularPlaces = async (
-  params: PlaceRecommendationParams,
-): Promise<PlaceSummaryResponse[]> => {
-  const { data } = await apiClient.get<PlaceSummaryResponse[]>('/places/recommendations/popular', {
+  params: PopularPlacesParams,
+): Promise<PlaceRecommendation[]> => {
+  const { data } = await apiClient.get<PlaceRecommendation[]>('/places/recommendations/popular', {
     params,
   });
   return data;
@@ -72,9 +92,17 @@ export const getPopularPlaces = async (
 
 // GET /api/places/recommendations/similar (비슷한 성향 공간 조회 - 로그인 필요)
 export const getSimilarPlaces = async (
-  params: PlaceRecommendationParams & { regionCode: number },
-): Promise<PlaceSummaryResponse[]> => {
-  const { data } = await apiClient.get<PlaceSummaryResponse[]>('/places/recommendations/similar', {
+  params: SimilarPlacesParams,
+): Promise<PlaceRecommendation[]> => {
+  const { data } = await apiClient.get<PlaceRecommendation[]>('/places/recommendations/similar', {
+    params,
+  });
+  return data;
+};
+
+// GET /api/places/recommendations/new (신규 공간 조회)
+export const getNewPlaces = async (params: SimilarPlacesParams): Promise<PlaceRecommendation[]> => {
+  const { data } = await apiClient.get<PlaceRecommendation[]>('/places/recommendations/new', {
     params,
   });
   return data;
@@ -82,21 +110,18 @@ export const getSimilarPlaces = async (
 
 // GET /api/places/recommendations/random-theme (랜덤 테마 추천 - 비로그인용)
 export const getRandomThemePlaces = async (
-  params: PlaceRecommendationParams,
-): Promise<ThemeRecommendationResponse> => {
-  const { data } = await apiClient.get<ThemeRecommendationResponse>(
+  params: PopularPlacesParams,
+): Promise<PlaceRecommendationResponse> => {
+  const { data } = await apiClient.get<PlaceRecommendationResponse>(
     '/places/recommendations/random-theme',
     { params },
   );
   return data;
 };
 
-// GET /api/places/recommendations/new (신규 공간 조회)
-export const getNewPlaces = async (
-  params: PlaceRecommendationParams & { regionCode: number },
-): Promise<PlaceSummaryResponse[]> => {
-  const { data } = await apiClient.get<PlaceSummaryResponse[]>('/places/recommendations/new', {
-    params,
-  });
+// GET /api/places/batch (일괄 조회)
+export const getBatchPlaces = async (ids: number[]): Promise<PlaceSearchItem[]> => {
+  const queryString = ids.map((id) => `ids=${id}`).join('&');
+  const { data } = await apiClient.get<PlaceSearchItem[]>(`/places/batch?${queryString}`);
   return data;
 };

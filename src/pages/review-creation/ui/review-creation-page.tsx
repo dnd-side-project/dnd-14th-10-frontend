@@ -1,4 +1,4 @@
-import { type ChangeEvent, Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
@@ -14,10 +14,9 @@ import { WorkspaceReviewSection } from '@/features/register-place/ui/WorkspaceRe
 import check3dImage from '@/shared/assets/images/check-3d.png';
 import { BottomCta } from '@/shared/ui/bottom-cta/BottomCta';
 import { CompletePage } from '@/shared/ui/complete-page/CompletePage';
-import AddCircleIcon from '@/shared/ui/icons/AddCircle.svg?react';
-import CloseCircleIcon from '@/shared/ui/icons/CloseCircle.svg?react';
 import ReviewChatIcon from '@/shared/ui/icons/ReviewChat.svg?react';
 import StarIcon from '@/shared/ui/icons/Star.svg?react';
+import { ImageUploadField } from '@/shared/ui/image-upload/ImageUploadField';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 const reviewSchema = z.object({
@@ -65,33 +64,9 @@ function ReviewCreationContent() {
 
   const images = watch('images') || [];
   const content = watch('content') || '';
-  const inputRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<string[]>([]);
 
   const isPending = isUploading || isCreating;
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    const newFiles = Array.from(files);
-    const totalFiles = images.length + newFiles.length;
-
-    if (totalFiles > 6) {
-      alert('사진은 최대 6장까지 등록할 수 있습니다.');
-      e.target.value = '';
-      return;
-    }
-
-    const updatedFiles = [...images, ...newFiles];
-    setValue('images', updatedFiles, { shouldValidate: true });
-    e.target.value = '';
-  };
-
-  const handleRemoveImage = (index: number) => {
-    const updatedFiles = images.filter((_, i) => i !== index);
-    setValue('images', updatedFiles, { shouldValidate: true });
-  };
 
   useEffect(() => {
     const newPreviews = images.map((file) => URL.createObjectURL(file));
@@ -247,46 +222,20 @@ function ReviewCreationContent() {
               </div>
 
               {/* 이미지 업로드 */}
-              <div className='space-y-2'>
-                <input
-                  type='file'
-                  multiple
-                  accept='image/*'
-                  ref={inputRef}
-                  onChange={handleFileChange}
-                  className='hidden'
-                />
-
-                <div className='flex min-w-0 gap-2 overflow-x-auto'>
-                  {previews.map((preview, index) => (
-                    <div key={preview} className='relative h-[100px] w-[100px] flex-shrink-0'>
-                      <img
-                        src={preview}
-                        alt={`preview ${index}`}
-                        className='h-full w-full rounded-xl object-cover'
-                      />
-                      <button
-                        type='button'
-                        onClick={() => handleRemoveImage(index)}
-                        className='absolute -top-2 -right-2'
-                      >
-                        <CloseCircleIcon className='h-[24px] w-[24px]' />
-                      </button>
-                    </div>
-                  ))}
-
-                  {images.length < 6 && (
-                    <button
-                      type='button'
-                      onClick={() => inputRef.current?.click()}
-                      className='bg-gray-150 flex h-[100px] w-[100px] flex-shrink-0 items-center justify-center rounded-xl'
-                    >
-                      <AddCircleIcon width={30} height={30} className='text-primary-700' />
-                    </button>
-                  )}
-                </div>
-                <p className='text-xs text-gray-500'>사진은 최대 6장까지 업로드 가능해요.</p>
-              </div>
+              <ImageUploadField
+                images={images}
+                previews={previews}
+                onAdd={(newFiles) =>
+                  setValue('images', [...images, ...newFiles], { shouldValidate: true })
+                }
+                onRemove={(index) =>
+                  setValue(
+                    'images',
+                    images.filter((_, i) => i !== index),
+                    { shouldValidate: true },
+                  )
+                }
+              />
             </div>
 
             <BottomCta type='submit' disabled={!isValid || isPending}>

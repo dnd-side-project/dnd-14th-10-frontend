@@ -1,10 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { PlaceRecommendationParams } from './place.types';
+import type { SimilarPlacesParams } from './place.types';
 import { placeKeys } from './query-keys';
 import { getSimilarPlaces } from '../api/place.api';
-
-type SimilarPlacesParams = PlaceRecommendationParams & { regionCode: number };
 
 export const useSimilarPlacesQuery = (params: SimilarPlacesParams, enabled = true) => {
   return useQuery({

@@ -77,6 +77,6 @@ export const CROWD_STATUS_OPTIONS: { value: CrowdStatus; label: string }[] = [
 export const MOOD_OPTIONS: { value: Mood; label: string }[] = [
   { value: 'NOISY', label: '소란스러움' },
   { value: 'CHATTING', label: '대화하는 분위기' },
-  { value: 'CALM', label: '차분한 분위기' },
+  { value: 'CALM', label: '잔잔한 분위기' },
   { value: 'SILENT', label: '고요해요' },
 ];
