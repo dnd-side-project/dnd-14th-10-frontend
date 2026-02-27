@@ -76,3 +76,35 @@ export function reverseGeocodeRegionCode(lat: number, lng: number): Promise<numb
     });
   });
 }
+
+/** 좌표 → 행정구역 코드 + 시군구명 조회 */
+export function reverseGeocodeLocationInfo(
+  lat: number,
+  lng: number,
+): Promise<{ regionCode: number; sigunguName: string }> {
+  return new Promise((resolve, reject) => {
+    if (!window.naver?.maps?.Service) {
+      return reject(new Error('Naver Maps Service를 사용할 수 없습니다.'));
+    }
+
+    const coords = new window.naver.maps.LatLng(lat, lng);
+
+    window.naver.maps.Service.reverseGeocode({ coords }, (status, response) => {
+      if (status !== window.naver.maps.Service.Status.OK) {
+        return reject(new Error('역지오코딩 실패'));
+      }
+
+      const admResult = response.v2.results?.find((r: { name: string }) => r.name === 'admcode');
+      const codeId = admResult?.code?.id;
+      const sigunguName: string =
+        admResult?.region?.area2?.name || admResult?.region?.area1?.name || '';
+
+      if (codeId === undefined) {
+        reject(new Error('행정동 코드를 찾을 수 없습니다.'));
+        return;
+      } else {
+        resolve({ regionCode: parseInt(codeId, 10), sigunguName });
+      }
+    });
+  });
+}
