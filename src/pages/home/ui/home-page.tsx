@@ -15,12 +15,12 @@ import PlaceSection from '@/features/home/ui/PlaceSection';
 import type { PlaceItem } from '@/features/home/ui/PlaceSection';
 import SearchDialog from '@/features/home/ui/SearchDialog';
 import { useToggleWishlistMutation } from '@/features/toggle-wishlist/model/use-toggle-wishlist-mutation';
-import { getCoordinateByRegionCode } from '@/shared/constants/region-coordinates';
+import { useInitCurrentLocation } from '@/shared/lib/location/use-init-current-location';
+import { useNaverMapScript } from '@/shared/lib/naver-map/use-naver-map-script';
+import { useLocationStore } from '@/shared/model/use-location-store';
 import { useAuthStore } from '@/shared/store/use-auth-store';
 import SearchInput from '@/shared/ui/inputs/SearchInput';
 
-const DEFAULT_COORDINATE = { latitude: 37.5172, longitude: 127.0473 };
-const DEFAULT_REGION_CODE = 1168000000;
 const MAX_ITEMS = 6;
 const RADIUS_METERS = 5000;
 
@@ -41,19 +41,19 @@ function HomePage() {
   const { data: user } = useUserQuery();
   const toggleWishlistMutation = useToggleWishlistMutation();
 
-  const coordinate = useMemo(() => {
-    if (user?.regionCode) {
-      return getCoordinateByRegionCode(user.regionCode) ?? DEFAULT_COORDINATE;
-    }
-    return DEFAULT_COORDINATE;
-  }, [user]);
+  const isNaverLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+  useInitCurrentLocation({ isNaverLoaded, user, isAuthenticated });
 
-  const regionCode = user?.regionCode ?? DEFAULT_REGION_CODE;
+  const lat = useLocationStore((state) => state.lat);
+  const lng = useLocationStore((state) => state.lng);
+  const regionCode = useLocationStore((state) => state.regionCode);
+  const sigunguName = useLocationStore((state) => state.sigunguName);
+
   const apiCategory = category === 'cafe' ? 'CAFE' : 'PUBLIC';
 
   const baseParams = {
-    longitude: coordinate.longitude,
-    latitude: coordinate.latitude,
+    longitude: lng,
+    latitude: lat,
     category: apiCategory as 'CAFE' | 'PUBLIC',
     radiusMeters: RADIUS_METERS,
   };
@@ -169,7 +169,7 @@ function HomePage() {
         />
 
         <PlaceSection
-          title='주변에 새로 생겼어요'
+          title={`${sigunguName} 주변에 새로 생겼어요`}
           places={newPlaces}
           isLoading={newQuery.isLoading}
           emptyMessage='주변에 신규 공간이 없습니다'
