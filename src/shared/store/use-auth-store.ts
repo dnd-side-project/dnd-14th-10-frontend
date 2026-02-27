@@ -16,20 +16,22 @@ interface AuthState {
   setLoggingOut: (value: boolean) => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   accessToken: null,
   user: null,
   isAuthenticated: false,
   isInitialized: false,
   isLoggingOut: false,
 
-  setAuth: (accessToken, user) =>
+  setAuth: (accessToken, user) => {
+    if (get().isLoggingOut) return;
     set({
       accessToken,
       user: user ?? null,
       isAuthenticated: true,
       isLoggingOut: false,
-    }),
+    });
+  },
 
   setUser: (user) => set({ user }),
 
