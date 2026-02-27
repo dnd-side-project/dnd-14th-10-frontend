@@ -15,14 +15,34 @@ import PlaceSection from '@/features/home/ui/PlaceSection';
 import type { PlaceItem } from '@/features/home/ui/PlaceSection';
 import SearchDialog from '@/features/home/ui/SearchDialog';
 import { useToggleWishlistMutation } from '@/features/toggle-wishlist/model/use-toggle-wishlist-mutation';
-import { getCoordinateByRegionCode } from '@/shared/constants/region-coordinates';
+import { useInitCurrentLocation } from '@/shared/lib/location/use-init-current-location';
+import { useNaverMapScript } from '@/shared/lib/naver-map/use-naver-map-script';
+import { useLocationStore } from '@/shared/model/use-location-store';
 import { useAuthStore } from '@/shared/store/use-auth-store';
 import SearchInput from '@/shared/ui/inputs/SearchInput';
 
-const DEFAULT_COORDINATE = { latitude: 37.5172, longitude: 127.0473 };
-const DEFAULT_REGION_CODE = 1168000000;
 const MAX_ITEMS = 6;
 const RADIUS_METERS = 5000;
+
+const THEME_LABEL: Record<string, string> = {
+  // Mood
+  SILENT: '조용한 분위기를 선호하는 분들을 위한 공간',
+  CALM: '잔잔한 분위기를 선호하는 분들을 위한 공간',
+  CHATTING: '대화하기 좋은 분위기를 선호하는 분들을 위한 공간',
+  NOISY: '활기찬 분위기를 선호하는 분들을 위한 공간',
+  // SpaceSize
+  LARGE: '넓은 곳을 선호하는 분들을 위한 공간',
+  MEDIUM: '적당한 크기를 선호하는 분들을 위한 공간',
+  SMALL: '아늑한 소형 공간을 선호하는 분들을 위한 공간',
+  // OutletScore
+  MANY: '콘센트 많은 곳을 선호하는 분들을 위한 공간',
+  AVERAGE: '콘센트가 적당한 곳을 선호하는 분들을 위한 공간',
+  FEW: '카페 감성을 선호하는 분들을 위한 공간',
+  // CrowdStatus
+  RELAX: '사람이 적은 곳을 선호하는 분들을 위한 공간',
+  NORMAL: '적당히 북적이는 곳을 선호하는 분들을 위한 공간',
+  FULL: '활발한 분위기를 선호하는 분들을 위한 공간',
+};
 
 const mapToPlaceItem = (place: PlaceRecommendation): PlaceItem => ({
   id: String(place.id),
@@ -41,19 +61,19 @@ function HomePage() {
   const { data: user } = useUserQuery();
   const toggleWishlistMutation = useToggleWishlistMutation();
 
-  const coordinate = useMemo(() => {
-    if (user?.regionCode) {
-      return getCoordinateByRegionCode(user.regionCode) ?? DEFAULT_COORDINATE;
-    }
-    return DEFAULT_COORDINATE;
-  }, [user]);
+  const isNaverLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+  useInitCurrentLocation({ isNaverLoaded, user, isAuthenticated });
 
-  const regionCode = user?.regionCode ?? DEFAULT_REGION_CODE;
+  const lat = useLocationStore((state) => state.lat);
+  const lng = useLocationStore((state) => state.lng);
+  const regionCode = useLocationStore((state) => state.regionCode);
+  const sigunguName = useLocationStore((state) => state.sigunguName);
+
   const apiCategory = category === 'cafe' ? 'CAFE' : 'PUBLIC';
 
   const baseParams = {
-    longitude: coordinate.longitude,
-    latitude: coordinate.latitude,
+    longitude: lng,
+    latitude: lat,
     category: apiCategory as 'CAFE' | 'PUBLIC',
     radiusMeters: RADIUS_METERS,
   };
@@ -90,7 +110,7 @@ function HomePage() {
       return `'${user.nickname}'과 비슷한 분들이 좋아한 공간이에요`;
     }
     if (randomThemeQuery.data?.themeValue) {
-      return `'${randomThemeQuery.data.themeValue}' 추천 공간`;
+      return THEME_LABEL[randomThemeQuery.data.themeValue] ?? '추천 공간';
     }
     return '추천 공간';
   }, [isAuthenticated, user, randomThemeQuery.data]);
@@ -169,7 +189,7 @@ function HomePage() {
         />
 
         <PlaceSection
-          title='주변에 새로 생겼어요'
+          title={`${sigunguName} 주변에 새로 생겼어요`}
           places={newPlaces}
           isLoading={newQuery.isLoading}
           emptyMessage='주변에 신규 공간이 없습니다'

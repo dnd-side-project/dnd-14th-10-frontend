@@ -304,13 +304,29 @@ function PlaceDetailContent({ id }: { id: string }) {
     toggleWishlist({ placeId: place.id, isWished: place.isWished });
   };
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '고작',
+          text: '디지털 노마드를 위한 공간 추천 서비스, Gojak!',
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.log('공유 실패 또는 취소', error);
+      }
+    } else {
+      alert('이 브라우저에서는 공유 기능을 지원하지 않습니다. 주소를 복사해 주세요.');
+    }
+  };
+
   return (
     <div className='min-h-screen bg-white'>
       <NavigationBar
         onBack={() => navigate(-1)}
         right={
           <div className='flex gap-[16px]'>
-            <button>
+            <button onClick={handleShare}>
               <ShareIcon className='h-[24px] w-[24px] text-gray-950' />
             </button>
             <button onClick={handleWishlistToggle}>
