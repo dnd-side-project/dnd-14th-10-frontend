@@ -22,11 +22,12 @@ import SearchInput from '@/shared/ui/inputs/SearchInput';
 const DEFAULT_COORDINATE = { latitude: 37.5172, longitude: 127.0473 };
 const DEFAULT_REGION_CODE = 1168000000;
 const MAX_ITEMS = 6;
+const RADIUS_METERS = 5000;
 
 const mapToPlaceItem = (place: PlaceRecommendation): PlaceItem => ({
   id: String(place.id),
   name: place.name,
-  location: place.addressDetail,
+  location: place.addressDetail.split(' ').slice(0, 2).join(' '),
   imageUrl: place.representativeImageUrl,
   isLiked: place.isWished,
 });
@@ -54,6 +55,7 @@ function HomePage() {
     longitude: coordinate.longitude,
     latitude: coordinate.latitude,
     category: apiCategory as 'CAFE' | 'PUBLIC',
+    radiusMeters: RADIUS_METERS,
   };
 
   const paramsWithRegion = {
@@ -156,7 +158,9 @@ function HomePage() {
           places={recommendedPlaces}
           isLoading={isAuthenticated ? similarQuery.isLoading : randomThemeQuery.isLoading}
           emptyMessage='추천 공간이 없습니다'
-          onMoreClick={() => handleMoreClick(isAuthenticated ? 'similar' : 'random-theme', recommendedTitle)}
+          onMoreClick={() =>
+            handleMoreClick(isAuthenticated ? 'similar' : 'random-theme', recommendedTitle)
+          }
           onPlaceClick={handlePlaceClick}
           onLikeClick={(id) => {
             const place = recommendedPlaces.find((p) => p.id === id);

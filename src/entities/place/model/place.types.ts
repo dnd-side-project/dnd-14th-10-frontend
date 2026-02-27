@@ -178,6 +178,7 @@ export interface SimilarPlacesParams {
   category: PlaceCategory;
   longitude: number;
   latitude: number;
+  radiusMeters?: number;
 }
 
 export interface PlaceSearchItem {
