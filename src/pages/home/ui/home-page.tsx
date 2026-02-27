@@ -24,6 +24,26 @@ import SearchInput from '@/shared/ui/inputs/SearchInput';
 const MAX_ITEMS = 6;
 const RADIUS_METERS = 5000;
 
+const THEME_LABEL: Record<string, string> = {
+  // Mood
+  SILENT: '조용한 분위기를 선호하는 분들을 위한 공간',
+  CALM: '잔잔한 분위기를 선호하는 분들을 위한 공간',
+  CHATTING: '대화하기 좋은 분위기를 선호하는 분들을 위한 공간',
+  NOISY: '활기찬 분위기를 선호하는 분들을 위한 공간',
+  // SpaceSize
+  LARGE: '넓은 곳을 선호하는 분들을 위한 공간',
+  MEDIUM: '적당한 크기를 선호하는 분들을 위한 공간',
+  SMALL: '아늑한 소형 공간을 선호하는 분들을 위한 공간',
+  // OutletScore
+  MANY: '콘센트 많은 곳을 선호하는 분들을 위한 공간',
+  AVERAGE: '콘센트가 적당한 곳을 선호하는 분들을 위한 공간',
+  FEW: '카페 감성을 선호하는 분들을 위한 공간',
+  // CrowdStatus
+  RELAX: '사람이 적은 곳을 선호하는 분들을 위한 공간',
+  NORMAL: '적당히 북적이는 곳을 선호하는 분들을 위한 공간',
+  FULL: '활발한 분위기를 선호하는 분들을 위한 공간',
+};
+
 const mapToPlaceItem = (place: PlaceRecommendation): PlaceItem => ({
   id: String(place.id),
   name: place.name,
@@ -90,7 +110,7 @@ function HomePage() {
       return `'${user.nickname}'과 비슷한 분들이 좋아한 공간이에요`;
     }
     if (randomThemeQuery.data?.themeValue) {
-      return `'${randomThemeQuery.data.themeValue}' 추천 공간`;
+      return THEME_LABEL[randomThemeQuery.data.themeValue] ?? '추천 공간';
     }
     return '추천 공간';
   }, [isAuthenticated, user, randomThemeQuery.data]);
