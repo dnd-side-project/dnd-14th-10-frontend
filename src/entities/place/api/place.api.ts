@@ -4,10 +4,13 @@ import type {
   NearbyParams,
   Place,
   PlaceDetail,
+  PlaceRecommendationParams,
   PlaceReviewsResponse,
+  PlaceSummaryResponse,
   RecommendedPlace,
   ReviewRatingStat,
   ReviewTagStat,
+  ThemeRecommendationResponse,
 } from '../model/place.types';
 export type { Review, ReviewTag } from '../model/place.types';
 
@@ -53,8 +56,47 @@ export const getReviewTagStats = async (placeId: string): Promise<ReviewTagStat[
 
 // GET /api/places/{placeId}/reviews/rating-stats (리뷰 별점 통계)
 export const getReviewRatingStats = async (placeId: string): Promise<ReviewRatingStat> => {
-  const { data } = await apiClient.get<ReviewRatingStat>(
-    `/places/${placeId}/reviews/rating-stats`,
+  const { data } = await apiClient.get<ReviewRatingStat>(`/places/${placeId}/reviews/rating-stats`);
+  return data;
+};
+
+// GET /api/places/recommendations/popular (인기 공간 조회)
+export const getPopularPlaces = async (
+  params: PlaceRecommendationParams,
+): Promise<PlaceSummaryResponse[]> => {
+  const { data } = await apiClient.get<PlaceSummaryResponse[]>('/places/recommendations/popular', {
+    params,
+  });
+  return data;
+};
+
+// GET /api/places/recommendations/similar (비슷한 성향 공간 조회 - 로그인 필요)
+export const getSimilarPlaces = async (
+  params: PlaceRecommendationParams & { regionCode: number },
+): Promise<PlaceSummaryResponse[]> => {
+  const { data } = await apiClient.get<PlaceSummaryResponse[]>('/places/recommendations/similar', {
+    params,
+  });
+  return data;
+};
+
+// GET /api/places/recommendations/random-theme (랜덤 테마 추천 - 비로그인용)
+export const getRandomThemePlaces = async (
+  params: PlaceRecommendationParams,
+): Promise<ThemeRecommendationResponse> => {
+  const { data } = await apiClient.get<ThemeRecommendationResponse>(
+    '/places/recommendations/random-theme',
+    { params },
   );
+  return data;
+};
+
+// GET /api/places/recommendations/new (신규 공간 조회)
+export const getNewPlaces = async (
+  params: PlaceRecommendationParams & { regionCode: number },
+): Promise<PlaceSummaryResponse[]> => {
+  const { data } = await apiClient.get<PlaceSummaryResponse[]>('/places/recommendations/new', {
+    params,
+  });
   return data;
 };

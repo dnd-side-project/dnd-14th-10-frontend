@@ -4,7 +4,7 @@ import type {
   OutletScore,
   PlaceCategory,
   SpaceSize,
-} from '@/features/register-place/model/register-place.types';
+} from '@/shared/types/place';
 
 export interface Review {
   id: string;
@@ -145,4 +145,33 @@ export interface RecommendedPlace {
   likeCount: number;
   tags: string[];
   images: string[];
+}
+
+// 홈 화면 추천 API 응답 타입
+export interface PlaceSummaryResponse {
+  id: number;
+  name: string;
+  category: PlaceCategory;
+  addressDetail: string;
+  regionCode: number;
+  representativeImageUrl: string;
+  latitude: number;
+  longitude: number;
+  mood: Mood;
+  spaceSize: SpaceSize;
+  isWished: boolean;
+}
+
+export interface ThemeRecommendationResponse {
+  themeType: string;
+  themeValue: string;
+  places: PlaceSummaryResponse[];
+}
+
+export interface PlaceRecommendationParams {
+  longitude: number;
+  latitude: number;
+  category: 'CAFE' | 'PUBLIC';
+  radiusMeters?: number;
+  regionCode?: number;
 }
