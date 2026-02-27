@@ -12,21 +12,21 @@ const publicImage = publicPlaceholder;
 // 인기있는 작업 공간 (카페)
 export const mockPopularCafePlaces: PlaceItem[] = [
   {
-    id: 'cafe-1',
+    id: '7',
     name: '스타벅스 강남점',
     location: '서울 강남구',
     imageUrl: cafeImage,
     isLiked: false,
   },
   {
-    id: 'cafe-2',
+    id: '6',
     name: '블루보틀 삼청',
     location: '서울 종로구',
     imageUrl: cafeImage,
     isLiked: true,
   },
   {
-    id: 'cafe-3',
+    id: '5',
     name: '투썸플레이스',
     location: '서울 강남구',
     imageUrl: cafeImage,

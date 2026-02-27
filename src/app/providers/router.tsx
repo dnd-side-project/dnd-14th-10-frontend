@@ -9,6 +9,7 @@ import HomePage from '@/pages/home/ui/home-page';
 import LoginPage from '@/pages/login/ui/login-page';
 import MapPage from '@/pages/map/ui/map-page';
 import MapRecommendedPage from '@/pages/map-recommended/ui/map-recommended-page';
+import MapSearchPage from '@/pages/map-search/ui/map-search-page';
 import MyPage from '@/pages/my/ui/my-page';
 import MyEditPage from '@/pages/my-edit/ui/my-edit-page';
 import MyEditAddressPage from '@/pages/my-edit-address/ui/my-edit-address-page';
@@ -17,10 +18,12 @@ import MyEditNicknamePage from '@/pages/my-edit-nickname/ui/my-edit-nickname-pag
 import OAuthKakaoCallbackPage from '@/pages/oauth-kakao-callback/ui/oauth-kakao-callback-page';
 import OnboardingPage from '@/pages/onboarding/ui/onboarding-page';
 import PlaceDetailPage from '@/pages/place-detail/ui/place-detail-page';
+import PlaceEditPage from '@/pages/place-edit/ui/place-edit-page';
 import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
 import RegisteredPlacesPage from '@/pages/registered-places/ui/registered-places-page';
 import RegistrationPage from '@/pages/registration/ui/registration-page';
 import ReviewCreationPage from '@/pages/review-creation/ui/review-creation-page';
+import ReviewEditPage from '@/pages/review-edit/ui/review-edit-page';
 import ReviewHistoryPage from '@/pages/review-history/ui/review-history-page';
 import ReviewListPage from '@/pages/review-list/ui/review-list-page';
 import WishlistPage from '@/pages/wishlist/ui/wishlist-page';
@@ -41,6 +44,10 @@ export const router = createBrowserRouter([
       {
         path: '/map/recommended',
         element: <MapRecommendedPage />,
+      },
+      {
+        path: '/map/search',
+        element: <MapSearchPage />,
       },
       {
         path: '/my',
@@ -84,15 +91,31 @@ export const router = createBrowserRouter([
       },
       {
         path: '/registration',
-        element: <RegistrationPage />,
+        element: (
+          <ProtectedRoute>
+            <RegistrationPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/place/:id',
         element: <PlaceDetailPage />,
       },
       {
+        path: '/place/:placeId/edit',
+        element: (
+          <ProtectedRoute>
+            <PlaceEditPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: '/review-creation/:id',
-        element: <ReviewCreationPage />,
+        element: (
+          <ProtectedRoute>
+            <ReviewCreationPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/place/:id/reviews',
@@ -119,6 +142,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ReviewHistoryPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/my/reviews/:reviewId/edit',
+        element: (
+          <ProtectedRoute>
+            <ReviewEditPage />
           </ProtectedRoute>
         ),
       },

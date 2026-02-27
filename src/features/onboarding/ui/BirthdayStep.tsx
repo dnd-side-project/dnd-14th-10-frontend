@@ -1,15 +1,16 @@
 import { useState } from 'react';
 
-import type { DateValue } from '@/features/onboarding/model/onboarding.types';
+import type { DateValue, Gender } from '@/features/onboarding/model/onboarding.types';
 import OnboardingLayout from '@/features/onboarding/ui/OnboardingLayout';
 import WheelPicker from '@/features/onboarding/ui/WheelPicker';
 import PrimaryButton from '@/shared/ui/buttons/PrimaryButton';
 import FormLabel from '@/shared/ui/forms/FormLabel';
 
 interface BirthdayStepProps {
-  onNext: (birthday: string) => void;
+  onNext: (birthday: string, gender: Gender) => void;
   onBack: () => void;
   initialValue?: string;
+  initialGender?: Gender;
   buttonText?: string;
 }
 
@@ -24,8 +25,10 @@ export default function BirthdayStep({
   onNext,
   onBack,
   initialValue,
+  initialGender,
   buttonText = '다음 단계',
 }: BirthdayStepProps) {
+  const [selectedGender, setSelectedGender] = useState<Gender | null>(initialGender || null);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<DateValue | null>(
     parseInitialDate(initialValue),
@@ -40,9 +43,9 @@ export default function BirthdayStep({
   };
 
   const handleNext = () => {
-    if (selectedDate) {
+    if (selectedDate && selectedGender) {
       const formattedDate = `${selectedDate.year}-${String(selectedDate.month).padStart(2, '0')}-${String(selectedDate.day).padStart(2, '0')}`;
-      onNext(formattedDate);
+      onNext(formattedDate, selectedGender);
     }
   };
 
@@ -50,11 +53,11 @@ export default function BirthdayStep({
     return `${date.year}년 ${date.month}월 ${date.day}일`;
   };
 
-  const isValid = selectedDate !== null;
+  const isValid = selectedDate !== null && selectedGender !== null;
 
   return (
     <OnboardingLayout
-      title='생년월일을 입력해주세요.'
+      title='성별, 생년월일을 알려주세요.'
       onBack={onBack}
       footer={
         <div className='px-5'>
@@ -64,7 +67,45 @@ export default function BirthdayStep({
         </div>
       }
     >
-      <div className='mt-10'>
+      <div className='mt-12'>
+        <FormLabel>성별</FormLabel>
+        <div className='mt-4 flex gap-8'>
+          <button
+            type='button'
+            onClick={() => setSelectedGender('MALE')}
+            className='flex items-center gap-2'
+          >
+            <div
+              className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                selectedGender === 'MALE' ? 'border-gray-500' : 'border-gray-300'
+              }`}
+            >
+              {selectedGender === 'MALE' && (
+                <div className='bg-primary-700 h-2.5 w-2.5 rounded-full' />
+              )}
+            </div>
+            <span className='text-[16px] font-medium text-gray-950'>남성</span>
+          </button>
+          <button
+            type='button'
+            onClick={() => setSelectedGender('FEMALE')}
+            className='flex items-center gap-2'
+          >
+            <div
+              className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                selectedGender === 'FEMALE' ? 'border-gray-500' : 'border-gray-300'
+              }`}
+            >
+              {selectedGender === 'FEMALE' && (
+                <div className='bg-primary-700 h-2.5 w-2.5 rounded-full' />
+              )}
+            </div>
+            <span className='text-[16px] font-medium text-gray-950'>여성</span>
+          </button>
+        </div>
+      </div>
+
+      <div className='mt-14'>
         <FormLabel>생년월일</FormLabel>
         <button
           type='button'

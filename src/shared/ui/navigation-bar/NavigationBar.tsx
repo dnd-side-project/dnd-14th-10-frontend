@@ -1,19 +1,32 @@
 import type { ReactNode } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+
 import ArrowLeftIcon from '@/shared/ui/icons/ArrowLeft.svg?react';
 
 interface NavigationBarProps {
   left?: ReactNode;
   title?: ReactNode;
   right?: ReactNode;
+  backPath?: string;
   onBack?: () => void;
 }
 
-export default function NavigationBar({ left, title, right, onBack }: NavigationBarProps) {
+export default function NavigationBar({
+  left,
+  title,
+  right,
+  backPath,
+  onBack,
+}: NavigationBarProps) {
+  const navigate = useNavigate();
+
+  const handleBack = onBack ?? (backPath ? () => navigate(backPath) : () => navigate(-1));
+
   const leftContent =
     left ??
-    (onBack ? (
-      <button onClick={onBack}>
+    (handleBack ? (
+      <button onClick={handleBack}>
         <ArrowLeftIcon className='h-[24px] w-[24px] text-gray-950' />
       </button>
     ) : null);

@@ -93,7 +93,7 @@ export interface PlaceReviewsResponse {
   empty: boolean;
 }
 
-interface PlaceImage {
+export interface PlaceImage {
   url: string;
   sequence: number;
   representativeFlag: boolean;
@@ -118,6 +118,7 @@ export interface PlaceDetail {
   floorInfo: number | null;
   restroomInfo: string | null;
   isWished: boolean;
+  tagIds: number[];
   reviewTags: ReviewTag[];
   reviews: Review[];
 }
@@ -144,4 +145,69 @@ export interface RecommendedPlace {
   likeCount: number;
   tags: string[];
   images: string[];
+}
+
+export interface PlaceRecommendation {
+  id: number;
+  name: string;
+  category: PlaceCategory;
+  addressDetail: string;
+  regionCode: number;
+  representativeImageUrl: string;
+  latitude: number;
+  longitude: number;
+  mood: Mood;
+  spaceSize: SpaceSize;
+  isWished: boolean;
+}
+
+export interface PlaceRecommendationResponse {
+  themeType: string;
+  themeValue: string;
+  places: PlaceRecommendation[];
+}
+
+export interface PopularPlacesParams {
+  longitude: number;
+  latitude: number;
+  category: PlaceCategory;
+  radiusMeters?: number;
+}
+
+export interface SimilarPlacesParams {
+  regionCode: number;
+  category: PlaceCategory;
+  longitude: number;
+  latitude: number;
+}
+
+export interface PlaceSearchItem {
+  id: number;
+  name: string;
+  category: PlaceCategory;
+  addressDetail: string;
+  regionCode: number;
+  images: PlaceImage[];
+  latitude: number;
+  longitude: number;
+  mood: Mood;
+  spaceSize: SpaceSize;
+  wishCount: number;
+}
+
+export interface PlaceSearchResponse {
+  places: PlaceSearchItem[];
+  lastDistance: number;
+  hasNext: boolean;
+}
+
+export interface PlaceSearchParams {
+  longitude: number;
+  latitude: number;
+  category?: PlaceCategory;
+  spaceSize?: SpaceSize;
+  moods?: string;
+  regionCodes?: number[];
+  lastDistance?: number;
+  size?: number;
 }

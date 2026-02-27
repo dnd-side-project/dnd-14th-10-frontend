@@ -2,70 +2,136 @@ import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
-import { mockRegisteredPlaces } from '@/features/registered-places/model/mock-data';
+import { type PlaceSortType } from '@/entities/place/api/my-places.api';
+import { useDeletePlaceMutation } from '@/entities/place/model/use-delete-place-mutation';
+import { useMyPlacesQuery } from '@/entities/place/model/use-my-places-query';
 import EmptyRegisteredPlaces from '@/features/registered-places/ui/EmptyRegisteredPlaces';
 import SortDropdown from '@/features/registered-places/ui/SortDropdown';
+import { getErrorMessage } from '@/shared/api/error.utils';
 import ActionMenuBottomSheet from '@/shared/ui/bottom-sheet/ActionMenuBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 import PlaceListItem from '@/shared/ui/place-list-item/PlaceListItem';
 
+const MOOD_LABELS: Record<string, string> = {
+  NOISY: '시끌벅적',
+  CHATTING: '대화하기 좋은',
+  CALM: '잔잔한',
+  SILENT: '조용한',
+};
+
+const SIZE_LABELS: Record<string, string> = {
+  SMALL: '소형',
+  MEDIUM: '중형',
+  LARGE: '대형',
+};
+
 export default function RegisteredPlacesPage() {
   const [isManageSheetOpen, setIsManageSheetOpen] = useState(false);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
+  const [sortType, setSortType] = useState<PlaceSortType>('LATEST');
+
+  const { data: placesData, isLoading } = useMyPlacesQuery(sortType);
+  const deletePlaceMutation = useDeletePlaceMutation();
 
   const navigate = useNavigate();
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
-  const handleMoreClick = () => {
+  const handleMoreClick = (placeId: number) => {
+    setSelectedPlaceId(placeId);
     setIsManageSheetOpen(true);
   };
 
-  const handlePlaceClick = (placeId: string) => {
+  const handlePlaceClick = (placeId: number) => {
     navigate(`/place/${placeId}`);
   };
 
   const handleEdit = () => {
-    // TODO: 정보 수정 페이지로 이동
+    if (selectedPlaceId) {
+      navigate(`/place/${selectedPlaceId}/edit`);
+    }
     setIsManageSheetOpen(false);
   };
 
-  const handleDelete = () => {
-    // TODO: 삭제 API 호출
+  const handleDelete = async () => {
+    if (!selectedPlaceId) return;
+
     setIsManageSheetOpen(false);
+
+    try {
+      await deletePlaceMutation.mutateAsync(selectedPlaceId);
+      setSelectedPlaceId(null);
+    } catch (error) {
+      console.error('장소 삭제 실패:', getErrorMessage(error));
+      alert(`장소 삭제에 실패했습니다.\n${getErrorMessage(error)}`);
+    }
   };
 
   const handleRegisterClick = () => {
     navigate('/registration');
   };
 
-  const hasPlaces = mockRegisteredPlaces.length > 0;
+  const handleSortChange = (value: string) => {
+    setSortType(value as PlaceSortType);
+  };
+
+  const places = placesData?.content ?? [];
+  const hasPlaces = places.length > 0;
+
+  const SORT_LABELS: Record<PlaceSortType, string> = {
+    LATEST: '최신순',
+    NAME: '이름순',
+    POPULAR: '인기순',
+  };
+
+  if (isLoading) {
+    return (
+      <div className='flex min-h-screen flex-col bg-white'>
+        <NavigationBar title='등록 장소 히스토리' backPath='/my' />
+        <div className='flex flex-1 items-center justify-center'>
+          <div className='border-t-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-gray-200' />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='flex min-h-screen flex-col bg-white'>
-      <NavigationBar title='등록 장소 히스토리' onBack={handleBack} />
+      <NavigationBar title='등록 장소 히스토리' backPath='/my' />
 
       {hasPlaces ? (
         <div className='flex flex-col pt-6'>
           <div className='flex items-center justify-between px-5'>
-            <SortDropdown value='최신순' />
+            <SortDropdown
+              value={SORT_LABELS[sortType]}
+              onClick={() => {
+                const sortOptions: PlaceSortType[] = ['LATEST', 'NAME', 'POPULAR'];
+                const currentIndex = sortOptions.indexOf(sortType);
+                const nextIndex = (currentIndex + 1) % sortOptions.length;
+                handleSortChange(sortOptions[nextIndex]);
+              }}
+            />
           </div>
 
           <div className='mt-4.5 flex flex-col gap-5 px-5'>
-            {mockRegisteredPlaces.map((place) => (
-              <PlaceListItem
-                key={place.id}
-                name={place.name}
-                imageUrl={place.imageUrl}
-                likeCount={place.likeCount}
-                tags={place.tags}
-                isLiked={place.isLiked}
-                showMoreButton
-                onMoreClick={handleMoreClick}
-                onClick={() => handlePlaceClick(place.id)}
-              />
-            ))}
+            {places.map((place) => {
+              const tags = [
+                `#${MOOD_LABELS[place.mood] || place.mood}`,
+                `#${SIZE_LABELS[place.spaceSize] || place.spaceSize}`,
+              ];
+
+              return (
+                <PlaceListItem
+                  key={place.placeId}
+                  name={place.placeName}
+                  imageUrl={place.representativeImageUrl || undefined}
+                  likeCount={place.wishCount}
+                  tags={tags}
+                  isLiked={place.wished}
+                  showMoreButton
+                  onMoreClick={() => handleMoreClick(place.placeId)}
+                  onClick={() => handlePlaceClick(place.placeId)}
+                />
+              );
+            })}
           </div>
         </div>
       ) : (

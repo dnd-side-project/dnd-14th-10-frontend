@@ -1,17 +1,19 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { reviewKeys } from '@/entities/review/model/query-keys';
+
+import type { UpdateReviewRequest } from '../api/review.api';
 import { updateReview } from '../api/review.api';
 
 export const useUpdateReviewMutation = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      placeId,
-      reviewId,
-      data,
-    }: {
-      placeId: string;
-      reviewId: string;
-      data: unknown;
-    }) => updateReview(placeId, reviewId, data),
+    mutationFn: ({ reviewId, data }: { reviewId: number; data: UpdateReviewRequest }) =>
+      updateReview(reviewId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: reviewKeys.myReviews() });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.detail(variables.reviewId) });
+    },
   });
 };

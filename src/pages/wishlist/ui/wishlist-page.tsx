@@ -1,77 +1,151 @@
-import { useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
+import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
 
+import {
+  useMyWishlistsInfiniteQuery,
+  useRemoveWishlistMutation,
+  useWishCountsQueries,
+  type WishlistSortType,
+} from '@/entities/wishlist/model/use-wishlist-query';
 import SortDropdown from '@/features/registered-places/ui/SortDropdown';
-import { mockWishlistItems } from '@/features/wishlist/model/mock-data';
 import EmptyWishlist from '@/features/wishlist/ui/EmptyWishlist';
+import { getImageUrl } from '@/shared/lib/image-utils';
+import ActionMenuBottomSheet from '@/shared/ui/bottom-sheet/ActionMenuBottomSheet';
 import ConfirmBottomSheet from '@/shared/ui/bottom-sheet/ConfirmBottomSheet';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 import PlaceListItem from '@/shared/ui/place-list-item/PlaceListItem';
 
+const SORT_OPTIONS: { label: string; value: WishlistSortType }[] = [
+  { label: '최신순', value: 'latest' },
+  { label: '인기순', value: 'popularity' },
+];
+
 export default function WishlistPage() {
+  const [sortType, setSortType] = useState<WishlistSortType>('latest');
+  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
   const [isDeleteSheetOpen, setIsDeleteSheetOpen] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
 
   const navigate = useNavigate();
+  const { ref: loadMoreRef, inView } = useInView();
 
-  const handleBack = () => {
-    navigate(-1);
-  };
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useMyWishlistsInfiniteQuery(sortType);
+  const removeWishlistMutation = useRemoveWishlistMutation();
 
-  const handlePlaceClick = (item: (typeof mockWishlistItems)[0]) => {
-    if (item.isDeleted) {
-      navigate('/place-not-found', {
-        state: { buttonText: '위시리스트로 돌아가기', navigateTo: '/wishlist' },
-      });
-    } else {
-      navigate(`/place/${item.id}`);
+  const allItems = useMemo(() => data?.pages.flatMap((page) => page.content) ?? [], [data]);
+  const placeIds = useMemo(() => allItems.map((item) => item.placeId), [allItems]);
+  const wishCountsQueries = useWishCountsQueries(placeIds);
+
+  const wishCountMap = useMemo(() => {
+    const map = new Map<number, number>();
+    wishCountsQueries.forEach((query) => {
+      if (query.data) {
+        map.set(query.data.placeId, query.data.wishCount);
+      }
+    });
+    return map;
+  }, [wishCountsQueries]);
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const handleSortClick = () => {
+    setIsSortSheetOpen(true);
   };
 
-  const handleHeartClick = (itemId: string) => {
-    setSelectedItemId(itemId);
+  const handleSortSelect = (value: WishlistSortType) => {
+    setSortType(value);
+    setIsSortSheetOpen(false);
+  };
+
+  const handlePlaceClick = (placeId: number) => {
+    navigate(`/place/${placeId}`);
+  };
+
+  const handleHeartClick = (placeId: number) => {
+    setSelectedPlaceId(placeId);
     setIsDeleteSheetOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // TODO: 삭제 API 호출
-    console.log('Delete item:', selectedItemId);
+  const handleDeleteConfirm = async () => {
+    if (selectedPlaceId) {
+      try {
+        await removeWishlistMutation.mutateAsync(selectedPlaceId);
+      } catch (error) {
+        console.error('위시리스트 삭제 실패:', error);
+      }
+    }
     setIsDeleteSheetOpen(false);
-    setSelectedItemId(null);
+    setSelectedPlaceId(null);
   };
 
-  const hasItems = mockWishlistItems.length > 0;
+  const hasItems = allItems.length > 0;
+  const currentSortLabel = SORT_OPTIONS.find((opt) => opt.value === sortType)?.label ?? '최신순';
+
+  if (isLoading) {
+    return (
+      <div className='flex min-h-screen flex-col bg-white'>
+        <NavigationBar title='위시리스트' backPath='/' />
+        <div className='flex flex-1 items-center justify-center'>
+          <div className='border-t-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-gray-200' />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='flex min-h-screen flex-col bg-white'>
-      <NavigationBar title='위시리스트' onBack={handleBack} />
+      <NavigationBar title='위시리스트' backPath='/' />
 
       {hasItems ? (
         <div className='flex flex-col pt-6'>
           <div className='flex items-center justify-between px-5'>
-            <SortDropdown value='최신순' />
+            <SortDropdown value={currentSortLabel} onClick={handleSortClick} />
           </div>
 
           <div className='mt-4.5 flex flex-col gap-5 px-5'>
-            {mockWishlistItems.map((item) => (
+            {allItems.map((item) => (
               <PlaceListItem
-                key={item.id}
-                name={item.name}
-                imageUrl={item.imageUrl}
-                likeCount={item.likeCount}
-                tags={item.tags}
-                isLiked={item.isLiked}
+                key={item.wishlistId}
+                name={item.placeName}
+                imageUrl={getImageUrl(item.representativeImageKey)}
+                likeCount={wishCountMap.get(item.placeId) ?? 0}
+                tags={[item.addressDetail]}
+                isLiked={true}
                 showMoreButton={false}
-                onHeartClick={() => handleHeartClick(item.id)}
-                onClick={() => handlePlaceClick(item)}
+                onHeartClick={() => handleHeartClick(item.placeId)}
+                onClick={() => handlePlaceClick(item.placeId)}
               />
             ))}
+          </div>
+
+          <div ref={loadMoreRef} className='h-10'>
+            {isFetchingNextPage && (
+              <div className='flex justify-center py-4'>
+                <div className='border-t-primary-500 h-6 w-6 animate-spin rounded-full border-4 border-gray-200' />
+              </div>
+            )}
           </div>
         </div>
       ) : (
         <EmptyWishlist />
       )}
+
+      <ActionMenuBottomSheet
+        isOpen={isSortSheetOpen}
+        onClose={() => setIsSortSheetOpen(false)}
+        title='정렬'
+        items={SORT_OPTIONS.map((opt) => ({
+          label: opt.label,
+          onClick: () => handleSortSelect(opt.value),
+        }))}
+      />
 
       <ConfirmBottomSheet
         isOpen={isDeleteSheetOpen}

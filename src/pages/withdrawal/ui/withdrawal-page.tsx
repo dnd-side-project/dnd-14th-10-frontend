@@ -2,19 +2,24 @@ import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
+import { useWithdrawMutation } from '@/entities/user/model/use-user-mutations';
 import ConfirmStep from '@/features/withdrawal/ui/ConfirmStep';
 import OtherReasonStep from '@/features/withdrawal/ui/OtherReasonStep';
-import ReasonSelectStep, { type WithdrawalReason } from '@/features/withdrawal/ui/ReasonSelectStep';
+import ReasonSelectStep from '@/features/withdrawal/ui/ReasonSelectStep';
 import WithdrawalHeader from '@/features/withdrawal/ui/WithdrawalHeader';
+import { useAuthStore } from '@/shared/store/use-auth-store';
+import type { WithdrawReason } from '@/shared/types/user';
 import NavigationBar from '@/shared/ui/navigation-bar/NavigationBar';
 
 type WithdrawalStep = 'reason-select' | 'confirm' | 'other-reason';
 
 export default function WithdrawalPage() {
   const [step, setStep] = useState<WithdrawalStep>('reason-select');
-  const [selectedReason, setSelectedReason] = useState<WithdrawalReason | null>(null);
+  const [selectedReason, setSelectedReason] = useState<WithdrawReason | null>(null);
 
   const navigate = useNavigate();
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const withdrawMutation = useWithdrawMutation();
 
   const handleBack = () => {
     if (step === 'reason-select') {
@@ -24,25 +29,35 @@ export default function WithdrawalPage() {
     }
   };
 
-  const handleSelectReason = (reason: WithdrawalReason) => {
+  const handleSelectReason = (reason: WithdrawReason) => {
     setSelectedReason(reason);
-    if (reason === 'other') {
+    if (reason === 'OTHER') {
       setStep('other-reason');
     } else {
       setStep('confirm');
     }
   };
 
-  const handleConfirm = () => {
-    // TODO: API 호출로 회원탈퇴 처리
-    console.log('회원탈퇴 처리:', selectedReason);
-    navigate('/login');
+  const handleConfirm = async () => {
+    if (!selectedReason) return;
+
+    try {
+      await withdrawMutation.mutateAsync({ reason: selectedReason });
+      clearAuth();
+      navigate('/login');
+    } catch (error) {
+      console.error('회원탈퇴 실패:', error);
+    }
   };
 
-  const handleOtherReasonConfirm = (reason: string) => {
-    // TODO: API 호출로 회원탈퇴 처리 (기타 사유 포함)
-    console.log('회원탈퇴 처리 (기타 사유):', reason);
-    navigate('/login');
+  const handleOtherReasonConfirm = async (detail: string) => {
+    try {
+      await withdrawMutation.mutateAsync({ reason: 'OTHER', detail });
+      clearAuth();
+      navigate('/login');
+    } catch (error) {
+      console.error('회원탈퇴 실패:', error);
+    }
   };
 
   return (

@@ -1,15 +1,14 @@
+import type { WithdrawReason } from '@/shared/types/user';
 import ChevronRight from '@/shared/ui/icons/ChevronRight.svg';
 
-export type WithdrawalReason = 'not-using' | 'privacy-concern' | 'other';
-
 interface ReasonSelectStepProps {
-  onSelectReason: (reason: WithdrawalReason) => void;
+  onSelectReason: (reason: WithdrawReason) => void;
 }
 
-const WITHDRAWAL_REASONS: { id: WithdrawalReason; label: string }[] = [
-  { id: 'not-using', label: '서비스를 자주 이용하지 않아요' },
-  { id: 'privacy-concern', label: '개인정보 보호가 걱정돼요' },
-  { id: 'other', label: '기타' },
+const WITHDRAWAL_REASONS: { id: WithdrawReason; label: string }[] = [
+  { id: 'LOW_USAGE', label: '서비스를 자주 이용하지 않아요' },
+  { id: 'PRIVACY_CONCERN', label: '개인정보 보호가 걱정돼요' },
+  { id: 'OTHER', label: '기타' },
 ];
 
 export default function ReasonSelectStep({ onSelectReason }: ReasonSelectStepProps) {
