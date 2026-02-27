@@ -48,8 +48,9 @@ export const setupInterceptors = () => {
 
       const originalRequest = error.config;
 
-      // 401 에러이고 재시도하지 않은 요청인 경우
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      // 401 에러이고 재시도하지 않은 요청인 경우 (로그아웃 중이면 토큰 갱신 시도하지 않음)
+      const { isLoggingOut } = useAuthStore.getState();
+      if (error.response?.status === 401 && !originalRequest._retry && !isLoggingOut) {
         // 이미 토큰 갱신 중이면 큐에 대기
         if (isRefreshing) {
           return new Promise<string>((resolve, reject) => {

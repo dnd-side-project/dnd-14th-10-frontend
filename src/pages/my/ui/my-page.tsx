@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { useMyHistoriesQuery } from '@/entities/history/model/use-my-histories-query';
@@ -44,15 +45,18 @@ export default function MyPage() {
   };
 
   const clearAuth = useAuthStore((state) => state.clearAuth);
+  const setLoggingOut = useAuthStore((state) => state.setLoggingOut);
+  const queryClient = useQueryClient();
 
   const handleLogoutConfirm = async () => {
+    setLoggingOut(true);
     try {
       await logout();
     } catch (error) {
       console.error('로그아웃 실패:', getErrorMessage(error));
-      // 서버 에러여도 로컬 상태는 초기화
     }
     clearAuth();
+    queryClient.clear();
     setIsLogoutSheetOpen(false);
     navigate('/login');
   };
