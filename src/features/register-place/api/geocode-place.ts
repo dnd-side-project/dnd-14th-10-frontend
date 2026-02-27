@@ -101,6 +101,7 @@ export function reverseGeocodeLocationInfo(
 
       if (codeId === undefined) {
         reject(new Error('행정동 코드를 찾을 수 없습니다.'));
+        return;
       } else {
         resolve({ regionCode: parseInt(codeId, 10), sigunguName });
       }
