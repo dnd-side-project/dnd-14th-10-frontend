@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
 
 import { type PlaceSortType } from '@/entities/place/api/my-places.api';
 import { useDeletePlaceMutation } from '@/entities/place/model/use-delete-place-mutation';
-import { useMyPlacesQuery } from '@/entities/place/model/use-my-places-query';
+import { useMyPlacesInfiniteQuery } from '@/entities/place/model/use-my-places-query';
 import EmptyRegisteredPlaces from '@/features/registered-places/ui/EmptyRegisteredPlaces';
 import SortDropdown from '@/features/registered-places/ui/SortDropdown';
 import { getErrorMessage } from '@/shared/api/error.utils';
@@ -30,10 +31,18 @@ export default function RegisteredPlacesPage() {
   const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
   const [sortType, setSortType] = useState<PlaceSortType>('LATEST');
 
-  const { data: placesData, isLoading } = useMyPlacesQuery(sortType);
+  const navigate = useNavigate();
+  const { ref: loadMoreRef, inView } = useInView();
+
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useMyPlacesInfiniteQuery(sortType);
   const deletePlaceMutation = useDeletePlaceMutation();
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleMoreClick = (placeId: number) => {
     setSelectedPlaceId(placeId);
@@ -73,7 +82,7 @@ export default function RegisteredPlacesPage() {
     setSortType(value as PlaceSortType);
   };
 
-  const places = placesData?.content ?? [];
+  const places = data?.pages.flatMap((page) => page.content) ?? [];
   const hasPlaces = places.length > 0;
 
   const SORT_LABELS: Record<PlaceSortType, string> = {
@@ -132,6 +141,14 @@ export default function RegisteredPlacesPage() {
                 />
               );
             })}
+          </div>
+
+          <div ref={loadMoreRef} className='h-10'>
+            {isFetchingNextPage && (
+              <div className='flex justify-center py-4'>
+                <div className='border-t-primary-500 h-6 w-6 animate-spin rounded-full border-4 border-gray-200' />
+              </div>
+            )}
           </div>
         </div>
       ) : (

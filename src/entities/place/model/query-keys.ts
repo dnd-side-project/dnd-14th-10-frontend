@@ -12,5 +12,6 @@ export const placeKeys = {
   batch: (ids: number[]) => [...placeKeys.lists(), 'batch', ids] as const,
   reviews: (placeId: string, page: number) => [...placeKeys.all, 'reviews', placeId, page] as const,
   reviewTagStats: (placeId: string) => [...placeKeys.all, 'reviews', 'tag-stats', placeId] as const,
-  reviewRatingStats: (placeId: string) => [...placeKeys.all, 'reviews', 'rating-stats', placeId] as const,
+  reviewRatingStats: (placeId: string) =>
+    [...placeKeys.all, 'reviews', 'rating-stats', placeId] as const,
 };

@@ -7,25 +7,31 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isInitialized: boolean;
+  isLoggingOut: boolean;
 
   setAuth: (accessToken: string, user?: User) => void;
   setUser: (user: User) => void;
   clearAuth: () => void;
   setInitialized: (value: boolean) => void;
+  setLoggingOut: (value: boolean) => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   accessToken: null,
   user: null,
   isAuthenticated: false,
   isInitialized: false,
+  isLoggingOut: false,
 
-  setAuth: (accessToken, user) =>
+  setAuth: (accessToken, user) => {
+    if (get().isLoggingOut) return;
     set({
       accessToken,
       user: user ?? null,
       isAuthenticated: true,
-    }),
+      isLoggingOut: false,
+    });
+  },
 
   setUser: (user) => set({ user }),
 
@@ -37,6 +43,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     }),
 
   setInitialized: (value) => set({ isInitialized: value }),
+
+  setLoggingOut: (value) => set({ isLoggingOut: value }),
 }));
 
 if (import.meta.env.DEV) {

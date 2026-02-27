@@ -13,11 +13,11 @@ import type { PlaceSearchItem } from '@/entities/place/model/place.types';
 import { placeKeys } from '@/entities/place/model/query-keys';
 import { useBatchPlacesQuery } from '@/entities/place/model/use-batch-places-query';
 import SearchDialog from '@/features/home/ui/SearchDialog';
-import type { PlaceCategory } from '@/features/register-place/model/register-place.types';
 import {
   MOOD_OPTIONS,
   SPACE_SIZE_OPTIONS,
 } from '@/features/register-place/model/register-place.types';
+import type { PlaceCategory } from '@/shared/types/place';
 import type { MapMarker } from '@/widgets/map-viewer/ui/MapViewer';
 import { MapViewer } from '@/widgets/map-viewer/ui/MapViewer';
 import { PlaceListDrawer } from '@/widgets/place-list-drawer/ui/PlaceListDrawer';
@@ -213,7 +213,7 @@ function MapRecommendedPage() {
   const [mapState, setMapState] = useState<MapState>({
     lat: DEFAULT_LOCATION.lat,
     lng: DEFAULT_LOCATION.lng,
-    radiusMeters: 1000,
+    radiusMeters: 5000,
   });
   const [markers, setMarkers] = useState<MapMarker[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);

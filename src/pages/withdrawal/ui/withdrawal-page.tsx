@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { useWithdrawMutation } from '@/entities/user/model/use-user-mutations';
@@ -19,6 +20,8 @@ export default function WithdrawalPage() {
 
   const navigate = useNavigate();
   const clearAuth = useAuthStore((state) => state.clearAuth);
+  const setLoggingOut = useAuthStore((state) => state.setLoggingOut);
+  const queryClient = useQueryClient();
   const withdrawMutation = useWithdrawMutation();
 
   const handleBack = () => {
@@ -41,22 +44,28 @@ export default function WithdrawalPage() {
   const handleConfirm = async () => {
     if (!selectedReason) return;
 
+    setLoggingOut(true);
     try {
       await withdrawMutation.mutateAsync({ reason: selectedReason });
       clearAuth();
+      queryClient.clear();
       navigate('/login');
     } catch (error) {
       console.error('회원탈퇴 실패:', error);
+      setLoggingOut(false);
     }
   };
 
   const handleOtherReasonConfirm = async (detail: string) => {
+    setLoggingOut(true);
     try {
       await withdrawMutation.mutateAsync({ reason: 'OTHER', detail });
       clearAuth();
+      queryClient.clear();
       navigate('/login');
     } catch (error) {
       console.error('회원탈퇴 실패:', error);
+      setLoggingOut(false);
     }
   };
 

@@ -163,7 +163,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/wishlist',
-        element: <WishlistPage />,
+        element: (
+          <ProtectedRoute>
+            <WishlistPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/place-not-found',

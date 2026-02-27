@@ -4,7 +4,7 @@ import type {
   OutletScore,
   PlaceCategory,
   SpaceSize,
-} from '@/features/register-place/model/register-place.types';
+} from '@/shared/types/place';
 
 export interface Review {
   id: string;
@@ -20,7 +20,6 @@ export interface ReviewTag {
   percentage: number;
 }
 
-// 리뷰 목록 API 응답 타입
 export interface ReviewImage {
   imageId: number;
   imageUrl: string;
@@ -126,7 +125,7 @@ export interface PlaceDetail {
 export interface NearbyParams {
   lat: number;
   lng: number;
-  radius?: number; // 미터 단위 반경
+  radius?: number;
 }
 
 export interface Place {
@@ -179,6 +178,7 @@ export interface SimilarPlacesParams {
   category: PlaceCategory;
   longitude: number;
   latitude: number;
+  radiusMeters?: number;
 }
 
 export interface PlaceSearchItem {

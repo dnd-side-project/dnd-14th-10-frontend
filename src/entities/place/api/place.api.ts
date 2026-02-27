@@ -90,7 +90,7 @@ export const getPopularPlaces = async (
   return data;
 };
 
-// GET /api/places/recommendations/similar (비슷한 성향 공간 조회)
+// GET /api/places/recommendations/similar (비슷한 성향 공간 조회 - 로그인 필요)
 export const getSimilarPlaces = async (
   params: SimilarPlacesParams,
 ): Promise<PlaceRecommendation[]> => {
@@ -100,7 +100,7 @@ export const getSimilarPlaces = async (
   return data;
 };
 
-// GET /api/places/recommendations/new (주변 신규 공간 조회)
+// GET /api/places/recommendations/new (신규 공간 조회)
 export const getNewPlaces = async (params: SimilarPlacesParams): Promise<PlaceRecommendation[]> => {
   const { data } = await apiClient.get<PlaceRecommendation[]>('/places/recommendations/new', {
     params,
@@ -108,7 +108,7 @@ export const getNewPlaces = async (params: SimilarPlacesParams): Promise<PlaceRe
   return data;
 };
 
-// GET /api/places/recommendations/random-theme (랜덤 태그 추천)
+// GET /api/places/recommendations/random-theme (랜덤 테마 추천 - 비로그인용)
 export const getRandomThemePlaces = async (
   params: PopularPlacesParams,
 ): Promise<PlaceRecommendationResponse> => {

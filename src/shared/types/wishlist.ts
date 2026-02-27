@@ -1,16 +1,15 @@
-export type PlaceCategory = 'CAFE' | 'PUBLIC';
+import type { Mood, SpaceSize } from './place';
 
 export interface WishlistItemResponse {
   wishlistId: number;
   placeId: number;
   placeName: string;
-  category: PlaceCategory;
-  addressDetail: string;
-  regionCode: number;
-  representativeImageKey: string | null;
-  latitude: number;
-  longitude: number;
-  createdAt: string;
+  representativeImageUrl: string | null;
+  mood: Mood;
+  spaceSize: SpaceSize;
+  wishCount: number;
+  wished: boolean;
+  wishedAt: string;
 }
 
 export interface PagedWishlistResponse {
@@ -24,6 +23,4 @@ export interface PagedWishlistResponse {
   empty: boolean;
 }
 
-export interface WishCountResponse {
-  wishCount: number;
-}
+export type WishlistSortType = 'LATEST' | 'NAME' | 'POPULAR';

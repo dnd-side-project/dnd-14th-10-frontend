@@ -1,6 +1,4 @@
-import type { Mood, SpaceSize } from '@/features/register-place/model/register-place.types';
-
-import type { PlaceCategory } from './wishlist';
+import type { Mood, PlaceCategory, SpaceSize } from '@/shared/types/place';
 
 export interface HistoryItemResponse {
   historyId: number;

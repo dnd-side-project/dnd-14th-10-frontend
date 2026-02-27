@@ -14,7 +14,6 @@ import {
   OUTLET_SCORE_OPTIONS,
   SPACE_SIZE_OPTIONS,
 } from '@/features/register-place/model/register-place.types';
-import type { Mood } from '@/features/register-place/model/register-place.types';
 import { useToggleWishlistMutation } from '@/features/toggle-wishlist/model/use-toggle-wishlist-mutation';
 import PlaceNotFoundPage from '@/pages/place-not-found/ui/place-not-found-page';
 import calmnessCalm from '@/shared/assets/images/calm-3d.png';
@@ -22,6 +21,7 @@ import calmnessChatty from '@/shared/assets/images/chatty-3d.png';
 import calmnessNoisy from '@/shared/assets/images/noisy-3d.png';
 import calmnessSilent from '@/shared/assets/images/silent-3d.png';
 import { useAuthStore } from '@/shared/store/use-auth-store';
+import type { Mood } from '@/shared/types/place';
 import PlaceErrorBoundary from '@/shared/ui/error-boundary/PlaceErrorBoundary';
 import BuildingIcon from '@/shared/ui/icons/Building.svg?react';
 import ChevronDownIcon from '@/shared/ui/icons/ChevronDown.svg?react';
@@ -194,7 +194,6 @@ function ReviewTagBar({
   );
 }
 
-// 바 5개 + gap 포함: (32px * 5) + (gap 4px * 5) = 180px, gap 영역에서 잘려 경계선 방지
 const COLLAPSED_TAG_HEIGHT = 180;
 
 function ReviewSection({ place }: { place: PlaceDetail }) {
