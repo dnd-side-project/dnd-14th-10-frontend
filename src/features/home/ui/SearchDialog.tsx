@@ -98,7 +98,7 @@ export default function SearchDialog({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          'h-dvh w-screen max-w-[var(--width-app)] rounded-none border-none p-0',
+          'h-[calc(100dvh-48px)] w-screen max-w-[var(--width-app)] rounded-none border-none p-0',
           'fixed top-0 left-1/2 -translate-x-1/2 !translate-y-0',
           '!animate-none !duration-0',
           'data-[state=open]:!zoom-in-100 data-[state=closed]:!zoom-out-100',

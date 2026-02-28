@@ -241,7 +241,7 @@ function MapRecommendedPage() {
 
   return (
     <div className='relative h-screen w-full overflow-hidden bg-white'>
-      <div className='absolute top-0 right-0 left-0 h-[calc(30vh+92px)]'>
+      <div className='absolute top-0 right-0 left-0 h-[calc(50vh+92px)]'>
         <MapViewer
           currentLocation={DEFAULT_LOCATION}
           markers={markers}

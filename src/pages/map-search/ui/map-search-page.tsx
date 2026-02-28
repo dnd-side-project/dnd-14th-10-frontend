@@ -118,7 +118,7 @@ function PlacesContent({
 
   return (
     <>
-      <div className='absolute top-0 right-0 left-0 h-[calc(30vh+92px)]'>
+      <div className='absolute top-0 right-0 left-0 h-[calc(50vh+92px)]'>
         <MapViewer currentLocation={{ lat, lng, address }} markers={markers} />
       </div>
       <PlaceListDrawer

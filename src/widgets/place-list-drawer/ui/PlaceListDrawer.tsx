@@ -14,7 +14,7 @@ interface PlaceListDrawerProps {
   footer?: ReactNode;
 }
 
-const SNAP_POINTS = [0.7, 1];
+const SNAP_POINTS = [0.5, 1];
 
 export function PlaceListDrawer({
   open,
