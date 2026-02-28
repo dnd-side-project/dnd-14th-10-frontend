@@ -18,10 +18,12 @@ export default defineConfig(({ mode }) => {
     },
     // 빌드 최적화 설정
     build: {
-      minify: 'esbuild',
-      esbuild: {
-        // 프로덕션 빌드 시 console.log와 debugger 제거
-        drop: mode === 'production' ? ['console', 'debugger'] : [],
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+        },
       },
     },
     // 개발 서버 전용 설정 (배포 환경에서는 적용되지 않음)
