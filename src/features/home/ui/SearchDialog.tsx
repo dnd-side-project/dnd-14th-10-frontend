@@ -98,7 +98,7 @@ export default function SearchDialog({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          'h-[calc(100dvh-48px)] w-screen max-w-[var(--width-app)] rounded-none border-none p-0',
+          'h-full w-screen max-w-[var(--width-app)] overflow-auto rounded-none border-none p-0',
           'fixed top-0 left-1/2 -translate-x-1/2 !translate-y-0',
           '!animate-none !duration-0',
           'data-[state=open]:!zoom-in-100 data-[state=closed]:!zoom-out-100',
@@ -111,7 +111,7 @@ export default function SearchDialog({
           <DialogTitle>검색 필터 설정</DialogTitle>
           <DialogDescription>지역, 분위기, 크기별로 카페를 검색할 수 있습니다.</DialogDescription>
         </DialogHeader>
-        <div className='flex h-full flex-col'>
+        <div className='flex h-full flex-col overflow-auto'>
           <NavigationBar
             left={
               <button type='button' onClick={handleClose}>
