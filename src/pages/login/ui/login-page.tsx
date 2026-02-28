@@ -86,8 +86,8 @@ export default function LoginPage() {
       {/* 소셜 로그인 버튼 */}
       <div className='mt-auto mb-[100px] flex w-full flex-col gap-4'>
         <SocialButton provider='kakao' onClick={() => handleSocialLogin('kakao')} />
-        <SocialButton provider='google' onClick={() => handleSocialLogin('google')} />
-        <SocialButton provider='naver' onClick={() => handleSocialLogin('naver')} />
+        {/* <SocialButton provider='google' onClick={() => handleSocialLogin('google')} />
+        <SocialButton provider='naver' onClick={() => handleSocialLogin('naver')} /> */}
       </div>
     </div>
   );
