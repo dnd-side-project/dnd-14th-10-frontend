@@ -18,7 +18,7 @@ export function BottomCta({
 }: BottomCtaProps) {
   return (
     <div
-      className='fixed bottom-0 left-1/2 w-full max-w-[var(--width-app)] -translate-x-1/2 bg-white px-5 pt-3'
+      className='fixed inset-x-0 bottom-0 mx-auto w-full max-w-[var(--width-app)] bg-white px-5 pt-3 outline outline-2 outline-white'
       style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
     >
       <Button
