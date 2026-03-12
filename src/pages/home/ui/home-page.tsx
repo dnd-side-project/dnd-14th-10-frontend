@@ -62,7 +62,7 @@ function HomePage() {
   const toggleWishlistMutation = useToggleWishlistMutation();
 
   const isNaverLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
-  useInitCurrentLocation({ isNaverLoaded, user, isAuthenticated });
+  const { isLocationReady } = useInitCurrentLocation({ isNaverLoaded, user, isAuthenticated });
 
   const lat = useLocationStore((state) => state.lat);
   const lng = useLocationStore((state) => state.lng);
@@ -83,10 +83,13 @@ function HomePage() {
     regionCode,
   };
 
-  const popularQuery = usePopularPlacesQuery(baseParams);
-  const similarQuery = useSimilarPlacesQuery(paramsWithRegion, isAuthenticated);
-  const randomThemeQuery = useRandomThemePlacesQuery(baseParams, !isAuthenticated);
-  const newQuery = useNewPlacesQuery(paramsWithRegion);
+  const popularQuery = usePopularPlacesQuery(baseParams, isLocationReady);
+  const similarQuery = useSimilarPlacesQuery(paramsWithRegion, isLocationReady && isAuthenticated);
+  const randomThemeQuery = useRandomThemePlacesQuery(
+    baseParams,
+    isLocationReady && !isAuthenticated,
+  );
+  const newQuery = useNewPlacesQuery(paramsWithRegion, isLocationReady);
 
   const popularPlaces = useMemo(
     () => (popularQuery.data?.slice(0, MAX_ITEMS) ?? []).map(mapToPlaceItem),
@@ -163,7 +166,7 @@ function HomePage() {
         <PlaceSection
           title='인기있는 작업 공간'
           places={popularPlaces}
-          isLoading={popularQuery.isLoading}
+          isLoading={!isLocationReady || popularQuery.isLoading}
           emptyMessage='주변에 인기 공간이 없습니다'
           onMoreClick={() => handleMoreClick('popular', '인기있는 작업 공간')}
           onPlaceClick={handlePlaceClick}
@@ -176,7 +179,10 @@ function HomePage() {
         <PlaceSection
           title={recommendedTitle}
           places={recommendedPlaces}
-          isLoading={isAuthenticated ? similarQuery.isLoading : randomThemeQuery.isLoading}
+          isLoading={
+            !isLocationReady ||
+            (isAuthenticated ? similarQuery.isLoading : randomThemeQuery.isLoading)
+          }
           emptyMessage='추천 공간이 없습니다'
           onMoreClick={() =>
             handleMoreClick(isAuthenticated ? 'similar' : 'random-theme', recommendedTitle)
@@ -191,7 +197,7 @@ function HomePage() {
         <PlaceSection
           title={`${sigunguName} 주변에 새로 생겼어요`}
           places={newPlaces}
-          isLoading={newQuery.isLoading}
+          isLoading={!isLocationReady || newQuery.isLoading}
           emptyMessage='주변에 신규 공간이 없습니다'
           onMoreClick={() => handleMoreClick('new', '주변에 새로 생겼어요')}
           onPlaceClick={handlePlaceClick}

@@ -1,35 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import {
-  getNewPlaces,
-  getPopularPlaces,
-  getRandomThemePlaces,
-  getSimilarPlaces,
-} from '@/entities/place/api/place.api';
 import type { PlaceSearchItem } from '@/entities/place/model/place.types';
-import { placeKeys } from '@/entities/place/model/query-keys';
 import { useBatchPlacesQuery } from '@/entities/place/model/use-batch-places-query';
+import { useNewPlacesQuery } from '@/entities/place/model/use-new-places-query';
+import { usePopularPlacesQuery } from '@/entities/place/model/use-popular-places-query';
+import { useRandomThemePlacesQuery } from '@/entities/place/model/use-random-theme-places-query';
+import { useSimilarPlacesQuery } from '@/entities/place/model/use-similar-places-query';
 import SearchDialog from '@/features/home/ui/SearchDialog';
 import {
   MOOD_OPTIONS,
   SPACE_SIZE_OPTIONS,
 } from '@/features/register-place/model/register-place.types';
+import { useLocationStore } from '@/shared/model/use-location-store';
 import type { PlaceCategory } from '@/shared/types/place';
 import type { MapMarker } from '@/widgets/map-viewer/ui/MapViewer';
 import { MapViewer } from '@/widgets/map-viewer/ui/MapViewer';
 import { PlaceListDrawer } from '@/widgets/place-list-drawer/ui/PlaceListDrawer';
 import { PlaceListHeader } from '@/widgets/place-list-header/ui/PlaceListHeader';
-
-const DEFAULT_LOCATION = {
-  lat: 37.4979,
-  lng: 127.0276,
-  address: '서울특별시 강남구',
-};
-
-const DEFAULT_REGION_CODE = 1168000000;
 
 type RecommendationType = 'popular' | 'similar' | 'random-theme' | 'new';
 
@@ -97,28 +86,22 @@ function toPlaceCategory(value: string): PlaceCategory {
 
 interface ContentProps {
   mapState: MapState;
+  regionCode: number;
   placeCategory: PlaceCategory;
   isFilterOpen: boolean;
   onMarkersChange: (markers: MapMarker[]) => void;
 }
 
 function PopularContent({ mapState, placeCategory, isFilterOpen, onMarkersChange }: ContentProps) {
-  const { data } = useQuery({
-    queryKey: placeKeys.popular({
+  const { data } = usePopularPlacesQuery(
+    {
       latitude: mapState.lat,
       longitude: mapState.lng,
       category: placeCategory,
       radiusMeters: Math.round(mapState.radiusMeters),
-    }),
-    queryFn: () =>
-      getPopularPlaces({
-        latitude: mapState.lat,
-        longitude: mapState.lng,
-        category: placeCategory,
-        radiusMeters: Math.round(mapState.radiusMeters),
-      }),
-    placeholderData: keepPreviousData,
-  });
+    },
+    { keepPrevious: true },
+  );
 
   const ids = useMemo(() => (data ?? []).map((p) => p.id), [data]);
   return (
@@ -126,23 +109,16 @@ function PopularContent({ mapState, placeCategory, isFilterOpen, onMarkersChange
   );
 }
 
-function SimilarContent({ mapState, placeCategory, isFilterOpen, onMarkersChange }: ContentProps) {
-  const { data } = useQuery({
-    queryKey: placeKeys.similar({
-      regionCode: DEFAULT_REGION_CODE,
+function SimilarContent({ mapState, regionCode, placeCategory, isFilterOpen, onMarkersChange }: ContentProps) {
+  const { data } = useSimilarPlacesQuery(
+    {
+      regionCode,
       category: placeCategory,
       longitude: mapState.lng,
       latitude: mapState.lat,
-    }),
-    queryFn: () =>
-      getSimilarPlaces({
-        regionCode: DEFAULT_REGION_CODE,
-        category: placeCategory,
-        longitude: mapState.lng,
-        latitude: mapState.lat,
-      }),
-    placeholderData: keepPreviousData,
-  });
+    },
+    { keepPrevious: true },
+  );
 
   const ids = useMemo(() => (data ?? []).map((p) => p.id), [data]);
   return (
@@ -150,23 +126,16 @@ function SimilarContent({ mapState, placeCategory, isFilterOpen, onMarkersChange
   );
 }
 
-function NewContent({ mapState, placeCategory, isFilterOpen, onMarkersChange }: ContentProps) {
-  const { data } = useQuery({
-    queryKey: placeKeys.new({
-      regionCode: DEFAULT_REGION_CODE,
+function NewContent({ mapState, regionCode, placeCategory, isFilterOpen, onMarkersChange }: ContentProps) {
+  const { data } = useNewPlacesQuery(
+    {
+      regionCode,
       category: placeCategory,
       longitude: mapState.lng,
       latitude: mapState.lat,
-    }),
-    queryFn: () =>
-      getNewPlaces({
-        regionCode: DEFAULT_REGION_CODE,
-        category: placeCategory,
-        longitude: mapState.lng,
-        latitude: mapState.lat,
-      }),
-    placeholderData: keepPreviousData,
-  });
+    },
+    { keepPrevious: true },
+  );
 
   const ids = useMemo(() => (data ?? []).map((p) => p.id), [data]);
   return (
@@ -180,22 +149,15 @@ function RandomThemeContent({
   isFilterOpen,
   onMarkersChange,
 }: ContentProps) {
-  const { data } = useQuery({
-    queryKey: placeKeys.randomTheme({
+  const { data } = useRandomThemePlacesQuery(
+    {
       latitude: mapState.lat,
       longitude: mapState.lng,
       category: placeCategory,
       radiusMeters: Math.round(mapState.radiusMeters),
-    }),
-    queryFn: () =>
-      getRandomThemePlaces({
-        latitude: mapState.lat,
-        longitude: mapState.lng,
-        category: placeCategory,
-        radiusMeters: Math.round(mapState.radiusMeters),
-      }),
-    placeholderData: keepPreviousData,
-  });
+    },
+    { keepPrevious: true },
+  );
 
   const ids = useMemo(() => (data?.places ?? []).map((p) => p.id), [data]);
   return (
@@ -210,9 +172,19 @@ function MapRecommendedPage() {
   const placeCategory = toPlaceCategory(searchParams.get('placeCategory') || 'CAFE');
   const navigate = useNavigate();
 
+  const storeLat = useLocationStore((s) => s.lat);
+  const storeLng = useLocationStore((s) => s.lng);
+  const storeAddress = useLocationStore((s) => s.address);
+  const regionCode = useLocationStore((s) => s.regionCode);
+
+  const currentLocation = useMemo(
+    () => ({ lat: storeLat, lng: storeLng, address: storeAddress }),
+    [storeLat, storeLng, storeAddress],
+  );
+
   const [mapState, setMapState] = useState<MapState>({
-    lat: DEFAULT_LOCATION.lat,
-    lng: DEFAULT_LOCATION.lng,
+    lat: storeLat,
+    lng: storeLng,
     radiusMeters: 5000,
   });
   const [markers, setMarkers] = useState<MapMarker[]>([]);
@@ -234,6 +206,7 @@ function MapRecommendedPage() {
 
   const contentProps: ContentProps = {
     mapState,
+    regionCode,
     placeCategory,
     isFilterOpen,
     onMarkersChange: handleMarkersChange,
@@ -243,7 +216,7 @@ function MapRecommendedPage() {
     <div className='relative h-screen w-full overflow-hidden bg-white'>
       <div className='absolute top-0 right-0 left-0 h-[calc(50vh+92px)]'>
         <MapViewer
-          currentLocation={DEFAULT_LOCATION}
+          currentLocation={currentLocation}
           markers={markers}
           disableFitBounds
           onMapChange={(center, radiusMeters) =>
