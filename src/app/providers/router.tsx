@@ -173,22 +173,22 @@ export const router = createBrowserRouter([
         path: '/place-not-found',
         element: <PlaceNotFoundPage />,
       },
+      {
+        path: '/login',
+        element: <LoginPage />,
+      },
+      {
+        path: '/onboarding',
+        element: <OnboardingPage />,
+      },
+      {
+        path: '/withdrawal',
+        element: <WithdrawalPage />,
+      },
+      {
+        path: '/oauth/kakao/callback',
+        element: <OAuthKakaoCallbackPage />,
+      },
     ],
-  },
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/onboarding',
-    element: <OnboardingPage />,
-  },
-  {
-    path: '/withdrawal',
-    element: <WithdrawalPage />,
-  },
-  {
-    path: '/oauth/kakao/callback',
-    element: <OAuthKakaoCallbackPage />,
   },
 ]);

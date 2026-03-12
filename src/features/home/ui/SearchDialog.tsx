@@ -99,7 +99,6 @@ export default function SearchDialog({
       <DialogContent
         className={cn(
           'h-full w-screen max-w-[var(--width-app)] overflow-auto rounded-none border-none p-0',
-          'fixed top-0 left-1/2 -translate-x-1/2 !translate-y-0',
           '!animate-none !duration-0',
           'data-[state=open]:!zoom-in-100 data-[state=closed]:!zoom-out-100',
           'data-[state=open]:!slide-in-from-top-0 data-[state=closed]:!slide-out-to-top-0',

@@ -84,14 +84,15 @@ export function GoodPointsSection() {
               className='relative mt-4 overflow-hidden transition-[max-height] duration-300'
               style={{ maxHeight: isExpanded ? '600px' : `${COLLAPSED_HEIGHT}px` }}
             >
-              <div className='columns-2 gap-3 space-y-3'>
+              <div className='flex flex-wrap gap-3'>
                 {GOOD_POINT_TAGS.map((tag) => (
-                  <TagButton
-                    key={tag.id}
-                    label={tag.label}
-                    isSelected={field.value?.includes(tag.id) ?? false}
-                    onClick={() => handleToggle(tag.id)}
-                  />
+                  <div key={tag.id} className='w-[calc(50%-6px)]'>
+                    <TagButton
+                      label={tag.label}
+                      isSelected={field.value?.includes(tag.id) ?? false}
+                      onClick={() => handleToggle(tag.id)}
+                    />
+                  </div>
                 ))}
               </div>
 
