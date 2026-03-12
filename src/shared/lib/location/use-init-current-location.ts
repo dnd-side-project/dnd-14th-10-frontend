@@ -17,6 +17,7 @@ export function useInitCurrentLocation({ isNaverLoaded, user, isAuthenticated }:
   const [gpsState, setGpsState] = useState<'pending' | 'granted' | 'denied'>(() =>
     typeof navigator !== 'undefined' && !navigator.geolocation ? 'denied' : 'pending',
   );
+  const [isLocationReady, setIsLocationReady] = useState(false);
 
   // GPS 요청은 즉시 실행 (Naver 로드 대기 없음)
   useEffect(() => {
@@ -40,27 +41,42 @@ export function useInitCurrentLocation({ isNaverLoaded, user, isAuthenticated }:
       })
       .catch(() => {
         // 역지오코딩 실패: 기본값 유지
+      })
+      .finally(() => {
+        setIsLocationReady(true);
       });
   }, [isNaverLoaded, gpsState, setLocation]);
 
-  // GPS 거부 + 로그인 → 유저 프로필 regionCode 기반 좌표 사용
-  // GPS 거부 + 비로그인 → 기본값(강남구) 유지
+  // GPS 거부 시 처리
   useEffect(() => {
-    if (gpsState !== 'denied' || !isAuthenticated || !user?.regionCode) return;
-    const coord = getCoordinateByRegionCode(user.regionCode);
-    if (!coord) return;
+    if (gpsState !== 'denied') return;
 
-    if (isNaverLoaded) {
-      reverseGeocodeLocationInfo(coord.latitude, coord.longitude)
-        .then(({ regionCode, sigunguName }) => {
-          setLocation(coord.latitude, coord.longitude, sigunguName, regionCode, sigunguName);
-        })
-        .catch(() => {
-          setLocation(coord.latitude, coord.longitude, '', user.regionCode, '');
-        });
-    } else {
-      // Naver 로드 전: regionCode만 업데이트, sigunguName은 Naver 로드 후 위 조건에서 처리
-      setLocation(coord.latitude, coord.longitude, '', user.regionCode, '');
+    // 로그인 + regionCode 있으면 유저 프로필 기반 좌표 사용
+    if (isAuthenticated && user?.regionCode) {
+      const coord = getCoordinateByRegionCode(user.regionCode);
+      if (coord) {
+        if (isNaverLoaded) {
+          reverseGeocodeLocationInfo(coord.latitude, coord.longitude)
+            .then(({ regionCode, sigunguName }) => {
+              setLocation(coord.latitude, coord.longitude, sigunguName, regionCode, sigunguName);
+            })
+            .catch(() => {
+              setLocation(coord.latitude, coord.longitude, '', user.regionCode, '');
+            })
+            .finally(() => {
+              setIsLocationReady(true);
+            });
+          return;
+        }
+        setLocation(coord.latitude, coord.longitude, '', user.regionCode, '');
+        queueMicrotask(() => setIsLocationReady(true));
+        return;
+      }
     }
+
+    // 비로그인 또는 regionCode 없으면 기본값(강남구) 그대로 사용
+    queueMicrotask(() => setIsLocationReady(true));
   }, [gpsState, isAuthenticated, isNaverLoaded, user, setLocation]);
+
+  return { isLocationReady };
 }
