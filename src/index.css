@@ -150,9 +150,7 @@
 }
 
 body {
-  margin: 0 auto;
   min-height: 100dvh;
-  max-width: var(--width-app);
 }
 
 @layer base {
