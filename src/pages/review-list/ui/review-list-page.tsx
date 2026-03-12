@@ -39,7 +39,7 @@ function ReviewListContent({ id }: { id: string }) {
 
   return (
     <div className='min-h-screen bg-white'>
-      <NavigationBar backPath={`/place/${id}`} title={`${place.name} 리뷰`} />
+      <NavigationBar title={`${place.name} 리뷰`} />
 
       <div className='flex flex-col gap-5 p-5'>
         <div className='flex items-center justify-between'>
