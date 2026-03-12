@@ -85,7 +85,10 @@ function HomePage() {
 
   const popularQuery = usePopularPlacesQuery(baseParams, isLocationReady);
   const similarQuery = useSimilarPlacesQuery(paramsWithRegion, isLocationReady && isAuthenticated);
-  const randomThemeQuery = useRandomThemePlacesQuery(baseParams, isLocationReady && !isAuthenticated);
+  const randomThemeQuery = useRandomThemePlacesQuery(
+    baseParams,
+    isLocationReady && !isAuthenticated,
+  );
   const newQuery = useNewPlacesQuery(paramsWithRegion, isLocationReady);
 
   const popularPlaces = useMemo(
@@ -176,7 +179,10 @@ function HomePage() {
         <PlaceSection
           title={recommendedTitle}
           places={recommendedPlaces}
-          isLoading={!isLocationReady || (isAuthenticated ? similarQuery.isLoading : randomThemeQuery.isLoading)}
+          isLoading={
+            !isLocationReady ||
+            (isAuthenticated ? similarQuery.isLoading : randomThemeQuery.isLoading)
+          }
           emptyMessage='추천 공간이 없습니다'
           onMoreClick={() =>
             handleMoreClick(isAuthenticated ? 'similar' : 'random-theme', recommendedTitle)
