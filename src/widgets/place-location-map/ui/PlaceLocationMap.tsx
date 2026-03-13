@@ -11,7 +11,7 @@ export function PlaceLocationMap({ locationPoint, placeName }: PlaceLocationMapP
   const mapRef = useRef<HTMLDivElement>(null);
   const naverMapRef = useRef<naver.maps.Map | null>(null);
   const markerRef = useRef<naver.maps.Marker | null>(null);
-  const isLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+  const isLoaded = useNaverMapScript();
 
   useEffect(
     function initializeMap() {

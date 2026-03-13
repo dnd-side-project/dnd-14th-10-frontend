@@ -14,11 +14,7 @@ interface Options {
   isAuthenticated: boolean;
 }
 
-async function geocodeAndSet(
-  lat: number,
-  lng: number,
-  setLocation: (data: LocationData) => void,
-) {
+async function geocodeAndSet(lat: number, lng: number, setLocation: (data: LocationData) => void) {
   const { regionCode, sigunguName } = await reverseGeocodeLocationInfo(lat, lng);
   setLocation({ lat, lng, address: sigunguName, regionCode, sigunguName });
 }
@@ -67,9 +63,7 @@ export function useInitCurrentLocation({ isNaverLoaded, user, isAuthenticated }:
     if (gpsState !== 'denied' || !isNaverLoaded) return;
 
     const coord =
-      isAuthenticated && user?.regionCode
-        ? getCoordinateByRegionCode(user.regionCode)
-        : null;
+      isAuthenticated && user?.regionCode ? getCoordinateByRegionCode(user.regionCode) : null;
 
     if (!coord) {
       queueMicrotask(() => setIsLocationReady(true));

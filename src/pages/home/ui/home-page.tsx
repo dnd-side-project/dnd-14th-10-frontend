@@ -61,7 +61,7 @@ function HomePage() {
   const { data: user } = useUserQuery();
   const toggleWishlistMutation = useToggleWishlistMutation();
 
-  const isNaverLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+  const isNaverLoaded = useNaverMapScript();
   const { isLocationReady } = useInitCurrentLocation({ isNaverLoaded, user, isAuthenticated });
 
   const lat = useLocationStore((state) => state.lat);
