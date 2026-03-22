@@ -42,7 +42,7 @@ export const MapViewer = ({
   const naverMapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
   const hasFitOnceRef = useRef(false);
-  const isLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+  const isLoaded = useNaverMapScript();
 
   const onMapChangeRef = useRef(onMapChange);
   useEffect(() => {

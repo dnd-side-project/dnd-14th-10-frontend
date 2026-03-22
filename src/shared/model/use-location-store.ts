@@ -6,13 +6,16 @@ const DEFAULT_REGION_CODE = 1168000000; // 서울 강남구
 const DEFAULT_SIGUNGU_NAME = '강남구';
 const DEFAULT_COORD = REGION_COORDINATES[DEFAULT_REGION_CODE];
 
-interface LocationState {
+export interface LocationData {
   lat: number;
   lng: number;
   address: string;
   regionCode: number;
   sigunguName: string;
-  setLocation: (lat: number, lng: number, address: string, regionCode: number, sigunguName: string) => void;
+}
+
+interface LocationState extends LocationData {
+  setLocation: (data: LocationData) => void;
 }
 
 export const useLocationStore = create<LocationState>((set) => ({
@@ -21,6 +24,5 @@ export const useLocationStore = create<LocationState>((set) => ({
   address: DEFAULT_SIGUNGU_NAME,
   regionCode: DEFAULT_REGION_CODE,
   sigunguName: DEFAULT_SIGUNGU_NAME,
-  setLocation: (lat, lng, address, regionCode, sigunguName) =>
-    set({ lat, lng, address, regionCode, sigunguName }),
+  setLocation: (data) => set(data),
 }));
