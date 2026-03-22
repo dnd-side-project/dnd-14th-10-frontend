@@ -24,7 +24,7 @@ export function useLocationMap({
   const initialCenterRef = useRef(initialCenter);
   const showInitialMarkerRef = useRef(showInitialMarker);
 
-  const isLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+  const isLoaded = useNaverMapScript();
 
   const updateMarkerPosition = useCallback((lat: number, lng: number) => {
     if (!naverMapRef.current) return;

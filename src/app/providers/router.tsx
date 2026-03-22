@@ -7,7 +7,6 @@ import AnnouncementDetailPage from '@/pages/announcement-detail/ui/announcement-
 import BadgePage from '@/pages/badge/ui/badge-page';
 import HomePage from '@/pages/home/ui/home-page';
 import LoginPage from '@/pages/login/ui/login-page';
-import MapPage from '@/pages/map/ui/map-page';
 import MapRecommendedPage from '@/pages/map-recommended/ui/map-recommended-page';
 import MapSearchPage from '@/pages/map-search/ui/map-search-page';
 import MyPage from '@/pages/my/ui/my-page';
@@ -36,10 +35,6 @@ export const router = createBrowserRouter([
       {
         path: '/',
         element: <HomePage />,
-      },
-      {
-        path: '/map',
-        element: <MapPage />,
       },
       {
         path: '/map/recommended',

@@ -153,7 +153,7 @@ function SearchContent({
   query,
   rawDistricts,
 }: SearchContentProps) {
-  const isNaverLoaded = useNaverMapScript(import.meta.env.VITE_NAVER_CLIENT_ID);
+  const isNaverLoaded = useNaverMapScript();
   const { lat, lng, address } = useLocationStore();
 
   const districtRegionCodes = useMemo(() => parseDistrictRegionCodes(rawDistricts), [rawDistricts]);
